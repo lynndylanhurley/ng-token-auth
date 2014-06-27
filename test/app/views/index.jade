@@ -1,0 +1,25 @@
+h1 Angular.js Token Auth Demo
+
+br
+
+.text-center
+  button.btn.btn-primary(ng-click='githubLogin()') Github
+  button.btn.btn-primary(ng-click='facebookLogin()') Facebook
+  button.btn.btn-primary(ng-click='googleLogin()') Google
+
+br
+
+.text-center
+  button.btn.btn-primary(ng-click='signOut()') Sign out
+
+h2 <u>current user</u>
+
+div
+  label user
+  p {{ user.email || "none" }}
+
+  label avatar
+  p {{ user.avatar_url || "none" }}
+
+  label auth token
+  p {{ user.auth_token || "none" }}

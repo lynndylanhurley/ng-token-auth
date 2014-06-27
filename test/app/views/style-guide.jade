@@ -1,0 +1,944 @@
+.row
+  #sidenav.col-sm-3.col-md-2.hidden-xs
+    .sg-sidenav(bs-affix, role='complementary', data-offset-top='-80')
+      ul.nav.nav-stacked(bs-scrollspy-list)
+        li(data-target='#style-guide')
+          a(href='#style-guide', scoll-to)
+            span.list-header Style guide
+
+        li(data-target='#headers')
+          a(href='#headers', scroll-to) Headers
+
+        li(data-target='#text-emphasis')
+          a(href='#text-emphasis', scroll-to) Text Emphasis
+          ul.nav.nav-stacked
+            li(data-target='#text-emphasis-small-text')
+              a(href='#text-emphasis-small-text', scroll-to) Small text
+            li(data-target='#text-emphasis-bold-text')
+              a(href='#text-emphasis-bold-text', scroll-to) Bold text
+            li(data-target='#text-emphasis-italics')
+              a(href='#text-emphasis-italics', scroll-to) Italics
+
+        li(data-target='#lists')
+          a(href='#lists', scroll-to) Lists
+          ul.nav.nav-stacked
+            li(data-target='#lists-ol')
+              a(href='#lists-ol', scroll-to) Ordered list
+            li(data-target='#lists-ul')
+              a(href='#lists-ul', scroll-to) Unordered list
+
+        li(data-target='#tables')
+          a(href='#tables', scroll-to) Tables
+          ul.nav.nav-stacked
+            li(data-target='#tables-default')
+              a(href='#tables-default', scroll-to) Default
+            li(data-target='#tables-striped')
+              a(href='#tables-striped', scroll-to) Striped
+            li(data-target='#tables-bordered')
+              a(href='#tables-bordered', scroll-to) Bordered
+            li(data-target='#tables-ctx')
+              a(href='#tables-ctx', scroll-to) Contextual
+
+        li(data-target='#forms')
+          a(href='#forms', scroll-to) Forms
+          ul.nav.nav-stacked
+            li(data-target='#forms-basic')
+              a(href='#forms-basic', scroll-to) Basic
+            li(data-target='#forms-inline')
+              a(href='#forms-inline', scroll-to) Inline
+            li(data-target='#forms-horizontal')
+              a(href='#forms-horizontal', scroll-to) Horizontal
+            li(data-target='#forms-field-types')
+              a(href='#forms-field-types', scroll-to) Field types
+            li(data-target='#forms-disabled')
+              a(href='#forms-disabled', scroll-to) Disabled
+            li(data-target='#forms-validation')
+              a(href='#forms-validation', scroll-to) Validation
+
+        li(data-target='#buttons')
+          a(href='#buttons', scroll-to) Buttons
+          ul.nav.nav-stacked
+            li(data-target='#buttons-options')
+              a(href='#buttons-options', scroll-to) Options
+            li(data-target='#buttons-sizes')
+              a(href='#buttons-sizes', scroll-to) Sizes
+            li(data-target='#buttons-active')
+              a(href='#buttons-active', scroll-to) Active
+            li(data-target='#buttons-disabled')
+              a(href='#buttons-disabled', scroll-to) Disabled
+
+        li(data-target='#images')
+          a(href='#images', scroll-to) Images
+          ul.nav.nav-stacked
+            li(data-target='#images-shapes')
+              a(href='#images-shapes', scroll-to) Shapes
+
+
+        li(data-target='#components')
+          a(href='#components', scroll-to) Components
+          ul.nav.nav-stacked
+            li(data-target='#components-modals')
+              a(href='#components-modals', scroll-to) Modals
+            li(data-target='#components-asides')
+              a(href='#components-asides', scroll-to) Asides
+            li(data-target='#components-alerts')
+              a(href='#components-alerts', scroll-to) Alerts
+            li(data-target='#components-button-groups')
+              a(href='#components-button-groups', scroll-to) Button groups
+            li(data-target='#components-selects')
+              a(href='#components-selects', scroll-to) Selects
+            li(data-target='#components-datepickers')
+              a(href='#components-datepickers', scroll-to) Datepickers
+            li(data-target='#components-timepickers')
+              a(href='#components-timepickers', scroll-to) Timepickers
+            li(data-target='#components-tooltips')
+              a(href='#components-tooltips', scroll-to) Tooltips
+            li(data-target='#components-popovers')
+              a(href='#components-popovers', scroll-to) Popovers
+            li(data-target='#components-dropdowns')
+              a(href='#components-dropdowns', scroll-to) Dropdowns
+            li(data-target='#components-typeaheads')
+              a(href='#components-typeaheads', scroll-to) Typeaheads
+
+
+  #content.col-sm-9.col-md-10
+    .page-header
+      h1
+        a.anchor#style-guide
+        | Style Guide
+
+    h2
+      a.anchor#headers
+      | Headers
+
+    .sg-example
+      h1
+        | This is an h1 header
+        small &nbsp; Secondary Text
+
+      h2
+        | This is an h2 header
+        small &nbsp; Secondary Text
+
+      h3
+        | This is an h3 header
+        small &nbsp; Secondary Text
+
+      h4
+        | This is an h4 header
+        small &nbsp; Secondary Text
+
+      h5
+        | This is an h5 header
+        small &nbsp; Secondary Text
+
+      h6
+        | This is an h6 header
+        small &nbsp; Secondary Text
+
+    h2
+      a.anchor#text-emphasis
+      | Text Emphasis
+
+    h3
+      a.anchor#text-emphasis-small-text
+      Small Text
+
+    .sg-example
+      small This line of text is meant to be treated as fine print
+
+    h3
+      a.anchor#text-emphasis-bold-text
+      | Bold
+
+    .sg-example
+      = 'The following snippet is '
+      strong rendered as bold text
+
+    h3
+      a.anchor#text-emphasis-italics
+      | Italics
+
+    .sg-example
+      = 'The following snippet is '
+      em rendered as italicized text
+
+    h2
+      a.anchor#lists 
+      | Lists
+
+    h3
+      a.anchor#lists-ol 
+      | Ordered List
+
+    .sg-example
+      ol
+        li(ng-repeat='item in fakeListContent') {{ item }}
+
+    h3
+      a.anchor#lists-ul 
+      | Unordered List
+
+    .sg-example
+      ul
+        li(ng-repeat='item in fakeListContent') {{ item }}
+
+    h2
+      a.anchor#tables 
+      | Tables
+
+    h3
+      a.anchor#tables-default 
+      | Default Table
+
+    .sg-example
+      table.table.table-hover
+        thead
+          tr
+            th #
+            th First Name
+            th Last Name
+            th Email
+
+        tbody
+          tr(ng-repeat='user in fakeUsers')
+            td {{ $index }}
+            td {{ user.firstName }}
+            td {{ user.lastName }}
+            td {{ user.email }}
+
+
+    h3
+      a.anchor#tables-striped 
+      | Striped Table
+
+    .sg-example
+      table.table.table-striped.table-hover
+        thead
+          tr
+            th #
+            th First Name
+            th Last Name
+            th Email
+
+        tbody
+          tr(ng-repeat='user in fakeUsers')
+            td {{ $index }}
+            td {{ user.firstName }}
+            td {{ user.lastName }}
+            td {{ user.email }}
+
+    h3
+      a.anchor#tables-bordered 
+      | Bordered Table
+
+    .sg-example
+      table.table.table-bordered.table-hover
+        thead
+          tr
+            th #
+            th First Name
+            th Last Name
+            th Email
+
+        tbody
+          tr(ng-repeat='user in fakeUsers')
+            td {{ $index }}
+            td {{ user.firstName }}
+            td {{ user.lastName }}
+            td {{ user.email }}
+
+    h3
+      a.anchor#tables-ctx 
+      | Contextual Table Items
+
+    .sg-example
+      table.table.table-hover
+        thead
+          tr
+            th Context
+            th First Name
+            th Last Name
+            th Email
+
+        tbody
+          tr
+            td Default
+            td {{ fakeUsers[0].firstName }}
+            td {{ fakeUsers[0].lastName }}
+            td {{ fakeUsers[0].email }}
+
+          tr.active
+            td Active
+            td {{ fakeUsers[1].firstName }}
+            td {{ fakeUsers[1].lastName }}
+            td {{ fakeUsers[1].email }}
+
+          tr.success
+            td Success
+            td {{ fakeUsers[2].firstName }}
+            td {{ fakeUsers[2].lastName }}
+            td {{ fakeUsers[2].email }}
+
+          tr.warning
+            td Warning
+            td {{ fakeUsers[3].firstName }}
+            td {{ fakeUsers[3].lastName }}
+            td {{ fakeUsers[3].email }}
+
+          tr.danger
+            td Danger
+            td {{ fakeUsers[4].firstName }}
+            td {{ fakeUsers[4].lastName }}
+            td {{ fakeUsers[4].email }}
+
+          tr.info
+            td Info
+            td {{ fakeUsers[5].firstName }}
+            td {{ fakeUsers[5].lastName }}
+            td {{ fakeUsers[5].email }}
+
+    h2
+      a.anchor#forms 
+      | Forms
+
+    h3
+      a.anchor#forms-basic 
+      | Basic Form
+
+    .sg-example
+      form(role="form")
+        .form-group
+          label(for="exampleInputEmail1") Email address
+          input#exampleInputEmail1.form-control(type="email", placeholder="Enter email")
+
+        .form-group
+          label(for='emampleInputPassword1') Password
+          input#exampleInputPassword1.form-control(type='password', placeholder='Password')
+
+        .form-group
+          label(for='exampleInputFile') File input
+          input#exampleInputFile(type='file')
+          p.help-block Example block-level help text here.
+
+        .checkbox
+          label
+            input(type='checkbox')
+            | Check Me out
+
+        button.btn.btn-default(type='submit') Submit
+
+    h3
+      a.anchor#forms-inline 
+      | Inline Form
+
+    .sg-example
+      form.form-inline(role='form')
+        .form-group
+          label.sr-only(for='exampleInputEmail2') Email address
+          input#exampleInputEmail2.form-control(type='email', placeholder='Enter email')
+
+        .form-group
+          label.sr-only(for='exampleInputPassword2') Password
+          input#exampleInputPassword2.form-control(type='password', placeholder='password')
+
+        .checkbox
+          label
+            input(type='checkbox')
+            | Remember me
+
+        button.btn.btn-default(type='submit') Sign in
+
+    h3
+      a.anchor#forms-horizontal 
+      | Horizontal Form
+
+    .sg-example
+      form.form-horizontal
+        .form-group
+          label.col-sm-2.control-label(for='inputEmail3') Email
+          .col-sm-10
+            input#inputEmail3.form-control(type='email', placeholder='Email')
+
+        .form-group
+          label.col-sm-2.control-label(for='inputPassword3') Password
+          .col-sm-10
+            input#inputEmail3.form-control(type='password', placeholder='Password')
+
+        .form-group
+          .col-sm-offset-2.col-sm-10
+            .checkbox
+              label
+                input(type='checkbox')
+                | Remember me
+
+        .form-group
+          .col-sm-offset-2.col-sm-10
+            button.btn.btn-default(type='submit') Sign in
+
+
+    h3
+      a.anchor#forms-field-types 
+      | Field types
+
+    .sg-example
+      input.form-control(type='text', placeholder='Text input')
+
+    .sg-example
+      textarea.form-control(rows='3', placeholder='Text area')
+
+    .sg-example
+      .checkbox
+        label
+          input(type='checkbox')
+          = ' Checkbox 1'
+
+      .checkbox
+        label
+          input(type='checkbox')
+          = ' Checkbox 2'
+
+    .sg-example
+      .radio
+        label
+          input#optionsRadios1(value='option1', name='optionsRadios', type='radio', checked='true')
+          | Radio buttons
+
+      .radio
+        label
+          input#optionsRadios2(value='option2', name='optionsRadios', type='radio', checked='true')
+          | There can be only one
+
+    .sg-example
+      select.form-control
+        option Select box
+        option 1
+        option 2
+        option 3
+
+    .sg-example
+      select.form-control(multiple)
+        option Multi-select box
+        option Hold 'Option'
+        option To select
+        option Multiple options
+
+    h3
+      a.anchor#forms-disabled 
+      | Disabled Fieldset
+
+    .sg-example
+      form(role='form')
+        fieldset(disabled)
+          .form-group
+            label(for='disabledTextInput') Disabled input
+            input#disabledTextInput.form-control(placeholder='Disabled text input')
+
+          .form-group
+            label(for='disabledTextarea') Disabled text area
+            textarea#disabledTextarea.form-control(rows='3', placeholder='Text area')
+
+          .form-group
+            label(for='disabledSelect') Disabled select menu
+            select#disabledSelect.form-control
+              option Disabled select
+
+          .checkbox
+            label
+              input(type='checkbox')
+              | Disabled checkbox
+
+          button.btn.btn-primary(type='submit') Submit
+
+    h3
+      a.anchor#forms-validation 
+      | Validation states
+
+    .sg-example
+      .form-group.has-success.has-feedback
+        label.control-label(for='inputSuccess1') Input with success
+        input#inputSuccess1.form-control(type='text')
+        span.glyphicon.glyphicon-ok.form-control-feedback
+
+      .form-group.has-warning.has-feedback
+        label.control-label(for='inputWarning1') Input with warning
+        input#inputWarning1.form-control(type='text')
+        span.glyphicon.glyphicon-warning-sign.form-control-feedback
+
+      .form-group.has-error.has-feedback
+        label.control-label(for='inputError1') Input with error
+        input#inputError1.form-control(type='text')
+        span.glyphicon.glyphicon-remove.form-control-feedback
+
+    h2
+      a.anchor#buttons 
+      | Buttons
+
+    h3
+      a.anchor#buttons-options 
+      | Options
+
+    .sg-example
+      button.btn.btn-default(type='button') Default
+      button.btn.btn-primary(type='button') Primary
+      button.btn.btn-success(type='button') Success
+      button.btn.btn-info(type='button') Info
+      button.btn.btn-warning(type='button') Warning
+      button.btn.btn-danger(type='button') Danger
+      button.btn.btn-link(type='button') link
+
+    h3
+      a.anchor#buttons-sizes
+      | Sizes
+
+    .sg-example
+      p
+        button.btn.btn-primary.btn-lg(type='button') Large button
+        button.btn.btn-default.btn-lg(type='button') Large button
+
+      p
+        button.btn.btn-primary(type='button') Default button
+        button.btn.btn-default(type='button') Default button
+
+      p
+        button.btn.btn-primary.btn-sm(type='button') Small button
+        button.btn.btn-default.btn-sm(type='button') Small button
+
+      p
+        button.btn.btn-primary.btn-xs(type='button') Extra small button
+        button.btn.btn-default.btn-xs(type='button') Extra small button
+
+      .well(style='max-width: 400px; margin: 0 0 10px;')
+        button.btn.btn-primary.btn-lg.btn-block(type='button') Block level button
+        button.btn.btn-default.btn-lg.btn-block(type='button') Block level button
+
+
+    h3
+      a.anchor#buttons-active
+      | Active state
+
+    .sg-example
+      button.btn.btn-primary.btn-lg.active(type='button') Primary button
+      button.btn.btn-default.btn-lg.active(type='button') Button
+
+    h3
+      a.anchor#buttons-disabled
+      | Disabled state
+
+    .sg-example
+      button.btn.btn-primary.btn-lg(type='button', disabled='disabled') Primary button
+      button.btn.btn-default.btn-lg(type='button', disabled='disabled') Button
+
+    h2
+      a.anchor#images
+      | Images
+
+    h3
+      a.anchor#images-shapes
+      | Image shapes
+
+    .sg-example
+      img.img-rounded(src="http://placehold.it/150x150")
+      | &nbsp;
+      img.img-circle(src="http://placehold.it/150x150")
+      | &nbsp;
+      img.img-thumbnail(src="http://placehold.it/150x150")
+
+    h2
+      a.anchor#components
+      | Components&nbsp;
+      small (rely on javascript)
+
+    h3
+      a.anchor#components-modals
+      | Modals
+
+    .sg-example
+      button.btn.btn-lg.btn-primary(
+        data-animation='am-fade-and-scale'
+        data-placement='center'
+        bs-modal='modal'
+      )
+        | Launch Modal
+
+    h3
+      a.anchor#components-asides
+      | Asides
+
+    .sg-example
+      button.btn.btn-lg.btn-primary(bs-aside='aside')
+        | Launch Aside
+
+    h3
+      a.anchor#components-alerts
+      | Alerts
+
+    .sg-example
+      button.btn.btn-lg.btn-info(
+        bs-alert='alert'
+        data-placement='top'
+        data-container='body'
+        data-duration='1'
+      )
+        | Toggle Info Alert
+        br
+        small (top)
+
+      button.btn.btn-lg.btn-success(
+        data-placement='top-left'
+        data-container='body'
+        data-duration='1'
+        data-type='success'
+        data-title='{{alert.title}}'
+        data-content='{{alert.content}}'
+        bs-alert
+      )
+        | Toggle Success Alert
+        br
+        small (top left)
+
+      button.btn.btn-lg.btn-danger(
+        data-placement='top-right'
+        data-container='body'
+        data-duration='1'
+        data-type='danger'
+        data-title='{{alert.title}}'
+        data-content='{{alert.content}}'
+        bs-alert
+      )
+        | Toggle Danger Alert
+        br
+        small (top right)
+
+    h3
+      a.anchor#components-button-groups
+      | Button Groups
+
+    .sg-example
+      label= 'Toggle: '
+      button.btn.btn-default(type='button', ng-model='buttons.toggle', bs-checkbox) Toggle
+
+      hr
+
+      label= 'Checkboxes: '
+      .btn-group(ng-model='buttons.checkbox', bs-checkbox-group)
+        label.btn.btn-default
+          input(type='checkbox', value='left')
+          | Left
+        label.btn.btn-default
+          input(type='checkbox', value='middle')
+          | Middle
+        label.btn.btn-default
+          input(type='checkbox', value='right')
+          | Right
+
+      hr
+
+      label= 'Radios: '
+      .btn-group(ng-model='buttons.radio', bs-radio-group)
+        label.btn.btn-default
+          input.btn.btn-default(type='radio', value='0')
+          | First
+        label.btn.btn-default
+          input.btn.btn-default(type='radio', value='1')
+          | Second
+        label.btn.btn-default
+          input.btn.btn-default(type='radio', value='2')
+          | Third
+
+    h3
+      a.anchor#components-selects
+      | Selects
+
+    .sg-example
+      label= 'Single select: '
+      button.btn.btn-default(
+        type='button'
+        data-html='1'
+        ng-model='selectedIcon'
+        ng-options='icon.value as icon.label for icon in icons'
+        bs-select
+      )
+        | Action
+        span.caret
+
+      hr
+
+      label= 'Multiple select: '
+      button.btn.btn-default(
+        type='button'
+        data-html='1'
+        data-multiple='1'
+        ng-model='selectedIcons'
+        ng-options='icon.value as icon.label for icon in icons'
+        bs-select
+      )
+        | Action
+        span.caret
+
+
+    h3
+      a.anchor#components-datepickers
+      | Datepickers
+
+    .sg-example
+      form.form-inline(name='datepickerForm', role='form')
+        .form-group(ng-class="{'has-error': datePickerForm.date.$invalid}")
+          label.control-label
+            i.fa.fa-calendar
+            = ' Date '
+            small (as date)
+          input.form-control(
+            type='text'
+            ng-model='selectedDate'
+            name='date'
+            bs-datepicker
+          )
+
+        hr
+
+        .form-group(ng-class="{'has-error': datepickerForm.date2.$invalid}")
+          label.control-label
+            i.fa.fa-calendar
+            = ' Date '
+            small (as number)
+          input.form-control(
+            type='text'
+            ng-model='selectedDateAsNumber'
+            data-date-format='yyyy-MM-dd'
+            data-date-type='number'
+            data-min-date='02/10/86'
+            data-max-date='today'
+            data-autoclose='1'
+            name='date2'
+            bs-datepicker
+          )
+
+        hr
+
+        .form-group
+          label.control-label
+            i.fa.fa-calendar
+            = ' '
+            i.fa.fa-arrows-h
+            = ' '
+            i.fa.fa-calendar
+            = ' Date range '
+            small (dynamic)
+
+          .form-group
+            input.form-control(
+              type='text'
+              ng-model='fromDate'
+              data-max-date='{{untilDate}}'
+              placeholder='From'
+              bs-datepicker
+            )
+
+          .form-group
+            input.form-control(
+              type='text'
+              ng-model='untilDate'
+              data-min-date='{{fromDate}}'
+              placeholder='Until'
+              bs-datepicker
+            )
+
+    h3
+      .anchor#components-timepickers
+      | Timepickers
+
+    .sg-example
+
+      form.form-inline(name='timepickerForm', role='form')
+        .form-group(ng-class="{'has-error': timePickerForm.time.$invalid}")
+          label.control-label
+            i.fa.fa-clock-o
+            = ' Time '
+            small (as date)
+          input.form-control(
+            type='text'
+            size='8'
+            ng-model='time'
+            name='time'
+            bs-timepicker
+          )
+
+        hr
+
+        .form-group(ng-class="{'has-error': timePickerForm.time2.$invalid}")
+          label.control-label
+            i.fa.fa-clock-o
+            = ' Time '
+            small (as number)
+          input.form-control(
+            type='text'
+            size='8'
+            ng-model='selectedTimeAsNumber'
+            data-time-format='HH:mm'
+            data-time-type='number'
+            data-min-time='10:00'
+            data-max-time='13:30'
+            data-autoclose='1'
+            name='time2'
+            bs-timepicker
+          )
+
+        hr
+
+        .form-group
+          label.control-label
+            i.fa.fa-calendar
+            = ' Datetime picker '
+          .form-group
+            input.form-control(
+              type='text'
+              size='10'
+              ng-model='sharedDate'
+              data-autoclose='1'
+              placeholder='Date'
+              bs-datepicker
+            )
+          .form-group
+            input.form-control(
+              type='text'
+              size='8'
+              ng-model='sharedDate'
+              data-autoclose='1'
+              placeholder='Time'
+              bs-timepicker
+            )
+
+
+    h3
+      a.anchor#components-tooltips 
+      | Tooltips
+
+    .sg-example
+      p
+        | smart- dolphin jeans free-market euro-pop car
+        a(
+          data-animation='am-flip-x'
+          bs-tooltip='tooltip'
+          data-html='true'
+        )
+          = ' motion apophenia '
+        | market modem alcohol sprawl otaku j-pop otaku ablative.
+
+      .input-group.col-xs-5
+        .input-group-btn
+          button.btn.btn-primary(
+            type='button'
+            data-trigger='click'
+            data-type='success'
+            data-title='{{tooltip.title}}'
+            data-html='true'
+            bs-tooltip
+          )
+            | Click me
+
+        input.form-control(
+          type='text'
+          data-placement='right'
+          data-type='info'
+          data-container='body'
+          placeholder='Focus to toggle tooltip'
+          data-trigger='focus'
+          data-html='true'
+          bs-tooltip='tooltip'
+        )
+
+      .checkbox
+        label(
+          data-placement='bottom-left'
+          data-type='info'
+          data-animation='am-fade-and-scale'
+          data-html='true'
+          bs-tooltip='tooltip'
+        )
+          input(type='checkbox', ng-model='tooltip.checked')
+          | Remember me
+
+    h3
+      a.anchor#components-popovers
+      | Popovers
+
+    .sg-example
+      button.btn.btn-lg.btn-primary(
+        type='button'
+        data-placement='bottom'
+        data-animation='am-flip-x'
+        data-html='true'
+        data-trigger='focus'
+        bs-popover='popover'
+      )
+        | Click to toggle popover
+        br
+        small (bottom)
+
+
+      button.btn.btn-lg.btn-primary(
+        type='button'
+        data-placement='top-right'
+        data-animation='am-flip-x'
+        data-html='true'
+        bs-popover='popover'
+      )
+        | Click to toggle popover
+        br
+        small (top-right, sticky)
+
+
+      button.btn.btn-lg.btn-danger(
+        type='button'
+        title='{{popover.title}}'
+        content='{{popover.content}}'
+        data-animation='am-flip-x'
+        data-trigger='focus'
+        data-template='partials/style-guide/popover.html'
+        bs-popover
+      )
+        | Click to toggle popover
+        br
+        small (right, using template)
+
+    h3
+      a.anchor#components-dropdowns
+      | Dropdowns
+
+    .sg-example
+      button.btn.btn-lg.btn-primary(
+        data-animation='am-flip-x'
+        bs-dropdown='dropdown'
+        html='true'
+      )
+        | Click to toggle dropdown
+
+    h3
+      a.anchor#components-typeaheads
+      | Typeaheads
+
+    .sg-example
+      form.form-inline(role='form')
+        label
+          i.fa.fa-globe
+          | State
+        input.form-control(
+          type='text'
+          ng-model='selectedState'
+          ng-options='state for state in states'
+          placeholder='Enter state'
+          bs-typeahead
+        )
+
+        label Icon
+        input.form-control(
+          type='text'
+          ng-model='selectedIcon'
+          data-min-length='0'
+          data-html='1'
+          data-animation='am-flip-x'
+          ng-options='icon.value as icon.label for icon in icons'
+          placeholder='Enter icon'
+          bs-typeahead
+        )

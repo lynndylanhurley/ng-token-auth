@@ -1,0 +1,81 @@
+doctype html
+html.no-js
+  head
+    meta(charset='utf-8')
+    title Ng Token Auth Test
+    meta(name='description', content='')
+    meta(name='viewport', content='width=device-width, initial-scale=1.0')
+
+    base(href='/')
+    meta(name='fragment', content='!')
+    link(rel='shortcut icon', href='/favicon.ico?v=2')
+
+    // build:css /styles/main.css
+
+    // bower:css
+    // endbower
+
+    // inject:css
+    // endinject
+
+    // endbuild
+
+    // build:js /scripts/vendor/modernizr.js
+    script(src='/bower_components/modernizr/modernizr.js')
+    // endbuild
+
+  body(ng-app='ngTokenAuthTestApp', ng-controller='MainCtrl')
+    .wrap
+      .navbar.navbar-default.navbar-fixed-top(role='navigation', bs-navbar)
+        .container
+          .navbar-header
+            a.navbar-brand.text-muted(ui-sref='index') Ng Token Auth Test
+            button.navbar-toggle(
+              type='button'
+              ng-click='collapse = !collapse'
+            )
+              span.icon-bar
+              span.icon-bar
+              span.icon-bar
+
+          #top-nav-collapse.collapse.navbar-collapse(
+            ng-class='{in: collapse}'
+          )
+            ul.nav.navbar-nav
+              li(ui-sref-active='active')
+                a(ui-sref='index') Home
+              li(ui-sref-active='active')
+                a(ui-sref='style-guide') Style Guide
+
+      .container#content
+        div(ui-view)
+
+    footer#footer
+      .container
+        .text-center
+          .btn-group
+            a.btn.btn-link.btn-xs(ui-sref='terms') Terms &amp; Conditions
+
+    span#spinner(
+      us-spinner='{radius:30, width: 2, length: 16, color: "#dedede"}'
+      spinner-key='main-loading'
+    )
+
+    // build:js /scripts/vendor.js
+    // bower:js
+    // endbower
+    // endbuild
+
+    // Google Analytics: change UA-XXXXX-X to be your site's ID.
+    script.
+      (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+      function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+      e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+      e.src='//www.google-analytics.com/analytics.js';
+      r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+      ga('create','UA-XXXXX-X');ga('send','pageview');
+
+    // build:js /scripts/main.js
+    // inject:js
+    // endinject
+    // endbuild

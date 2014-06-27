@@ -1,0 +1,38 @@
+{
+  "name": "ng-token-auth-test-site",
+  "private": true,
+  "dependencies": {
+    "bootstrap-sass": "git://github.com/twbs/bootstrap-sass.git#v3.1.0",
+    "modernizr": "~2.6.2",
+    "jquery": "~1.10.2",
+    "angular-ui-router": "~0.2.10",
+    "angular": "1.3.0-beta.11",
+    "angular-strap": "~2.0.3",
+    "Faker": "~0.7.0",
+    "lodash": "~2.4.1",
+    "angular-motion": "~0.3.2",
+    "bootstrap-additions": "~0.2.2",
+    "font-awesome": "~4.0.3",
+    "angular-sanitize": "~1.2.15",
+    "angular-cookies": "~1.2.16",
+    "angular-resource": "~1.2.16",
+    "matchmedia-ng": "~1.0.2",
+    "angular-spinner": "~0.4.0",
+    "respond": "~1.4.2"
+  },
+  "devDependencies": {},
+  "overrides": {
+    "bootstrap": {
+      "ignore": true
+    },
+    "bootstrap-sass": {
+      "ignore": true
+    },
+    "Faker": {
+      "main": "Faker.js"
+    }
+  },
+  "resolutions": {
+    "angular": "1.3.0-beta.11"
+  }
+}

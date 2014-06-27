@@ -1,0 +1,52 @@
+footer-height = 60px
+header-height = 50px
+
+// sticky footer
+html, body
+  height 100%
+
+  &.loading #content
+    opacity 0
+    transition-duration 0s
+
+  .wrap
+    padding-top header-height
+    min-height 100%
+    margin-bottom -(footer-height)
+
+    &:after
+      content ""
+      display block
+      height footer-height
+
+  #footer
+    height footer-height
+
+  #content
+    opacity 1
+    transition-property opacity
+    transition-duration 0.5s
+
+
+.browsehappy
+  margin 0.2em 0
+  background #ccc
+  color #000
+  padding 0.2em 0
+
+// correct anchor links for header padding
+.anchor
+  display block
+  position relative
+  top -(header-height)
+  visibility hidden
+
+.sprite-test
+  sprite($logo)
+  margin 0 auto
+
+
+#footer
+  padding-top 19px
+  color #777
+  border-top 1px solid #e5e5e5
