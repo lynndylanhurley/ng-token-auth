@@ -7,14 +7,12 @@ angular.module('ng-token-auth', ['ngCookies'])
       emailRegistrationPath:  '/auth'
       confirmationSuccessUrl: window.location.href
       tokenValidationPath:    '/auth/validate_token'
-      useIEProxy:             false
-      authProviders:
-        github:
-          path: '/auth/github'
-        facebook:
-          path: '/auth/facebook'
-        google:
-          path: '/auth/google'
+      proxyIf:                -> false
+      proxyUrl:               '/proxy'
+      authProviderPaths:
+        github:   '/auth/github'
+        facebook: '/auth/facebook'
+        google:   '/auth/google'
 
 
     return {
@@ -81,9 +79,14 @@ angular.module('ng-token-auth', ['ngCookies'])
 
           # open external window to authentication provider
           openAuthWindow: (provider) ->
-            $window.open(config.apiUrl+config.authProviders[provider].path)
+            $window.open(config.apiUrl+config.authProviderPaths[provider])
 
 
+          # ping auth window to see if user has completed registration.
+          # recursively call this method until:
+          # 1. user completes authentication
+          # 2. user fails authentication
+          # 3. auth window is closed
           requestCredentials: (authWindow) ->
             # user has closed the external provider's auth window without
             # completing login.
@@ -93,7 +96,7 @@ angular.module('ng-token-auth', ['ngCookies'])
                 errors: ['User canceled login']
               })
 
-            # ping auth window to see if user has completed registration
+            # still awaiting user input
             else
               authWindow.postMessage("requestCredentials", "*")
               @t = $timeout((=>@requestCredentials(authWindow)), 500)
@@ -237,7 +240,7 @@ angular.module('ng-token-auth', ['ngCookies'])
           # use proxy for IE
           apiUrl: ->
             unless @_apiUrl?
-              if config.useIEProxy and navigator.sayswho.match(/IE/)
+              if config.proxyIf()
                 @_apiUrl = '/proxy'
               else
                 @_apiUrl = config.apiUrl
