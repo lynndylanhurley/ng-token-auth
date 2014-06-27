@@ -1,11 +1,13 @@
 angular.module('ng-token-auth', ['ngCookies'])
   .provider '$auth', ->
     config =
-      apiUrl:              '/api'
-      signOutUrl:          '/auth/sign_out'
-      emailSignInUrl:      '/auth/sign_in'
-      tokenValidationPath: '/auth/validate_token'
-      useIEProxy:          false
+      apiUrl:                 '/api'
+      signOutUrl:             '/auth/sign_out'
+      emailSignInPath:        '/auth/sign_in'
+      emailRegistrationPath:  '/auth'
+      confirmationSuccessUrl: window.location.href
+      tokenValidationPath:    '/auth/validate_token'
+      useIEProxy:             false
       authProviders:
         github:
           path: '/auth/github'
@@ -14,9 +16,11 @@ angular.module('ng-token-auth', ['ngCookies'])
         google:
           path: '/auth/google'
 
+
     return {
       configure: (params) ->
         angular.extend(config, params)
+
 
       $get: [
         '$http'
@@ -29,9 +33,39 @@ angular.module('ng-token-auth', ['ngCookies'])
         '$rootScope'
         ($http, $q, $location, $cookies, $cookieStore, $window, $timeout, $rootScope) =>
           token: null
-          email: null
+          uid:   null
           dfd:   null
-          user: {}
+          user:  {}
+
+
+          # register by email. server will send confirmation email
+          # containing a link to activate the account. the link will
+          # redirect to this site.
+          submitRegistration: (params) ->
+            console.log 'submitting registration', params
+            angular.extend(params, {
+              confirm_success_url: config.confirmationSuccessUrl
+            })
+            $http.post(config.apiUrl + config.emailRegistrationPath, params)
+
+
+          # capture input from user, authenticate serverside
+          submitLogin: (params) ->
+            console.log 'params', params
+            @dfd = $q.defer()
+            $http.post(config.apiUrl + config.emailSignInPath, params)
+              .success((resp) =>
+                console.log 'this', @
+                console.log 'resp', resp.data
+                @handleValidAuth(resp.data)
+              )
+              .error((resp) =>
+                @rejectDfd({
+                  reason: 'unauthorized'
+                  errors: ['Invalid credentials']
+                })
+              )
+            @dfd.promise
 
 
           # open external auth provider in separate window, send requests for
@@ -65,9 +99,10 @@ angular.module('ng-token-auth', ['ngCookies'])
               @t = $timeout((=>@requestCredentials(authWindow)), 500)
 
 
-          # this needs to happen after a reflow so that the promise
-          # can be rejected properly before it is destroyed.
+          # failed login. invalidate auth token and reject promise.
+          # defered object must be destroyed after reflow.
           rejectDfd: (reason) ->
+            @invalidateTokens()
             if @dfd?
               @dfd.reject(reason)
               $timeout((=> @dfd = null))
@@ -77,7 +112,11 @@ angular.module('ng-token-auth', ['ngCookies'])
           # can be rejected properly before it is destroyed.
           resolveDfd: ->
             @dfd.resolve({id: @user.id})
-            $timeout((=> @dfd = null), 0)
+            $timeout((=> 
+              @dfd = null
+              $rootScope.$digest()
+              console.log 'user', @user
+            ), 0)
 
           # this is something that can be returned from 'resolve' methods
           # of pages that have restricted access
@@ -85,20 +124,20 @@ angular.module('ng-token-auth', ['ngCookies'])
             unless @dfd?
               @dfd = $q.defer()
 
-              unless @token and @email and @user.id
+              unless @token and @uid and @user.id
                 # token querystring is present. user most likely just came from
                 # registration email link.
                 if $location.search().token != undefined
                   @token = $location.search().token
-                  @email = $location.search().email
+                  @uid   = $location.search().uid
 
                 # token cookie is present. user is returning to the site, or
                 # has refreshed the page.
                 else if $cookieStore.get('auth_token')
                   @token = $cookieStore.get('auth_token')
-                  @email = $cookieStore.get('auth_email')
+                  @uid   = $cookieStore.get('auth_uid')
 
-                if @token and @email
+                if @token and @uid
                   @validateToken()
 
                 # new user session. will redirect to login
@@ -109,7 +148,7 @@ angular.module('ng-token-auth', ['ngCookies'])
                   })
 
               else
-                # user is logged in
+                # user is already logged in
                 @resolveDfd()
 
             @dfd.promise
@@ -119,14 +158,13 @@ angular.module('ng-token-auth', ['ngCookies'])
           validateToken: () ->
             $http.post(config.apiUrl + config.tokenValidationPath, {
               auth_token: @token,
-              email: @email
+              uid:        @uid
             })
               .success((resp) =>
                 console.log 'validate token resp', resp
                 @handleValidAuth(resp.data)
               )
               .error((data) =>
-                @invalidateTokens()
                 @dfd.reject({
                   reason: 'unauthorized'
                   errors: ['Invalid/expired credentials']
@@ -150,42 +188,42 @@ angular.module('ng-token-auth', ['ngCookies'])
             # setting these values to null will force the validateToken method
             # to re-validate credentials with api server when validate is called
             @token = null
-            @email = null
+            @uid   = null
 
             # kill cookies, otherwise session will resume on page reload
             delete $cookies['auth_token']
-            delete $cookies['auth_email']
+            delete $cookies['auth_uid']
 
 
           # store tokens as cookies for returning users / page refresh
           persistTokens: (u)->
             @token = u.auth_token
-            @email = u.email
+            @uid   = u.uid
 
             $cookieStore.put('auth_token', @token)
-            $cookieStore.put('auth_email', @email)
+            $cookieStore.put('auth_uid', @uid)
 
             # add api token headers to all subsequent requests
             $http.defaults.headers.common['Authorization'] = @buildAuthHeader()
 
 
-          # generate auth header from auth token + user email
+          # generate auth header from auth token + user uid
           buildAuthHeader: ->
-            "token=#{@token} email=#{@email}"
+            "token=#{@token} uid=#{@uid}"
 
 
           # destroy auth token on server, destroy user auth credentials
           signOut: ->
-            $http.post(config.apiUrl + config.signOutUrl, {
-              email: @email
-              token: @auth_token
-            })
+            $http.delete(config.apiUrl + config.signOutUrl)
               .success((resp) => @invalidateTokens())
               .error((resp) => @invalidateTokens())
 
 
           handleValidAuth: (user) ->
-            _.extend @user, user
+            $timeout.cancel(@t) if @t?
+            angular.extend @user, user
+            @token = @user.auth_token
+            @uid   = @user.uid
             @persistTokens(@user)
             @resolveDfd()
 
@@ -193,7 +231,6 @@ angular.module('ng-token-auth', ['ngCookies'])
           # user closed external auth dialog. cancel authentication
           cancelAuth: ->
             $timeout.cancel(@t)
-            @invalidateTokens()
             @rejectDfd()
 
 
@@ -206,19 +243,16 @@ angular.module('ng-token-auth', ['ngCookies'])
                 @_apiUrl = config.apiUrl
 
             @_apiUrl
-
       ]
     }
 
-  .run ($auth, $timeout, $window, $rootScope) ->
-    # add listeners for external auth window communication
+  .run ($auth, $window, $rootScope) ->
+    # add listeners for communication with external auth window
     $window.addEventListener("message", (ev) =>
-      console.log 'received message', ev
-
       if ev.data.message == 'deliverCredentials'
         ev.source.close()
-        $auth.handleValidAuth(_.omit(ev.data, 'message'))
-        $rootScope.$digest()
+        delete ev.data.message
+        $auth.handleValidAuth(ev.data)
 
       if ev.data.message == 'authFailure'
         ev.source.close()
@@ -228,19 +262,15 @@ angular.module('ng-token-auth', ['ngCookies'])
     # bind global user object to auth user
     $rootScope.user = $auth.user
 
-    # shortcuts to supported providers
-    $rootScope.githubLogin = ->
-      $auth.authenticate('github')
+    # template access to authentication methods
+    $rootScope.githubLogin   = -> $auth.authenticate('github')
+    $rootScope.facebookLogin = -> $auth.authenticate('facebook')
+    $rootScope.googleLogin   = -> $auth.authenticate('google')
 
-    $rootScope.facebookLogin = ->
-      $auth.authenticate('facebook')
-
-    $rootScope.googleLogin = ->
-      $auth.authenticate('google')
-
-    # shortcut to log out method
-    $rootScope.signOut = ->
-      $auth.signOut()
+    # template access to view actions
+    $rootScope.signOut            = -> $auth.signOut()
+    $rootScope.submitRegistration = (params) -> $auth.submitRegistration(params)
+    $rootScope.submitLogin        = (params) -> $auth.submitLogin(params)
 
     # check to see if user is returning user
     $auth.validateUser()

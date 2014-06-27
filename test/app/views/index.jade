@@ -12,7 +12,63 @@ br
 .text-center
   button.btn.btn-primary(ng-click='signOut()') Sign out
 
-h2 <u>current user</u>
+
+h2 Register by email
+
+form(ng-submit='submitRegistration(registrationForm)', role='form', ng-init='registrationForm = {}')
+  .form-group
+    label email
+    input.form-control(
+      type='email'
+      name='email'
+      ng-model='registrationForm.email'
+      required
+    )
+
+  .form-group
+    label password
+    input.form-control(
+      type='password'
+      name='password'
+      ng-model='registrationForm.password'
+      required
+    )
+
+  .form-group
+    label password confirmation
+    input.form-control(
+      type='password'
+      name='password_confirmation'
+      ng-model='registrationForm.password_confirmation'
+      required
+    )
+
+  button.btn.btn-primary.btn-lg(type='submit') Register
+
+h2 Sign in by email
+
+form(ng-submit='submitLogin(loginForm)', role='form', ng-init='loginForm = {}')
+  .form-group
+    label email
+    input.form-control(
+      type='email'
+      name='email'
+      ng-model='loginForm.email'
+      required
+    )
+
+  .form-group
+    label password
+    input.form-control(
+      type='password'
+      name='password'
+      ng-model='loginForm.password'
+      required
+    )
+
+  button.btn.btn-primary.btn-lg(type='submit') Sign in
+
+h3 <u>current user</u>
 
 div
   label user
