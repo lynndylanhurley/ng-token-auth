@@ -82,9 +82,9 @@ When authenticating with a 3rd party provider, the following steps will take pla
 1. The API will send the user's info back to the client via `postMessage` event, and then close the external window.
 
 The postMessage event must include the following a parameters:
-* `message` - this must contain the value `"deliverCredentials"`
-* `auth_token` - a unique token set by your server.
-* `uid` - the id that was returned by the provider. For example, the user's facebook id, twitter id, etc.
+* **message** - this must contain the value `"deliverCredentials"`
+* **auth_token** - a unique token set by your server.
+* **uid** - the id that was returned by the provider. For example, the user's facebook id, twitter id, etc.
 
 Rails example: [controller](https://github.com/lynndylanhurley/ng-token-auth-api-rails/blob/master/app/controllers/users/auth_controller.rb#L21), [layout](https://github.com/lynndylanhurley/ng-token-auth-api-rails/blob/master/app/views/layouts/oauth_response.html.erb), [view](https://github.com/lynndylanhurley/ng-token-auth-api-rails/blob/master/app/views/users/auth/oauth_success.html.erb).
 
@@ -215,9 +215,9 @@ This module also provides support for email registration. The following diagram 
 
 Users can be registered by email using the `$auth.submitRegistration` method. This method accepts an object with the following params.
 
-* `email`
-* `password`
-* `password_confirmation`
+* **email**
+* **password**
+* **password_confirmation**
 
 The `$auth.submitRegistration` method is available to the `$rootScope`.
 
@@ -253,8 +253,8 @@ The `$auth.submitRegistration` method is available to the `$rootScope`.
 
 Once a user has completed email registration, they will be able to sign in using the `$auth.submitLogin` method. This method accepts an object with the following params.
 
-* `email`
-* `password`
+* **email**
+* **password**
 
 The `$auth.submitRegistration` method is available to the `$rootScope`.
 
