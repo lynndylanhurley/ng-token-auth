@@ -264,3 +264,23 @@ For users that signed up via email, the `$auth.submitLogin` method allows them t
   <button type="submit" class="btn btn-primary btn-lg">Sign in</button>
 </form>
 ~~~
+
+---
+
+## Development
+
+There is a test project in the test directory of this app. To start a dev server, perform the following steps.
+
+1. `cd` to the root of this project.
+1. `npm install`
+1. `cd test && bundle install`
+1. `cd ..`
+1. `gulp dev`
+
+A dev server will start on [localhost:7777](http://localhost:7777).
+
+There are more detailed instructions in `test/README.md`.
+
+## Contributing
+
+Send me a pull request. 

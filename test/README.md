@@ -48,22 +48,6 @@ This app uses the following:
 
 ---
 
-### Testing
-
-#### Unit Tests
-
-Unit tests use karma + mocha.
-
-`karma start` - runs all tests in `test/unit/**/*.coffee`
-
-#### E2E Tests
-
-E2E Tests use protractor + mocha.
-
-`gulp test:e2e` - runs all tests in `test/e2e/**/*.coffee`
-
----
-
 ### Deployment
 
 This assumes the following, where `ENV_NAME` is the name of the target `NODE_ENV` (`production`, `staging`, etc.)
