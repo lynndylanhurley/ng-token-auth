@@ -131,7 +131,7 @@ The `$auth` service is available for injection during the app's run phase.
 
 ### $auth.authenticate
 
-This method is available as part of the `$auth` service, and it is also attached to the `$rootScope` for use in templates.
+The `$auth.authenticate` method is used to authenticate using an oauth2 provider. This method takes a single argument, a string containing the name of the provider. This method opens an external window to the corresponding `authProviderPaths` value that was set in the config.  This method is also attached to the `$rootScope` for use in templates.
 
 #### Example use in a controller
 ~~~javascript
