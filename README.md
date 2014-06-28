@@ -1,8 +1,6 @@
 # Angular Token Auth
 
-## Project goals
-
-This module aims to provide a simple method of client authentication that can be configured to work with a wide variety of server stacks.
+This module aims to provide a simple method of client authentication that can be configured to work with any api.
 
 This module was built against [Rails](https://github.com/rails/rails), [devise](https://github.com/plataformatec/devise) and [omniauth](https://github.com/intridea/omniauth), but I've been able to use it with [go](http://golang.org/), [gorm](https://github.com/jinzhu/gorm) and [gomniauth](https://github.com/stretchr/gomniauth) as well. Note that none of these projects work with this module out of the box. 
 Links to server-side (Rails) code have been provided. The examples are taken from [this project](https://github.com/lynndylanhurley/ng-token-auth-api-rails), which was designed to work with this module.
@@ -80,7 +78,7 @@ The following diagram illustrates the steps necessary to authenticate a client u
 When authenticating with a 3rd party provider, the following steps will take place.
 
 1. An external window will be opened to the provider's authentication page. 
-1. Once the user signs in, they will be redirected back to api API at the callback uri that was registered with the oauth2 provider.
+1. Once the user signs in, they will be redirected back to the API at the callback uri that was registered with the oauth2 provider.
 1. The API will send the user's info back to the client via `postMessage` event, and then close the external window.
 
 The postMessage event must include the following a parameters:
