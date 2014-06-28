@@ -50,8 +50,7 @@ angular.module('myApp'), ['ng-token-auth'])
 			// this value is passed to the API for email registration.
 			// I use it to redirect after email registration, but that
 			// can also be set server-side or ignored. this is useful
-			// to me when working with APIs that have multiple 
-			// client domains.
+			// when working with APIs that have multiple client domains.
 			confirmationSuccessUrl: window.location.href,
 
 			// path for signing in using email credentials. this
@@ -60,7 +59,7 @@ angular.module('myApp'), ['ng-token-auth'])
 			
 			// older browsers have trouble with CORS. pass a method
 			// here to determine whether or not a proxy should be used.
-			// example: function() { return Modernizr.cors }
+			// example: function() { return !Modernizr.cors }
 			proxyIf: function() { return false; },
 
 			// proxy url if proxy is used
