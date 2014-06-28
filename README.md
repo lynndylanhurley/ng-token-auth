@@ -203,7 +203,7 @@ angular.module('ngTokenAuthTestApp', [
   });
 ~~~
 
-Note that this is not secure, and that any restricted content should be limited by the server as well.
+Note that this is not secure, and that any access to any restricted content should be limited by the server as well.
 
 ## Email registration
 
