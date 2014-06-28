@@ -213,7 +213,13 @@ This module also provides support for email registration. The following diagram 
 
 ### $auth.submitRegistration
 
-The `$auth.submitRegistration` method is provided to the `$rootScope` to facilitate email registraiton submission.
+Users can be registered by email using the `$auth.submitRegistration` method. This method accepts an object with the following params.
+
+* `email`
+* `password`
+* `password_confirmation`
+
+The `$auth.submitRegistration` method is available to the `$rootScope`.
 
 #### Example
 ~~~html
@@ -245,7 +251,12 @@ The `$auth.submitRegistration` method is provided to the `$rootScope` to facilit
 
 ### $auth.submitLogin
 
-For users that signed up via email, the `$auth.submitLogin` method allows them to authenticate using the email and password they used to register their account.
+Once a user has completed email registration, they will be able to sign in using the `$auth.submitLogin` method. This method accepts an object with the following params.
+
+* `email`
+* `password`
+
+The `$auth.submitRegistration` method is available to the `$rootScope`.
 
 #### Example
 
@@ -269,7 +280,7 @@ For users that signed up via email, the `$auth.submitLogin` method allows them t
 
 ## Development
 
-There is a test project in the test directory of this app. To start a dev server, perform the following steps.
+There is a test project in the `test` directory of this app. To start a dev server, perform the following steps.
 
 1. `cd` to the root of this project.
 1. `npm install`
@@ -279,8 +290,15 @@ There is a test project in the test directory of this app. To start a dev server
 
 A dev server will start on [localhost:7777](http://localhost:7777).
 
+This module was built against [this API](https://github.com/lynndylanhurley/ng-token-auth-api-rails). You can use this, or feel free to use your own.
+
 There are more detailed instructions in `test/README.md`.
 
 ## Contributing
 
-Send me a pull request. 
+Send me a pull request. I will grant you commit access if I feel like I can trust your work.
+
+## TODO
+
+* Tests. This will be difficult because test will require both an API and an oauth2 provider. I welcome suggestions on this.
+* Example site coming soon.
