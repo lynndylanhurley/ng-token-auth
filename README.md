@@ -2,7 +2,7 @@
 
 ## Project goals
 
-This module aims to provide the simplest method of client authentication while providing the best user experience, and maintaining as much flexibility as possible. 
+This module aims to provide a simple method of client authentication that can be configured to work with a wide variety of server stacks.
 
 This module was built against [Rails](https://github.com/rails/rails), [devise](https://github.com/plataformatec/devise) and [omniauth](https://github.com/intridea/omniauth), but I've been able to use it with [go](http://golang.org/), [gorm](https://github.com/jinzhu/gorm) and [gomniauth](https://github.com/stretchr/gomniauth) as well. Note that none of these projects work with this module out of the box. 
 Links to server-side (Rails) code have been provided. The examples are taken from [this project](https://github.com/lynndylanhurley/ng-token-auth-api-rails), which was designed to work with this module.
@@ -247,6 +247,8 @@ The `$auth.submitRegistration` method is provided to the `$rootScope` to facilit
 ### $auth.submitLogin
 
 For users that signed up via email, the `$auth.submitLogin` method allow them to authenticate using the email and password they used to register their account.
+
+#### Example
 
 ~~~html
 <form ng-submit="submitLogin(loginForm)" role="form" ng-init="loginForm = {}">
