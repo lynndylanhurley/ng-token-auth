@@ -8,6 +8,18 @@ Links to server-side (Rails) code have been provided. The examples are taken fro
 Token based authentication requires coordination between the client and the server. Diagrams are included to illustrate this relationship. 
 
 
+## Installation
+
+* `bower install ng-token-auth --save`
+* include `ng-token-auth` in your app.
+
+#### Example
+~~~javascript
+angular.module('myApp'), ['ng-token-auth'])
+~~~
+
+Your controllers, directives, filters etc. will now be able to inject the `$auth` service, and your config block will be able to inject the `$authProvider` provider for configuration.
+
 ## Configuration
 ### $authProvider.configure
 
