@@ -148,7 +148,7 @@ angular.module('ngTokenAuthTestApp')
 #### Example use in a template
 ~~~html
 <button ng-click="authenticate('github')">
-  Sign in with Facebook
+  Sign in with Github
 </button>
 ~~~
 
