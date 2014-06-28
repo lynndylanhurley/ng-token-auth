@@ -31,53 +31,41 @@ angular.module('myApp'), ['ng-token-auth'])
 
 	.config(function($authProvider) {
 
-		// the following uses the default values. values passed
+		// the following shows the default values. values passed
 		// to this method will extend the defaults using
 		// angular.extend
-		$authProvider.configure({
-			
-			// the base route to your api
-			apiUrl: '/api',
 
-			// object containing paths to auth endpoints.
+		$authProvider.configure({
+			apiUrl:                 '/api',
+			tokenValidationPath:    '/auth/validate_token',
+			signOutUrl:             '/auth/sign_out',
+			emailRegistrationPath:  '/auth',
+			confirmationSuccessUrl: window.location.href,
+			emailSignInPath:        '/auth/sign_in',
+			proxyIf:                function() { return false; },
+			proxyUrl:               '/proxy',
 			authProviderPaths: {
         		github:   '/auth/github',
         		facebook: '/auth/facebook',
         		google:   '/auth/google'
-			},
-
-			// path to validate authentication tokens
-			tokenValidationPath: '/auth/validate_token',
-
-			// path to sign user out. this will destroy the
-			// user's token both server-side and client-side
-			signOutUrl: '/auth/sign_out',
-
-			// path for submitting new email registrations. this
-			// will be done via a post request.
-			emailRegistrationPath: '/auth',
-			
-			// this value is passed to the API for email registration.
-			// I use it to redirect after email registration, but that
-			// can also be set server-side or ignored. this is useful
-			// when working with APIs that have multiple client domains.
-			confirmationSuccessUrl: window.location.href,
-
-			// path for signing in using email credentials. this
-			// will be done via a post request.
-			emailSignInPath: '/auth/sign_in',
-			
-			// older browsers have trouble with CORS. pass a method
-			// here to determine whether or not a proxy should be used.
-			// example: function() { return !Modernizr.cors }
-			proxyIf: function() { return false; },
-
-			// proxy url if proxy is used
-			proxyUrl: '/proxy'
+			}
 
 		});
 	});
 ~~~
+
+### Explanation
+
+* **apiUrl**: the base route to your api
+* **authProviderPaths**: an object containing paths to auth endpoints. keys are names of the providers, values are their auth paths relative to the `apiUrl`. requests to these paths will be made via POST.
+* **tokenValidationPath**: relative path to validate authentication tokens. This will happen via POST.
+* **signOutUrl**: relative path to sign user out. this will destroy the user's token both server-side and client-side. this will be done via a DELETE request
+* **emailRegistrationPath**: path for submitting new email registrations. this will be done via a POST request.
+* **confirmationSuccessUrl**: this value is passed to the API for email registration. I use it to redirect after email registration, but that can also be set server-side or ignored. this is useful when working with APIs that have multiple client domains. this will be done via GET request, and the request will contain the user's auth token and uid as params.
+* **emailSignInPath**: path for signing in using email credentials. this will be done via a POST request.
+* **proxyIf**: older browsers have trouble with CORS. pass a method here to determine whether or not a proxy should be used. example: `function() { return !Modernizr.cors }`
+* **proxyUrl**: proxy url if proxy is to be used
+
 
 ## Oauth2 authentication
 
@@ -308,9 +296,9 @@ There are more detailed instructions in `test/README.md`.
 
 ## Contributing
 
-Send me a pull request. I will grant you commit access if I feel like I can trust your work.
+Just send a pull request. You will be granted commit access if you consistently send quality pull requests.
 
 ## TODO
 
-* Tests. This will be difficult because test will require both an API and an oauth2 provider. I welcome suggestions on this.
+* Tests. This will be difficult because test will require both an API and an oauth2 provider. Please open an issue if you have any suggestions.
 * Example site coming soon.
