@@ -168,6 +168,8 @@ Rails example [here](https://github.com/lynndylanhurley/ng-token-auth-api-rails/
 
 This method returns a `$q` promise. These promises can be used to prevent users from viewing certain pages when using angular ui router resolvers.
 
+#### Example
+
 ~~~coffeescript
 angular.module('ngTokenAuthTestApp', [
   'ui.router',
@@ -245,7 +247,7 @@ The `$auth.submitRegistration` method is provided to the `$rootScope` to facilit
 
 ### $auth.submitLogin
 
-For users that signed up via email, the `$auth.submitLogin` method allow them to authenticate using the email and password they used to register their account.
+For users that signed up via email, the `$auth.submitLogin` method allows them to authenticate using the email and password they used to register their account.
 
 #### Example
 
