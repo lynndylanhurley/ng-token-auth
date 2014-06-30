@@ -198,7 +198,7 @@ The `$auth` module is available for dependency injection during your app's run p
 
   ##### Example use in a template:
   ~~~html
-  <button type="submit" class="btn btn-primary btn-lg" ng-click='signOut()'>Sign out</button>
+  <button class="btn btn-primary btn-lg" ng-click='signOut()'>Sign out</button>
   ~~~
 
 # Conceptual
