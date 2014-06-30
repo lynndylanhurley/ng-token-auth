@@ -21,7 +21,7 @@ angular.module('myApp'), ['ng-token-auth'])
 
 The `$authProvider` is available for injection during the app's configuration phase. Use `$authProvider.configure` to configure the module for use with your server.
 
-The following settings correspond to the paths that are available when using the [devise token auth](https://github.com/lynndylanhurley/devise_token_auth#usage) gem for Rails. If you're using this gem, you will need to set the `apiUrl` option.
+The following settings correspond to the paths that are available when using the [devise token auth](https://github.com/lynndylanhurley/devise_token_auth#usage) gem for Rails. If you're using this gem, you will only need to set the `apiUrl` option.
 
 ##### Example configuration when using devise token auth
 ~~~javascript
@@ -139,7 +139,7 @@ The `$auth` module is available for dependency injection during your app's run p
     });
   ~~~
 
-  Note that this is not secure, and that any access to any restricted content should be limited by the server as well.
+  Note that this is not secure, and that access to any restricted content should be limited by the server as well.
 
 * **$auth.submitRegistration**: Users can register by email using this method. [Read more](#email-registration-flow). Accepts an object with the following params:
   * **email**
