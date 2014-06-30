@@ -7,7 +7,7 @@ This module was designed to work out of the box with the [devise token auth](htt
 Token based authentication requires coordination between the client and the server. Diagrams are included to illustrate this relationship.
 
 
-## Installation
+# Installation
 
 * `bower install ng-token-auth --save`
 * include `ng-token-auth` in your app.
@@ -65,6 +65,20 @@ angular.module('myApp'), ['ng-token-auth'])
 * **proxyIf**: older browsers have trouble with CORS. pass a method here to determine whether or not a proxy should be used. example: `function() { return !Modernizr.cors }`
 * **proxyUrl**: proxy url if proxy is to be used
 
+# Usage
+
+If you're using the [devise token auth](https://github.com/lynndylanhurley/devise_token_auth) gem for Rails, just set the `apiUrl` on the `$authProvider`:
+
+~~~javascript
+angular.module('myApp'), ['ng-token-auth'])
+	.config(function($authProvider) {
+		$authProvider.configure({
+			apiUrl: 'http://api.example.com/api'
+		});
+	});
+~~~
+
+Read on to learn what is needed to build your own API for this module.
 
 ## Oauth2 authentication
 
