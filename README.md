@@ -30,9 +30,8 @@ angular.module('myApp'), ['ng-token-auth'])
 
 	.config(function($authProvider) {
 
-		// the following shows the default values. values passed
-		// to this method will extend the defaults using
-		// angular.extend
+    // the following shows the default values. values passed to this method
+    // will extend the defaults using angular.extend
 
 		$authProvider.configure({
 			apiUrl:                 '/api',
