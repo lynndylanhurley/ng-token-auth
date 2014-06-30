@@ -347,9 +347,16 @@ There are more detailed instructions in `test/README.md`.
 
 ## Contributing
 
-Just send a pull request. You will be granted commit access if you consistently send quality pull requests.
+Just send a pull request. You will be granted commit access if you send quality pull requests.
+
+Guidelines will be posted if the need arises.
 
 ## TODO
 
 * Tests. This will be difficult because test will require both an API and an oauth2 provider. Please open an issue if you have any suggestions.
 * Example site coming soon.
+
+## License
+
+This project uses the WTFPL
+
