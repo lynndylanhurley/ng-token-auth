@@ -56,23 +56,24 @@ angular.module('myApp'), ['ng-token-auth'])
 ### Config params
 
 * **apiUrl**: the base route to your api. Each of the following paths will be relative to this URL.
-* **authProviderPaths**: an object containing paths to auth endpoints. keys are names of the providers, values are their auth paths relative to the `apiUrl`. requests to these paths will be made via POST.
-* **tokenValidationPath**: relative path to validate authentication tokens. This will happen via POST.
-* **signOutUrl**: relative path to sign user out. this will destroy the user's token both server-side and client-side. this will be done via a DELETE request
-* **emailRegistrationPath**: path for submitting new email registrations. this will be done via a POST request.
-* **confirmationSuccessUrl**: this value is passed to the API for email registration. I use it to redirect after email registration, but that can also be set server-side or ignored. this is useful when working with APIs that have multiple client domains. this will be done via GET request, and the request will contain the user's auth token and uid as params.
-* **emailSignInPath**: path for signing in using email credentials. this will be done via a POST request.
+* **authProviderPaths**: an object containing paths to auth endpoints. keys are names of the providers, values are their auth paths relative to the `apiUrl`.
+* **tokenValidationPath**: relative path to validate authentication tokens.
+* **signOutUrl**: relative path to sign user out. this will destroy the user's token both server-side and client-side.
+* **emailRegistrationPath**: path for submitting new email registrations.
+* **confirmationSuccessUrl**: this value is passed to the API for email registration. I use it to redirect after email registration, but that can also be set server-side or ignored. this is useful when working with APIs that have multiple client domains.
+* **emailSignInPath**: path for signing in using email credentials.
 * **proxyIf**: older browsers have trouble with CORS. pass a method here to determine whether or not a proxy should be used. example: `function() { return !Modernizr.cors }`
 * **proxyUrl**: proxy url if proxy is to be used
 
 
-If you're using the [devise token auth](https://github.com/lynndylanhurley/devise_token_auth) gem for Rails, just set the `apiUrl` on the `$authProvider`:
+These settings correspond to the paths that are available when using the [devise token auth](https://github.com/lynndylanhurley/devise_token_auth#usage) gem for Rails. If you're using the gem, just set the `apiUrl` to your server's base auth route.
 
+##### Example configuration when using devise token auth
 ~~~javascript
 angular.module('myApp'), ['ng-token-auth'])
 	.config(function($authProvider) {
 		$authProvider.configure({
-			apiUrl: 'http://api.example.com/api'
+			apiUrl: 'http://api.example.com/auth'
 		});
 	});
 ~~~
