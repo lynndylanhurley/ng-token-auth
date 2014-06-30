@@ -79,121 +79,121 @@ The `$auth` module is available for dependency injection during your app's run p
 
 * **$auth.authenticate**: initiate on oauth2 authentication. takes 1 argument, a string that is also the name of the target provider service. This method is also added to the `$rootScope` for use in templates. [Read more](#oauth2-authentication-flow).
 
-##### Example use in a controller
-~~~javascript
-angular.module('ngTokenAuthTestApp')
-	.controller('IndexCtrl', function($auth) {
-		$scope.handleBtnClick = function() {
-			$auth.authenticate('github')
-		};
+  ##### Example use in a controller
+  ~~~javascript
+  angular.module('ngTokenAuthTestApp')
+    .controller('IndexCtrl', function($auth) {
+      $scope.handleBtnClick = function() {
+        $auth.authenticate('github')
+      };
 
-	});
-~~~
+    });
+  ~~~
 
-##### Example use in a template
-~~~html
-<button ng-click="authenticate('github')">
-  Sign in with Github
-</button>
-~~~
+  ##### Example use in a template
+  ~~~html
+  <button ng-click="authenticate('github')">
+    Sign in with Github
+  </button>
+  ~~~
 
 * **$auth.validateToken**: return a promise that will resolve if a user's auth token exists and is valid. This method does not take any arguments. [Read more](#token-validation-flow)
 
-This method is called on page load during the app's run phase so that returning users will not need to manually re-authenticate themselves.
+  This method is called on page load during the app's run phase so that returning users will not need to manually re-authenticate themselves.
 
-The promise returned by this method can be used to prevent users from viewing certain pages when using [angular ui router](https://github.com/angular-ui/ui-router) [resolvers](http://angular-ui.github.io/ui-router/site/#/api/ui.router.util.$resolve).
+  The promise returned by this method can be used to prevent users from viewing certain pages when using [angular ui router](https://github.com/angular-ui/ui-router) [resolvers](http://angular-ui.github.io/ui-router/site/#/api/ui.router.util.$resolve).
 
-##### Example using angular ui router
+  ##### Example using angular ui router
 
-~~~coffeescript
-angular.module('ngTokenAuthTestApp', [
-  'ui.router',
-  'ng-token-auth'
-])
-  .config(function($stateProvider) {
-    $stateProvider
-      // this state will be visible to everyone
-      .state('index', {
-        url: '/',
-        templateUrl: 'index.html',
-        controller: 'IndexCtrl'
-      })
+  ~~~coffeescript
+  angular.module('ngTokenAuthTestApp', [
+    'ui.router',
+    'ng-token-auth'
+  ])
+    .config(function($stateProvider) {
+      $stateProvider
+        // this state will be visible to everyone
+        .state('index', {
+          url: '/',
+          templateUrl: 'index.html',
+          controller: 'IndexCtrl'
+        })
 
-      // only authenticated users will be able to see routes that are
-      // children of this state
-      .state('admin', {
-        url: '/admin',
-        abstract: true,
-        resolve: {
-          auth: function($auth) {
-            return $auth.validateUser();
+        // only authenticated users will be able to see routes that are
+        // children of this state
+        .state('admin', {
+          url: '/admin',
+          abstract: true,
+          resolve: {
+            auth: function($auth) {
+              return $auth.validateUser();
+            }
           }
-        }
-      })
+        })
 
-      // this route will only be available to authenticated users
-      .state('admin.dashboard', {
-        url: '/dash',
-        templateUrl: '/admin/dash.html',
-        controller: 'AdminDashCtrl'
-      });
-  });
-~~~
+        // this route will only be available to authenticated users
+        .state('admin.dashboard', {
+          url: '/dash',
+          templateUrl: '/admin/dash.html',
+          controller: 'AdminDashCtrl'
+        });
+    });
+  ~~~
 
-Note that this is not secure, and that any access to any restricted content should be limited by the server as well.
+  Note that this is not secure, and that any access to any restricted content should be limited by the server as well.
 
 * **$auth.submitRegistration**: Users can register by email using this method. [Read more](#email-registration-flow). Accepts an object with the following params:
   * **email**
   * **password**
   * **password_confirmation**
 
-This method is also available in the `$rootScope` for use in templates.
+  This method is also available in the `$rootScope` for use in templates.
 
-##### Example use in a template:
+  ##### Example use in a template:
 
-~~~html
-<form ng-submit="submitRegistration(registrationForm)" role="form" ng-init="registrationForm = {}">
-  <div class="form-group">
-    <label>email</label>
-    <input type="email" name="email" ng-model="registrationForm.email" required="required" class="form-control"/>
-  </div>
+  ~~~html
+  <form ng-submit="submitRegistration(registrationForm)" role="form" ng-init="registrationForm = {}">
+    <div class="form-group">
+      <label>email</label>
+      <input type="email" name="email" ng-model="registrationForm.email" required="required" class="form-control"/>
+    </div>
 
-  <div class="form-group">
-    <label>password</label>
-    <input type="password" name="password" ng-model="registrationForm.password" required="required" class="form-control"/>
-  </div>
+    <div class="form-group">
+      <label>password</label>
+      <input type="password" name="password" ng-model="registrationForm.password" required="required" class="form-control"/>
+    </div>
 
-  <div class="form-group">
-    <label>password confirmation</label>
-    <input type="password" name="password_confirmation" ng-model="registrationForm.password_confirmation" required="required" class="form-control"/>
-  </div>
+    <div class="form-group">
+      <label>password confirmation</label>
+      <input type="password" name="password_confirmation" ng-model="registrationForm.password_confirmation" required="required" class="form-control"/>
+    </div>
 
-  <button type="submit" class="btn btn-primary btn-lg">Register</button>
-</form>
-~~~
+    <button type="submit" class="btn btn-primary btn-lg">Register</button>
+  </form>
+  ~~~
 
 * **$auth.submitEmail**: authenticate a user who has registered by email. [Read more](#email-sign-in-flow). Accepts an object with the following params:
   * **email**
   * **password**
 
-This method is also available in the `$rootScope` for use in templates.
+  This method is also available in the `$rootScope` for use in templates.
 
-##### Example use in a template:
-~~~html
-<form ng-submit="submitLogin(loginForm)" role="form" ng-init="loginForm = {}">
-  <div class="form-group">
-    <label>email</label>
-    <input type="email" name="email" ng-model="loginForm.email" required="required" class="form-control"/>
-  </div>
+  ##### Example use in a template:
+  ~~~html
+  <form ng-submit="submitLogin(loginForm)" role="form" ng-init="loginForm = {}">
+    <div class="form-group">
+      <label>email</label>
+      <input type="email" name="email" ng-model="loginForm.email" required="required" class="form-control"/>
+    </div>
 
-  <div class="form-group">
-    <label>password</label>
-    <input type="password" name="password" ng-model="loginForm.password" required="required" class="form-control"/>
-  </div>
+    <div class="form-group">
+      <label>password</label>
+      <input type="password" name="password" ng-model="loginForm.password" required="required" class="form-control"/>
+    </div>
 
-  <button type="submit" class="btn btn-primary btn-lg">Sign in</button>
-</form>
-~~~
+    <button type="submit" class="btn btn-primary btn-lg">Sign in</button>
+  </form>
+  ~~~
 
 # Conceptual
 
