@@ -289,6 +289,44 @@ The `$auth.submitRegistration` method is available to the `$rootScope`.
 </form>
 ~~~
 
+## Proxy CORS requests
+Older browsers (IE8, IE9) have trouble with CORS requests. You will need to set up a proxy if support for these browsers is required.
+
+##### Example proxy using express for node.js
+~~~javascript
+var express   = require('express');
+var request   = require('request');
+var httpProxy = require('http-proxy');
+var CONFIG    = require('config');
+
+// proxy api requests (for older IE browsers)
+app.all('/proxy/*', function(req, res, next) {
+  // transform request URL into remote URL
+  var apiUrl = 'http:'+CONFIG.API_URL+req.params[0];
+  var r = null;
+
+  // preserve GET params
+  if (req._parsedUrl.search) {
+    apiUrl += req._parsedUrl.search;
+  }
+
+  // handle POST / PUT
+  if (req.method === 'POST' || req.method === 'PUT') {
+    r = request[req.method.toLowerCase()]({
+      uri: apiUrl, 
+      json: req.body
+    });
+  } else {
+    r = request(apiUrl);
+  }
+
+  // pipe request to remote API
+  req.pipe(r).pipe(res);
+});
+~~~
+
+The above example assumes that you're using [express](http://expressjs.com/), [request](https://github.com/mikeal/request), and [http-proxy](https://github.com/nodejitsu/node-http-proxy), and that you have set the API_URL value using [node-config](https://github.com/lorenwest/node-config).
+
 ---
 
 ## Development
