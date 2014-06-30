@@ -12,17 +12,15 @@ Token based authentication requires coordination between the client and the serv
 * `bower install ng-token-auth --save`
 * include `ng-token-auth` in your app.
 
-#### Example
+##### Example module inclusion:
 ~~~javascript
 angular.module('myApp'), ['ng-token-auth'])
 ~~~
 
-Your controllers, directives, filters etc. will now be able to inject the `$auth` service, and your config block will be able to inject the `$authProvider` provider for configuration.
-
 ## Configuration
 ### $authProvider.configure
 
-The `$authProvider` is available for injection during the app's configuration phase. Configure this module for use with the API server using a `config` block. [Read more about configuring providers](https://github.com/angular/angular.js/wiki/Understanding-Dependency-Injection#configuring-providers)
+The `$authProvider` is available for injection during the app's configuration phase.
 
 The following settings correspond to the paths that are available when using the [devise token auth](https://github.com/lynndylanhurley/devise_token_auth#usage) gem for Rails. If you're using the gem, just set the `apiUrl` to your server's base auth route.
 
@@ -77,108 +75,35 @@ angular.module('myApp'), ['ng-token-auth'])
 
 # Usage
 
-**TODO**: add TLDR;
+The `$auth` module is available for dependency injection during your app's run phase (for controllers, directives, filters, etc.). The following methods are available.
 
-## Oauth2 authentication
+* **$auth.authenticate**: initiate on oauth2 authentication. takes 1 argument, a string that is also the name of the target provider service. This method is also added to the `$rootScope` for use in templates. [Read more](#oauth2-authentication-flow).
 
-### Conceptual
-
-The following diagram illustrates the steps necessary to authenticate a client using an oauth2 provider.
-
-![oauth flow](https://github.com/lynndylanhurley/ng-token-auth/raw/master/test/app/images/flow/omniauth-flow.jpg)
-
-When authenticating with a 3rd party provider, the following steps will take place.
-
-1. An external window will be opened to the provider's authentication page. 
-1. Once the user signs in, they will be redirected back to the API at the callback uri that was registered with the oauth2 provider.
-1. The API will send the user's info back to the client via `postMessage` event, and then close the external window.
-
-The postMessage event must include the following a parameters:
-* **message** - this must contain the value `"deliverCredentials"`
-* **auth_token** - a unique token set by your server.
-* **uid** - the id that was returned by the provider. For example, the user's facebook id, twitter id, etc.
-
-Rails example: [controller](https://github.com/lynndylanhurley/ng-token-auth-api-rails/blob/master/app/controllers/users/auth_controller.rb#L21), [layout](https://github.com/lynndylanhurley/ng-token-auth-api-rails/blob/master/app/views/layouts/oauth_response.html.erb), [view](https://github.com/lynndylanhurley/ng-token-auth-api-rails/blob/master/app/views/users/auth/oauth_success.html.erb).
-
-#### Example redirect_uri destination:
-
-~~~html
-<!DOCTYPE html>
-<html>
-  <head>
-    <script>
-      window.addEventListener("message", function(ev) {
-
-        // this page must respond to "requestCredentials"
-        if (ev.data === "requestCredentials") {
-
-          ev.source.postMessage({
-             message: "deliverCredentials", // required
-             auth_token: 'xxxx', // required
-             uid: 'yyyy', // required
-
-             // additional params will be added to the user object
-             name: 'Slemp Diggler'
-             // etc.
-
-          }, '*');
-
-          // close window after message is sent
-          window.close();
-        }
-      });
-    </script>
-  </head>
-  <body>
-    <pre>
-      Redirecting...
-    </pre>
-  </body>
-</html>
-~~~
-
-### Oauth2 Service methods
-
-The `$auth` service is available for injection during the app's run phase.
-
-### $auth.authenticate
-
-The `$auth.authenticate` method is used to authenticate using an oauth2 provider. This method takes a single argument, a string containing the name of the provider. This method opens an external window to the corresponding `authProviderPaths` value that was set in the config.  This method is also attached to the `$rootScope` for use in templates.
-
-#### Example use in a controller
+##### Example use in a controller
 ~~~javascript
 angular.module('ngTokenAuthTestApp')
 	.controller('IndexCtrl', function($auth) {
-
-		$auth.authenticate('github')
+		$scope.handleBtnClick = function() {
+			$auth.authenticate('github')
+		};
 
 	});
 ~~~
 
-#### Example use in a template
+##### Example use in a template
 ~~~html
 <button ng-click="authenticate('github')">
   Sign in with Github
 </button>
 ~~~
 
-## Token validation
+* **$auth.validateToken**: return a promise that will resolve if a user's auth token exists and is valid. This method does not take any arguments. [Read more](#token-validation-flow)
 
-The client's tokens are stored in cookies using the ngCookie module. This is done so that users won't need to re-authenticate each time they return to the site or refresh the page.
+This method is called on page load during the app's run phase so that returning users will not need to manually re-authenticate themselves.
 
-### Conceptual
+The promise returned by this method can be used to prevent users from viewing certain pages when using [angular ui router](https://github.com/angular-ui/ui-router) [resolvers](http://angular-ui.github.io/ui-router/site/#/api/ui.router.util.$resolve).
 
-![validation flow](https://github.com/lynndylanhurley/ng-token-auth/raw/master/test/app/images/flow/validation-flow.jpg)
-
-Rails example [here](https://github.com/lynndylanhurley/ng-token-auth-api-rails/blob/master/app/controllers/users/auth_controller.rb#L5)
-
-### $auth.validateUser
-
-`$auth.validateUser()` is called on page load during the app's run phase.
-
-This method returns a `$q` promise. These promises can be used to prevent users from viewing certain pages when using angular ui router resolvers.
-
-#### Example
+##### Example using angular ui router
 
 ~~~coffeescript
 angular.module('ngTokenAuthTestApp', [
@@ -217,23 +142,15 @@ angular.module('ngTokenAuthTestApp', [
 
 Note that this is not secure, and that any access to any restricted content should be limited by the server as well.
 
-## Email registration
+* **$auth.submitRegistration**: Users can register by email using this method. [Read more](#email-registration-flow). Accepts an object with the following params:
+  * **email**
+  * **password**
+  * **password_confirmation**
 
-This module also provides support for email registration. The following diagram illustrates this process.
+This method is also available in the `$rootScope` for use in templates.
 
-![email registration flow](https://github.com/lynndylanhurley/ng-token-auth/raw/master/test/app/images/flow/email-registration-flow.jpg)
+##### Example use in a template:
 
-### $auth.submitRegistration
-
-Users can be registered by email using the `$auth.submitRegistration` method. This method accepts an object with the following params.
-
-* **email**
-* **password**
-* **password_confirmation**
-
-The `$auth.submitRegistration` method is available to the `$rootScope`.
-
-#### Example
 ~~~html
 <form ng-submit="submitRegistration(registrationForm)" role="form" ng-init="registrationForm = {}">
   <div class="form-group">
@@ -255,23 +172,13 @@ The `$auth.submitRegistration` method is available to the `$rootScope`.
 </form>
 ~~~
 
-## Email sign in
+* **$auth.submitEmail**: authenticate a user who has registered by email. [Read more](#email-sign-in-flow). Accepts an object with the following params:
+  * **email**
+  * **password**
 
-### Conceptual
+This method is also available in the `$rootScope` for use in templates.
 
-![email sign in flow](https://github.com/lynndylanhurley/ng-token-auth/raw/master/test/app/images/flow/email-sign-in-flow.jpg)
-
-### $auth.submitLogin
-
-Once a user has completed email registration, they will be able to sign in using the `$auth.submitLogin` method. This method accepts an object with the following params.
-
-* **email**
-* **password**
-
-The `$auth.submitRegistration` method is available to the `$rootScope`.
-
-#### Example
-
+##### Example use in a template:
 ~~~html
 <form ng-submit="submitLogin(loginForm)" role="form" ng-init="loginForm = {}">
   <div class="form-group">
@@ -288,7 +195,84 @@ The `$auth.submitRegistration` method is available to the `$rootScope`.
 </form>
 ~~~
 
-## Identifying users on the server.
+# Conceptual
+
+## Oauth2 authentication flow
+
+The following diagram illustrates the steps necessary to authenticate a client using an oauth2 provider.
+
+![oauth flow](https://github.com/lynndylanhurley/ng-token-auth/raw/master/test/app/images/flow/omniauth-flow.jpg)
+
+When authenticating with a 3rd party provider, the following steps will take place.
+
+1. An external window will be opened to the provider's authentication page. 
+1. Once the user signs in, they will be redirected back to the API at the callback uri that was registered with the oauth2 provider.
+1. The API will send the user's info back to the client via `postMessage` event, and then close the external window.
+
+The postMessage event must include the following a parameters:
+* **message** - this must contain the value `"deliverCredentials"`
+* **auth_token** - a unique token set by your server.
+* **uid** - the id that was returned by the provider. For example, the user's facebook id, twitter id, etc.
+
+Rails example: [controller](https://github.com/lynndylanhurley/ng-token-auth-api-rails/blob/master/app/controllers/users/auth_controller.rb#L21), [layout](https://github.com/lynndylanhurley/ng-token-auth-api-rails/blob/master/app/views/layouts/oauth_response.html.erb), [view](https://github.com/lynndylanhurley/ng-token-auth-api-rails/blob/master/app/views/users/auth/oauth_success.html.erb).
+
+##### Example redirect_uri destination:
+
+~~~html
+<!DOCTYPE html>
+<html>
+  <head>
+    <script>
+      window.addEventListener("message", function(ev) {
+
+        // this page must respond to "requestCredentials"
+        if (ev.data === "requestCredentials") {
+
+          ev.source.postMessage({
+             message: "deliverCredentials", // required
+             auth_token: 'xxxx', // required
+             uid: 'yyyy', // required
+
+             // additional params will be added to the user object
+             name: 'Slemp Diggler'
+             // etc.
+
+          }, '*');
+
+          // close window after message is sent
+          window.close();
+        }
+      });
+    </script>
+  </head>
+  <body>
+    <pre>
+      Redirecting...
+    </pre>
+  </body>
+</html>
+~~~
+
+## Token validation flow
+
+The client's tokens are stored in cookies using the ngCookie module. This is done so that users won't need to re-authenticate each time they return to the site or refresh the page.
+
+![validation flow](https://github.com/lynndylanhurley/ng-token-auth/raw/master/test/app/images/flow/validation-flow.jpg)
+
+Rails example [here](https://github.com/lynndylanhurley/ng-token-auth-api-rails/blob/master/app/controllers/users/auth_controller.rb#L5)
+
+
+## Email registration flow
+
+This module also provides support for email registration. The following diagram illustrates this process.
+
+![email registration flow](https://github.com/lynndylanhurley/ng-token-auth/raw/master/test/app/images/flow/email-registration-flow.jpg)
+
+## Email sign in flow
+
+![email sign in flow](https://github.com/lynndylanhurley/ng-token-auth/raw/master/test/app/images/flow/email-sign-in-flow.jpg)
+
+# Identifying users on the server.
 
 The user's authentication information is included by the client in the `Authorization` header of each request. If you're using the [devise token auth](https://github.com/lynndylanhurley/devise_token_auth) gem, the header must follow this format:
 
@@ -303,8 +287,8 @@ This will all happen by default when using this module.
 **Note**: If you require a different authorization header format, post an issue. I will make it a configuration option if there is a demand.
 
 
-## Proxy CORS requests
-Shit browsers (IE8, IE9) have trouble with CORS requests. You will need to set up a proxy to support them.
+# Proxy CORS requests
+Older browsers (IE8, IE9) have trouble with CORS requests. You will need to set up a proxy to support them.
 
 ##### Example proxy using express for node.js
 ~~~javascript
@@ -343,7 +327,7 @@ The above example assumes that you're using [express](http://expressjs.com/), [r
 
 ---
 
-## Development
+# Development
 
 There is a test project in the `test` directory of this app. To start a dev server, perform the following steps.
 
@@ -359,18 +343,18 @@ This module was built against [this API](https://github.com/lynndylanhurley/ng-t
 
 There are more detailed instructions in `test/README.md`.
 
-## Contributing
+# Contributing
 
 Just send a pull request. You will be granted commit access if you send quality pull requests.
 
 Guidelines will be posted if the need arises.
 
-## TODO
+# TODO
 
 * Tests. This will be difficult because test will require both an API and an oauth2 provider. Please open an issue if you have any suggestions.
 * Example site coming soon.
 
-## License
+# License
 
 This project uses the WTFPL
 
