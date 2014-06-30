@@ -12,7 +12,7 @@ angular.module('ng-token-auth', ['ngCookies'])
       authProviderPaths:
         github:   '/auth/github'
         facebook: '/auth/facebook'
-        google:   '/auth/google'
+        google:   '/auth/google_oauth2'
 
 
     return {
@@ -115,7 +115,7 @@ angular.module('ng-token-auth', ['ngCookies'])
           # can be rejected properly before it is destroyed.
           resolveDfd: ->
             @dfd.resolve({id: @user.id})
-            $timeout((=> 
+            $timeout((=>
               @dfd = null
               $rootScope.$digest()
               console.log 'user', @user

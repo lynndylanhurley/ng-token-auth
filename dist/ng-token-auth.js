@@ -7,17 +7,14 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
     emailRegistrationPath: '/auth',
     confirmationSuccessUrl: window.location.href,
     tokenValidationPath: '/auth/validate_token',
-    useIEProxy: false,
-    authProviders: {
-      github: {
-        path: '/auth/github'
-      },
-      facebook: {
-        path: '/auth/facebook'
-      },
-      google: {
-        path: '/auth/google'
-      }
+    proxyIf: function() {
+      return false;
+    },
+    proxyUrl: '/proxy',
+    authProviderPaths: {
+      github: '/auth/github',
+      facebook: '/auth/facebook',
+      google: '/auth/google_oauth2'
     }
   };
   return {
@@ -68,7 +65,7 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
               return this.dfd;
             },
             openAuthWindow: function(provider) {
-              return $window.open(config.apiUrl + config.authProviders[provider].path);
+              return $window.open(config.apiUrl + config.authProviderPaths[provider]);
             },
             requestCredentials: function(authWindow) {
               if (authWindow.closed) {
@@ -203,7 +200,7 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
             },
             apiUrl: function() {
               if (this._apiUrl == null) {
-                if (config.useIEProxy && navigator.sayswho.match(/IE/)) {
+                if (config.proxyIf()) {
                   this._apiUrl = '/proxy';
                 } else {
                   this._apiUrl = config.apiUrl;

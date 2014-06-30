@@ -18,7 +18,7 @@ angular.module('ngTokenAuthTestApp', [
     $urlRouterProvider.otherwise('/404')
 
     $authProvider.configure({
-      apiUrl: '//ng-token-auth-api-rails.dev'
+      apiUrl: '//localhost:3000'
     })
 
     console.log '@-->auth config', $authProvider

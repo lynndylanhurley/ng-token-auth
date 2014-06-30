@@ -2,10 +2,9 @@
 
 This module aims to provide a simple method of client authentication that can be configured to work with any api.
 
-This module was built against [Rails](https://github.com/rails/rails), [devise](https://github.com/plataformatec/devise) and [omniauth](https://github.com/intridea/omniauth), but I've been able to use it with [go](http://golang.org/), [gorm](https://github.com/jinzhu/gorm) and [gomniauth](https://github.com/stretchr/gomniauth) as well. Note that none of these projects work with this module out of the box. 
-Links to server-side (Rails) code have been provided. The examples are taken from [this project](https://github.com/lynndylanhurley/ng-token-auth-api-rails), which was designed to work with this module.
+This module was designed to work out of the box with the [devise token auth](https://github.com/lynndylanhurley/devise_token_auth) gem, but I've been able to use it in other environments as well ([go](http://golang.org/), [gorm](https://github.com/jinzhu/gorm) and [gomniauth](https://github.com/stretchr/gomniauth) for example). 
 
-Token based authentication requires coordination between the client and the server. Diagrams are included to illustrate this relationship. 
+Token based authentication requires coordination between the client and the server. Diagrams are included to illustrate this relationship.
 
 
 ## Installation
