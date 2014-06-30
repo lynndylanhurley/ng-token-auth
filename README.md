@@ -307,7 +307,7 @@ This will all happen by default when using this module.
 
 
 ## Proxy CORS requests
-Shit browsers (IE8, IE9) have trouble with CORS requests. You will need to set up a proxy to support these shit browsers.
+Shit browsers (IE8, IE9) have trouble with CORS requests. You will need to set up a proxy to support them.
 
 ##### Example proxy using express for node.js
 ~~~javascript
