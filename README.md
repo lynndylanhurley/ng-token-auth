@@ -68,7 +68,7 @@ angular.module('myApp'), ['ng-token-auth'])
 * **emailRegistrationPath**: path for submitting new email registrations.
 * **confirmationSuccessUrl**: this value is passed to the API for email registration. I use it to redirect after email registration, but that can also be set server-side or ignored. this is useful when working with APIs that have multiple client domains.
 * **emailSignInPath**: path for signing in using email credentials.
-* **proxyIf**: older browsers have trouble with CORS. pass a method here to determine whether or not a proxy should be used. [Read more](#proxy-cors-requests). example: `function() { return !Modernizr.cors }`
+* **proxyIf**: older browsers have trouble with CORS ([read more](#proxy-cors-requests)). pass a method here to determine whether or not a proxy should be used. example: `function() { return !Modernizr.cors }`
 * **proxyUrl**: proxy url if proxy is to be used
 
 
