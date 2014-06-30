@@ -25,8 +25,7 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
       '$http', '$q', '$location', '$cookies', '$cookieStore', '$window', '$timeout', '$rootScope', (function(_this) {
         return function($http, $q, $location, $cookies, $cookieStore, $window, $timeout, $rootScope) {
           return {
-            token: null,
-            uid: null,
+            header: null,
             dfd: null,
             config: config,
             user: {},
@@ -35,12 +34,12 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
               angular.extend(params, {
                 confirm_success_url: config.confirmationSuccessUrl
               });
-              return $http.post(config.apiUrl + config.emailRegistrationPath, params);
+              return $http.post(this.apiUrl() + config.emailRegistrationPath, params);
             },
             submitLogin: function(params) {
               console.log('params', params);
               this.dfd = $q.defer();
-              $http.post(config.apiUrl + config.emailSignInPath, params).success((function(_this) {
+              $http.post(this.apiUrl() + config.emailSignInPath, params).success((function(_this) {
                 return function(resp) {
                   console.log('this', _this);
                   console.log('resp', resp.data);
@@ -66,7 +65,7 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
               return this.dfd;
             },
             openAuthWindow: function(provider) {
-              return $window.open(config.apiUrl + config.authProviderPaths[provider]);
+              return $window.open(this.apiUrl() + config.authProviderPaths[provider]);
             },
             requestCredentials: function(authWindow) {
               if (authWindow.closed) {
@@ -107,17 +106,20 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
               })(this)), 0);
             },
             validateUser: function() {
+              var token, uid;
               if (this.dfd == null) {
                 this.dfd = $q.defer();
-                if (!(this.token && this.uid && this.user.id)) {
+                if (!(this.header && this.user.id)) {
                   if ($location.search().token !== void 0) {
-                    this.token = $location.search().token;
-                    this.uid = $location.search().uid;
-                  } else if ($cookieStore.get('auth_token')) {
-                    this.token = $cookieStore.get('auth_token');
-                    this.uid = $cookieStore.get('auth_uid');
+                    token = $location.search().token;
+                    uid = $location.search().uid;
+                    this.setAuthHeader(this.buildAuthToken(token, uid));
+                  } else if ($cookieStore.get('auth_header')) {
+                    this.header = $cookieStore.get('auth_header');
+                    console.log('found header', this.header);
+                    $http.defaults.headers.common['Authorization'] = this.header;
                   }
-                  if (this.token && this.uid) {
+                  if (this.header) {
                     this.validateToken();
                   } else {
                     this.rejectDfd({
@@ -132,12 +134,8 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
               return this.dfd.promise;
             },
             validateToken: function() {
-              return $http.post(config.apiUrl + config.tokenValidationPath, {
-                auth_token: this.token,
-                uid: this.uid
-              }).success((function(_this) {
+              return $http.get(this.apiUrl() + config.tokenValidationPath).success((function(_this) {
                 return function(resp) {
-                  console.log('validate token resp', resp);
                   return _this.handleValidAuth(resp.data);
                 };
               })(this)).error((function(_this) {
@@ -159,24 +157,12 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
                 val = _ref[key];
                 delete this.user[key];
               }
-              this.token = null;
-              this.uid = null;
-              delete $cookies['auth_token'];
-              delete $cookies['auth_uid'];
+              this.header = null;
+              delete $cookies['auth_header'];
               return $http.defaults.headers.common['Authorization'] = '';
             },
-            persistTokens: function(u) {
-              this.token = u.auth_token;
-              this.uid = u.uid;
-              $cookieStore.put('auth_token', this.token);
-              $cookieStore.put('auth_uid', this.uid);
-              return $http.defaults.headers.common['Authorization'] = this.buildAuthHeader();
-            },
-            buildAuthHeader: function() {
-              return "token=" + this.token + " uid=" + this.uid;
-            },
             signOut: function() {
-              return $http["delete"](config.apiUrl + config.signOutUrl).success((function(_this) {
+              return $http["delete"](this.apiUrl() + config.signOutUrl).success((function(_this) {
                 return function(resp) {
                   return _this.invalidateTokens();
                 };
@@ -186,19 +172,29 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
                 };
               })(this));
             },
-            handleValidAuth: function(user) {
+            handleValidAuth: function(user, setHeader) {
+              if (setHeader == null) {
+                setHeader = false;
+              }
               if (this.t != null) {
                 $timeout.cancel(this.t);
               }
               angular.extend(this.user, user);
-              this.token = this.user.auth_token;
-              this.uid = this.user.uid;
-              this.persistTokens(this.user);
+              if (setHeader) {
+                this.setAuthHeader(this.buildAuthToken(this.user.auth_token, this.user.uid));
+              }
               return this.resolveDfd();
             },
             cancelAuth: function() {
               $timeout.cancel(this.t);
               return this.rejectDfd();
+            },
+            buildAuthToken: function(token, uid) {
+              return "token=" + token + " uid=" + uid;
+            },
+            setAuthHeader: function(header) {
+              this.header = $http.defaults.headers.common['Authorization'] = header;
+              return $cookieStore.put('auth_header', header);
             },
             apiUrl: function() {
               if (this._apiUrl == null) {
@@ -215,13 +211,24 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
       })(this)
     ]
   };
+}).config(function($httpProvider) {
+  return $httpProvider.interceptors.push(function($injector) {
+    return {
+      response: function(response) {
+        $injector.invoke(function($http, $auth) {
+          return $auth.setAuthHeader(response.headers('Authorization'));
+        });
+        return response;
+      }
+    };
+  });
 }).run(function($auth, $window, $rootScope) {
   $window.addEventListener("message", (function(_this) {
     return function(ev) {
       if (ev.data.message === 'deliverCredentials') {
         ev.source.close();
         delete ev.data.message;
-        $auth.handleValidAuth(ev.data);
+        $auth.handleValidAuth(ev.data, true);
       }
       if (ev.data.message === 'authFailure') {
         ev.source.close();
@@ -238,6 +245,9 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
   };
   $rootScope.googleLogin = function() {
     return $auth.authenticate('google');
+  };
+  $rootScope.authenticate = function(provider) {
+    return $auth.authenticate(provider);
   };
   $rootScope.signOut = function() {
     return $auth.signOut();

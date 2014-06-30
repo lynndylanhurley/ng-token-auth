@@ -30,8 +30,7 @@ angular.module('ng-token-auth', ['ngCookies'])
         '$timeout'
         '$rootScope'
         ($http, $q, $location, $cookies, $cookieStore, $window, $timeout, $rootScope) =>
-          token:  null
-          uid:    null
+          header: null
           dfd:    null
           config: config
           user:   {}
@@ -103,7 +102,7 @@ angular.module('ng-token-auth', ['ngCookies'])
               @t = $timeout((=>@requestCredentials(authWindow)), 500)
 
 
-          # failed login. invalidate auth token and reject promise.
+          # failed login. invalidate auth header and reject promise.
           # defered object must be destroyed after reflow.
           rejectDfd: (reason) ->
             @invalidateTokens()
@@ -129,20 +128,22 @@ angular.module('ng-token-auth', ['ngCookies'])
             unless @dfd?
               @dfd = $q.defer()
 
-              unless @token and @uid and @user.id
+              unless @header and @user.id
                 # token querystring is present. user most likely just came from
                 # registration email link.
                 if $location.search().token != undefined
-                  @token = $location.search().token
-                  @uid   = $location.search().uid
+                  token = $location.search().token
+                  uid   = $location.search().uid
+                  @setAuthHeader(@buildAuthToken(token, uid))
 
                 # token cookie is present. user is returning to the site, or
                 # has refreshed the page.
-                else if $cookieStore.get('auth_token')
-                  @token = $cookieStore.get('auth_token')
-                  @uid   = $cookieStore.get('auth_uid')
+                else if $cookieStore.get('auth_header')
+                  @header = $cookieStore.get('auth_header')
+                  console.log 'found header', @header
+                  $http.defaults.headers.common['Authorization'] = @header
 
-                if @token and @uid
+                if @header
                   @validateToken()
 
                 # new user session. will redirect to login
@@ -161,12 +162,8 @@ angular.module('ng-token-auth', ['ngCookies'])
 
           # confirm that user's auth token is still valid.
           validateToken: () ->
-            $http.post(@apiUrl() + config.tokenValidationPath, {
-              auth_token: @token,
-              uid:        @uid
-            })
+            $http.get(@apiUrl() + config.tokenValidationPath)
               .success((resp) =>
-                console.log 'validate token resp', resp
                 @handleValidAuth(resp.data)
               )
               .error((data) =>
@@ -190,34 +187,15 @@ angular.module('ng-token-auth', ['ngCookies'])
             # all keys on object.
             delete @user[key] for key, val of @user
 
-            # setting these values to null will force the validateToken method
+            # setting this value to null will force the validateToken method
             # to re-validate credentials with api server when validate is called
-            @token = null
-            @uid   = null
+            @header = null
 
             # kill cookies, otherwise session will resume on page reload
-            delete $cookies['auth_token']
-            delete $cookies['auth_uid']
+            delete $cookies['auth_header']
 
             # kill default auth header
             $http.defaults.headers.common['Authorization'] = ''
-
-
-          # store tokens as cookies for returning users / page refresh
-          persistTokens: (u)->
-            @token = u.auth_token
-            @uid   = u.uid
-
-            $cookieStore.put('auth_token', @token)
-            $cookieStore.put('auth_uid', @uid)
-
-            # add api token headers to all subsequent requests
-            $http.defaults.headers.common['Authorization'] = @buildAuthHeader()
-
-
-          # generate auth header from auth token + user uid
-          buildAuthHeader: ->
-            "token=#{@token} uid=#{@uid}"
 
 
           # destroy auth token on server, destroy user auth credentials
@@ -228,18 +206,16 @@ angular.module('ng-token-auth', ['ngCookies'])
 
 
           # handle successful authentication
-          handleValidAuth: (user) ->
+          handleValidAuth: (user, setHeader=false) ->
             # cancel any pending postMessage checks
             $timeout.cancel(@t) if @t?
 
             # must extend existing object for scoping reasons
             angular.extend @user, user
 
-            @token = @user.auth_token
-            @uid   = @user.uid
-
-            # save creds for return visits
-            @persistTokens(@user)
+            # postMessage will not contain header. must save headers manually.
+            if setHeader
+              @setAuthHeader(@buildAuthToken(@user.auth_token, @user.uid))
 
             # fulfill promise
             @resolveDfd()
@@ -249,6 +225,16 @@ angular.module('ng-token-auth', ['ngCookies'])
           cancelAuth: ->
             $timeout.cancel(@t)
             @rejectDfd()
+
+
+          # auth token format. consider making this configurable
+          buildAuthToken: (token, uid) ->
+            "token=#{token} uid=#{uid}"
+
+
+          setAuthHeader: (header) ->
+            @header = $http.defaults.headers.common['Authorization'] = header
+            $cookieStore.put('auth_header', header)
 
 
           # use proxy for IE
@@ -263,13 +249,25 @@ angular.module('ng-token-auth', ['ngCookies'])
       ]
     }
 
+
+  # use crazy acrobatics to configure $http service on the fly
+  # http://stackoverflow.com/questions/14681654/i-need-two-instances-of-angularjs-http-service-or-what
+  .config ($httpProvider) ->
+    $httpProvider.interceptors.push ($injector) ->
+      response: (response) ->
+        $injector.invoke ($http, $auth) ->
+          $auth.setAuthHeader(response.headers('Authorization'))
+
+        return response
+
+
   .run ($auth, $window, $rootScope) ->
     # add listeners for communication with external auth window
     $window.addEventListener("message", (ev) =>
       if ev.data.message == 'deliverCredentials'
         ev.source.close()
         delete ev.data.message
-        $auth.handleValidAuth(ev.data)
+        $auth.handleValidAuth(ev.data, true)
 
       if ev.data.message == 'authFailure'
         ev.source.close()
