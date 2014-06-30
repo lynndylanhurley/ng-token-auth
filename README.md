@@ -18,11 +18,10 @@ angular.module('myApp'), ['ng-token-auth'])
 ~~~
 
 ## Configuration
-### $authProvider.configure
 
-The `$authProvider` is available for injection during the app's configuration phase.
+The `$authProvider` is available for injection during the app's configuration phase. Use `$authProvider.configure` to configure the module for use with your server.
 
-The following settings correspond to the paths that are available when using the [devise token auth](https://github.com/lynndylanhurley/devise_token_auth#usage) gem for Rails. If you're using the gem, just set the `apiUrl` to your server's base auth route.
+The following settings correspond to the paths that are available when using the [devise token auth](https://github.com/lynndylanhurley/devise_token_auth#usage) gem for Rails. If you're using this gem, you will need to set the `apiUrl` option.
 
 ##### Example configuration when using devise token auth
 ~~~javascript
