@@ -28,28 +28,27 @@ The `$authProvider` is available for injection during the app's configuration ph
 ~~~javascript
 angular.module('myApp'), ['ng-token-auth'])
 
-	.config(function($authProvider) {
+  .config(function($authProvider) {
 
     // the following shows the default values. values passed to this method
     // will extend the defaults using angular.extend
 
-		$authProvider.configure({
-			apiUrl:                 '/api',
-			tokenValidationPath:    '/auth/validate_token',
-			signOutUrl:             '/auth/sign_out',
-			emailRegistrationPath:  '/auth',
-			confirmationSuccessUrl: window.location.href,
-			emailSignInPath:        '/auth/sign_in',
-			proxyIf:                function() { return false; },
-			proxyUrl:               '/proxy',
-			authProviderPaths: {
-        		github:   '/auth/github',
-        		facebook: '/auth/facebook',
-        		google:   '/auth/google'
-			}
-
-		});
-	});
+    $authProvider.configure({
+      apiUrl:                 '/api',
+      tokenValidationPath:    '/auth/validate_token',
+      signOutUrl:             '/auth/sign_out',
+      emailRegistrationPath:  '/auth',
+      confirmationSuccessUrl: window.location.href,
+      emailSignInPath:        '/auth/sign_in',
+      proxyIf:                function() { return false; },
+      proxyUrl:               '/proxy',
+      authProviderPaths: {
+        github:   '/auth/github',
+        facebook: '/auth/facebook',
+        google:   '/auth/google'
+      }
+    });
+  });
 ~~~
 
 ### Config params
