@@ -65,7 +65,6 @@ angular.module('myApp'), ['ng-token-auth'])
 * **proxyIf**: older browsers have trouble with CORS. pass a method here to determine whether or not a proxy should be used. example: `function() { return !Modernizr.cors }`
 * **proxyUrl**: proxy url if proxy is to be used
 
-# Usage
 
 If you're using the [devise token auth](https://github.com/lynndylanhurley/devise_token_auth) gem for Rails, just set the `apiUrl` on the `$authProvider`:
 
@@ -78,7 +77,9 @@ angular.module('myApp'), ['ng-token-auth'])
 	});
 ~~~
 
-Read on to learn what is needed to build your own API for this module.
+# Usage
+
+**TODO**: add TLDR;
 
 ## Oauth2 authentication
 
@@ -288,6 +289,21 @@ The `$auth.submitRegistration` method is available to the `$rootScope`.
   <button type="submit" class="btn btn-primary btn-lg">Sign in</button>
 </form>
 ~~~
+
+## Identifying users on the server.
+
+The user's authentication information is included by the client in the `Authorization` header of each request. If you're using the [devise token auth](https://github.com/lynndylanhurley/devise_token_auth) gem, the header must follow this format:
+
+~~~
+token=xxxxx uid=yyyyy
+~~~
+
+Replace `xxxxx` with the user's `auth_token` and `yyyyy` with the user's `uid`.
+
+This will all happen by default when using this module.
+
+**Note**: If you require a different authorization header format, post an issue. I will make it a configuration option if there is a demand.
+
 
 ## Proxy CORS requests
 Shit browsers (IE8, IE9) have trouble with CORS requests. You will need to set up a proxy to support these shit browsers.
