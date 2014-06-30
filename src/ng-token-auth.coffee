@@ -45,14 +45,14 @@ angular.module('ng-token-auth', ['ngCookies'])
             angular.extend(params, {
               confirm_success_url: config.confirmationSuccessUrl
             })
-            $http.post(config.apiUrl + config.emailRegistrationPath, params)
+            $http.post(@apiUrl() + config.emailRegistrationPath, params)
 
 
           # capture input from user, authenticate serverside
           submitLogin: (params) ->
             console.log 'params', params
             @dfd = $q.defer()
-            $http.post(config.apiUrl + config.emailSignInPath, params)
+            $http.post(@apiUrl() + config.emailSignInPath, params)
               .success((resp) =>
                 console.log 'this', @
                 console.log 'resp', resp.data
@@ -80,7 +80,7 @@ angular.module('ng-token-auth', ['ngCookies'])
 
           # open external window to authentication provider
           openAuthWindow: (provider) ->
-            $window.open(config.apiUrl+config.authProviderPaths[provider])
+            $window.open(@apiUrl() + config.authProviderPaths[provider])
 
 
           # ping auth window to see if user has completed registration.
@@ -122,6 +122,7 @@ angular.module('ng-token-auth', ['ngCookies'])
               console.log 'user', @user
             ), 0)
 
+
           # this is something that can be returned from 'resolve' methods
           # of pages that have restricted access
           validateUser: ->
@@ -160,7 +161,7 @@ angular.module('ng-token-auth', ['ngCookies'])
 
           # confirm that user's auth token is still valid.
           validateToken: () ->
-            $http.post(config.apiUrl + config.tokenValidationPath, {
+            $http.post(@apiUrl() + config.tokenValidationPath, {
               auth_token: @token,
               uid:        @uid
             })
@@ -221,17 +222,26 @@ angular.module('ng-token-auth', ['ngCookies'])
 
           # destroy auth token on server, destroy user auth credentials
           signOut: ->
-            $http.delete(config.apiUrl + config.signOutUrl)
+            $http.delete(@apiUrl() + config.signOutUrl)
               .success((resp) => @invalidateTokens())
               .error((resp) => @invalidateTokens())
 
 
+          # handle successful authentication
           handleValidAuth: (user) ->
+            # cancel any pending postMessage checks
             $timeout.cancel(@t) if @t?
+
+            # must extend existing object for scoping reasons
             angular.extend @user, user
+
             @token = @user.auth_token
             @uid   = @user.uid
+
+            # save creds for return visits
             @persistTokens(@user)
+
+            # fulfill promise
             @resolveDfd()
 
 
