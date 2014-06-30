@@ -24,7 +24,19 @@ Your controllers, directives, filters etc. will now be able to inject the `$auth
 
 The `$authProvider` is available for injection during the app's configuration phase. Configure this module for use with the API server using a `config` block. [Read more about configuring providers](https://github.com/angular/angular.js/wiki/Understanding-Dependency-Injection#configuring-providers)
 
-### Config example
+The following settings correspond to the paths that are available when using the [devise token auth](https://github.com/lynndylanhurley/devise_token_auth#usage) gem for Rails. If you're using the gem, just set the `apiUrl` to your server's base auth route.
+
+##### Example configuration when using devise token auth
+~~~javascript
+angular.module('myApp'), ['ng-token-auth'])
+	.config(function($authProvider) {
+		$authProvider.configure({
+			apiUrl: 'http://api.example.com/auth'
+		});
+	});
+~~~
+
+#### Complete config example
 ~~~javascript
 angular.module('myApp'), ['ng-token-auth'])
 
@@ -51,8 +63,7 @@ angular.module('myApp'), ['ng-token-auth'])
   });
 ~~~
 
-### Config params
-
+### Config param definitions
 * **apiUrl**: the base route to your api. Each of the following paths will be relative to this URL.
 * **authProviderPaths**: an object containing paths to auth endpoints. keys are names of the providers, values are their auth paths relative to the `apiUrl`.
 * **tokenValidationPath**: relative path to validate authentication tokens.
@@ -63,18 +74,6 @@ angular.module('myApp'), ['ng-token-auth'])
 * **proxyIf**: older browsers have trouble with CORS. pass a method here to determine whether or not a proxy should be used. example: `function() { return !Modernizr.cors }`
 * **proxyUrl**: proxy url if proxy is to be used
 
-
-These settings correspond to the paths that are available when using the [devise token auth](https://github.com/lynndylanhurley/devise_token_auth#usage) gem for Rails. If you're using the gem, just set the `apiUrl` to your server's base auth route.
-
-##### Example configuration when using devise token auth
-~~~javascript
-angular.module('myApp'), ['ng-token-auth'])
-	.config(function($authProvider) {
-		$authProvider.configure({
-			apiUrl: 'http://api.example.com/auth'
-		});
-	});
-~~~
 
 # Usage
 
