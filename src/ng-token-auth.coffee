@@ -30,10 +30,11 @@ angular.module('ng-token-auth', ['ngCookies'])
         '$timeout'
         '$rootScope'
         ($http, $q, $location, $cookies, $cookieStore, $window, $timeout, $rootScope) =>
-          token: null
-          uid:   null
-          dfd:   null
-          user:  {}
+          token:  null
+          uid:    null
+          dfd:    null
+          config: config
+          user:   {}
 
 
           # register by email. server will send confirmation email
@@ -196,6 +197,9 @@ angular.module('ng-token-auth', ['ngCookies'])
             # kill cookies, otherwise session will resume on page reload
             delete $cookies['auth_token']
             delete $cookies['auth_uid']
+
+            # kill default auth header
+            $http.defaults.headers.common['Authorization'] = ''
 
 
           # store tokens as cookies for returning users / page refresh

@@ -79,3 +79,11 @@ div
 
   label auth token
   p {{ user.auth_token || "none" }}
+
+div
+  h3 Restricted routes
+  p This should only work for authenticated users.
+  button.btn.btn-lg(
+    ng-click='accessRestrictedRoute()'
+    ng-class='{"btn-primary": user.uid, "btn-danger": !user.uid}'
+  ) Access restricted route

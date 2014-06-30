@@ -28,6 +28,7 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
             token: null,
             uid: null,
             dfd: null,
+            config: config,
             user: {},
             submitRegistration: function(params) {
               console.log('submitting registration', params);
@@ -161,7 +162,8 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
               this.token = null;
               this.uid = null;
               delete $cookies['auth_token'];
-              return delete $cookies['auth_uid'];
+              delete $cookies['auth_uid'];
+              return $http.defaults.headers.common['Authorization'] = '';
             },
             persistTokens: function(u) {
               this.token = u.auth_token;
