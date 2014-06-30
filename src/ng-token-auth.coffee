@@ -283,6 +283,7 @@ angular.module('ng-token-auth', ['ngCookies'])
     $rootScope.githubLogin   = -> $auth.authenticate('github')
     $rootScope.facebookLogin = -> $auth.authenticate('facebook')
     $rootScope.googleLogin   = -> $auth.authenticate('google')
+    $rootScope.authenticate  = (provider) -> $auth.authenticate(provider)
 
     # template access to view actions
     $rootScope.signOut            = -> $auth.signOut()
