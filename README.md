@@ -2,7 +2,7 @@
 
 This module aims to provide a simple method of client authentication that can be configured to work with any api.
 
-This module was designed to work out of the box with the outstanding [devise token auth](https://github.com/lynndylanhurley/devise_token_auth) gem, but I've been able to use it in other environments as well ([go](http://golang.org/), [gorm](https://github.com/jinzhu/gorm) and [gomniauth](https://github.com/stretchr/gomniauth) for example). 
+This module was designed to work out of the box with the outstanding [devise token auth](https://github.com/lynndylanhurley/devise_token_auth) gem, but I've been able to use it in other environments as well ([go](http://golang.org/), [gorm](https://github.com/jinzhu/gorm) and [gomniauth](https://github.com/stretchr/gomniauth) for example).
 
 Token based authentication requires coordination between the client and the server. Diagrams are included to illustrate this relationship.
 
@@ -194,6 +194,13 @@ The `$auth` module is available for dependency injection during your app's run p
   </form>
   ~~~
 
+* **$auth.signOut**: de-authenticate a user. This method does not take any arguments. This method will change the user's `auth_token` server-side, and it will destroy the `uid` and `auth_token` cookies saved client-side. This method is also available in the `$rootScope` for use in templates.
+
+  ##### Example use in a template:
+  ~~~html
+  <button type="submit" class="btn btn-primary btn-lg" ng-click='signOut()'>Sign out</button>
+  ~~~
+
 # Conceptual
 
 ## Oauth2 authentication flow
@@ -204,7 +211,7 @@ The following diagram illustrates the steps necessary to authenticate a client u
 
 When authenticating with a 3rd party provider, the following steps will take place.
 
-1. An external window will be opened to the provider's authentication page. 
+1. An external window will be opened to the provider's authentication page.
 1. Once the user signs in, they will be redirected back to the API at the callback uri that was registered with the oauth2 provider.
 1. The API will send the user's info back to the client via `postMessage` event, and then close the external window.
 
@@ -310,7 +317,7 @@ app.all('/proxy/*', function(req, res, next) {
   // handle POST / PUT
   if (req.method === 'POST' || req.method === 'PUT') {
     r = request[req.method.toLowerCase()]({
-      uri: apiUrl, 
+      uri: apiUrl,
       json: req.body
     });
   } else {
