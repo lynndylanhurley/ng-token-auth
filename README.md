@@ -290,7 +290,7 @@ The `$auth.submitRegistration` method is available to the `$rootScope`.
 ~~~
 
 ## Proxy CORS requests
-Older browsers (IE8, IE9) have trouble with CORS requests. You will need to set up a proxy if support for these browsers is required.
+Shit browsers (IE8, IE9) have trouble with CORS requests. You will need to set up a proxy to support these shit browsers.
 
 ##### Example proxy using express for node.js
 ~~~javascript
