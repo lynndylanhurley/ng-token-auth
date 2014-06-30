@@ -1,6 +1,6 @@
 # Angular Token Auth
 
-This module aims to provide a simple method of client authentication that can be configured to work with any api.
+This provides a simple method of client authentication that can be configured to work with any api.
 
 This module was designed to work out of the box with the outstanding [devise token auth](https://github.com/lynndylanhurley/devise_token_auth) gem, but I've been able to use it in other environments as well ([go](http://golang.org/), [gorm](https://github.com/jinzhu/gorm) and [gomniauth](https://github.com/stretchr/gomniauth) for example).
 
