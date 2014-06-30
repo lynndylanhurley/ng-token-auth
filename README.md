@@ -171,7 +171,7 @@ The `$auth` module is available for dependency injection during your app's run p
   </form>
   ~~~
 
-* **$auth.submitEmail**: authenticate a user who has registered by email. [Read more](#email-sign-in-flow). Accepts an object with the following params:
+* **$auth.submitLogin**: authenticate a user who has registered by email. [Read more](#email-sign-in-flow). Accepts an object with the following params:
   * **email**
   * **password**
 
