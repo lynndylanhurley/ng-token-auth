@@ -6,6 +6,8 @@ This module was designed to work out of the box with the outstanding [devise tok
 
 Token based authentication requires coordination between the client and the server. Diagrams are included to illustrate this relationship.
 
+**About security**: [read here](http://stackoverflow.com/questions/18605294/is-devises-token-authenticatable-secure) for more information on securing your token auth system. The [devise token auth](https://github.com/lynndylanhurley/devise_token_auth#security) gem has adequate security measures in place, and it works seamlessly with this module.
+
 
 # Installation
 
@@ -283,15 +285,14 @@ This module also provides support for email registration. The following diagram 
 The user's authentication information is included by the client in the `Authorization` header of each request. If you're using the [devise token auth](https://github.com/lynndylanhurley/devise_token_auth) gem, the header must follow this format:
 
 ~~~
-token=xxxxx uid=yyyyy
+token=xxxxx client=yyyyy uid=zzzzz
 ~~~
 
-Replace `xxxxx` with the user's `auth_token` and `yyyyy` with the user's `uid`.
+Replace `xxxxx` with the user's `auth_token` and `zzzzz` with the user's `uid`. The `client` field exists to allow for multiple simultaneous sessions per user. The `client` field defaults to `default` if omitted.
 
-This will all happen by default when using this module.
+This will all happen automatically when using this module.
 
 **Note**: If you require a different authorization header format, post an issue. I will make it a configuration option if there is a demand.
-
 
 # Proxy CORS requests
 Older browsers (IE8, IE9) have trouble with CORS requests. You will need to set up a proxy to support them.
