@@ -106,17 +106,17 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
               })(this)), 0);
             },
             validateUser: function() {
-              var token, uid;
+              var clientId, token, uid;
               if (this.dfd == null) {
                 this.dfd = $q.defer();
                 if (!(this.header && this.user.id)) {
                   if ($location.search().token !== void 0) {
                     token = $location.search().token;
+                    clientId = $location.search().client_id;
                     uid = $location.search().uid;
-                    this.setAuthHeader(this.buildAuthToken(token, uid));
+                    this.setAuthHeader(this.buildAuthToken(token, client_id, uid));
                   } else if ($cookieStore.get('auth_header')) {
                     this.header = $cookieStore.get('auth_header');
-                    console.log('found header', this.header);
                     $http.defaults.headers.common['Authorization'] = this.header;
                   }
                   if (this.header) {
@@ -181,7 +181,7 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
               }
               angular.extend(this.user, user);
               if (setHeader) {
-                this.setAuthHeader(this.buildAuthToken(this.user.auth_token, this.user.uid));
+                this.setAuthHeader(this.buildAuthToken(this.user.auth_token, this.user.client_id, this.user.uid));
               }
               return this.resolveDfd();
             },
@@ -189,8 +189,8 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
               $timeout.cancel(this.t);
               return this.rejectDfd();
             },
-            buildAuthToken: function(token, uid) {
-              return "token=" + token + " uid=" + uid;
+            buildAuthToken: function(token, clientId, uid) {
+              return "token=" + token + " client=" + clientId + " uid=" + uid;
             },
             setAuthHeader: function(header) {
               this.header = $http.defaults.headers.common['Authorization'] = header;

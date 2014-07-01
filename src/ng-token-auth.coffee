@@ -30,10 +30,10 @@ angular.module('ng-token-auth', ['ngCookies'])
         '$timeout'
         '$rootScope'
         ($http, $q, $location, $cookies, $cookieStore, $window, $timeout, $rootScope) =>
-          header: null
-          dfd:    null
-          config: config
-          user:   {}
+          header:   null
+          dfd:      null
+          config:   config
+          user:     {}
 
 
           # register by email. server will send confirmation email
@@ -132,15 +132,15 @@ angular.module('ng-token-auth', ['ngCookies'])
                 # token querystring is present. user most likely just came from
                 # registration email link.
                 if $location.search().token != undefined
-                  token = $location.search().token
-                  uid   = $location.search().uid
-                  @setAuthHeader(@buildAuthToken(token, uid))
+                  token    = $location.search().token
+                  clientId = $location.search().client_id
+                  uid      = $location.search().uid
+                  @setAuthHeader(@buildAuthToken(token, client_id, uid))
 
                 # token cookie is present. user is returning to the site, or
                 # has refreshed the page.
                 else if $cookieStore.get('auth_header')
                   @header = $cookieStore.get('auth_header')
-                  console.log 'found header', @header
                   $http.defaults.headers.common['Authorization'] = @header
 
                 if @header
@@ -215,7 +215,7 @@ angular.module('ng-token-auth', ['ngCookies'])
 
             # postMessage will not contain header. must save headers manually.
             if setHeader
-              @setAuthHeader(@buildAuthToken(@user.auth_token, @user.uid))
+              @setAuthHeader(@buildAuthToken(@user.auth_token, @user.client_id, @user.uid))
 
             # fulfill promise
             @resolveDfd()
@@ -228,10 +228,11 @@ angular.module('ng-token-auth', ['ngCookies'])
 
 
           # auth token format. consider making this configurable
-          buildAuthToken: (token, uid) ->
-            "token=#{token} uid=#{uid}"
+          buildAuthToken: (token, clientId, uid) ->
+            "token=#{token} client=#{clientId} uid=#{uid}"
 
 
+          # persist authentication token, client id, uid
           setAuthHeader: (header) ->
             @header = $http.defaults.headers.common['Authorization'] = header
             $cookieStore.put('auth_header', header)
@@ -250,9 +251,11 @@ angular.module('ng-token-auth', ['ngCookies'])
     }
 
 
-  # use crazy acrobatics to configure $http service on the fly
-  # http://stackoverflow.com/questions/14681654/i-need-two-instances-of-angularjs-http-service-or-what
+  # each response will contain auth headers that have been updated by
+  # the server. copy those headers for use in the next request.
   .config ($httpProvider) ->
+    # this is ugly...
+    # http://stackoverflow.com/questions/14681654/i-need-two-instances-of-angularjs-http-service-or-what
     $httpProvider.interceptors.push ($injector) ->
       response: (response) ->
         $injector.invoke ($http, $auth) ->

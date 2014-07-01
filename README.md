@@ -14,7 +14,7 @@ Token based authentication requires coordination between the client and the serv
 
 ##### Example module inclusion:
 ~~~javascript
-angular.module('myApp'), ['ng-token-auth'])
+angular.module('myApp', ['ng-token-auth'])
 ~~~
 
 ## Configuration
@@ -25,7 +25,7 @@ The following settings correspond to the paths that are available when using the
 
 ##### Example configuration when using devise token auth
 ~~~javascript
-angular.module('myApp'), ['ng-token-auth'])
+angular.module('myApp', ['ng-token-auth'])
 	.config(function($authProvider) {
 		$authProvider.configure({
 			apiUrl: 'http://api.example.com/auth'
@@ -35,7 +35,7 @@ angular.module('myApp'), ['ng-token-auth'])
 
 ##### Complete config example
 ~~~javascript
-angular.module('myApp'), ['ng-token-auth'])
+angular.module('myApp', ['ng-token-auth'])
 
   .config(function($authProvider) {
 
@@ -105,7 +105,7 @@ The `$auth` module is available for dependency injection during your app's run p
   ##### Example using angular ui router
 
   ~~~coffeescript
-  angular.module('ngTokenAuthTestApp', [
+  angular.module('myApp', [
     'ui.router',
     'ng-token-auth'
   ])
