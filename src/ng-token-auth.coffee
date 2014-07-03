@@ -108,8 +108,9 @@ angular.module('ng-token-auth', ['ngCookies'])
             @invalidateTokens()
             if @dfd?
               @dfd.reject(reason)
-              $timeout((=> 
+              $timeout((=>
                 @dfd = null
+                console.log 'auth failure reason', reason
                 $rootScope.$broadcast('auth:failure', reason)
               ), 0)
 
@@ -228,7 +229,7 @@ angular.module('ng-token-auth', ['ngCookies'])
           cancelAuth: (reason) ->
             $timeout.cancel(@t)
             $rootScope.$broadcast('auth:cancelled', reason)
-            @rejectDfd()
+            @rejectDfd(reason)
 
 
           # auth token format. consider making this configurable
@@ -259,12 +260,15 @@ angular.module('ng-token-auth', ['ngCookies'])
   # the server. copy those headers for use in the next request.
   .config ($httpProvider) ->
     # this is ugly...
+    # we need to configure an interceptor (must be done in the configuration
+    # phase), but we need access to the $http service, which is only available
+    # during the run phase. the following technique was taken from this
+    # stackoverflow post:
     # http://stackoverflow.com/questions/14681654/i-need-two-instances-of-angularjs-http-service-or-what
     $httpProvider.interceptors.push ($injector) ->
       response: (response) ->
         $injector.invoke ($http, $auth) ->
           $auth.setAuthHeader(response.headers('Authorization'))
-
         return response
 
 
@@ -287,10 +291,7 @@ angular.module('ng-token-auth', ['ngCookies'])
     # bind global user object to auth user
     $rootScope.user = $auth.user
 
-    # template access to authentication methods
-    $rootScope.githubLogin   = -> $auth.authenticate('github')
-    $rootScope.facebookLogin = -> $auth.authenticate('facebook')
-    $rootScope.googleLogin   = -> $auth.authenticate('google')
+    # template access to authentication method
     $rootScope.authenticate  = (provider) -> $auth.authenticate(provider)
 
     # template access to view actions

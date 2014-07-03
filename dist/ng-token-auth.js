@@ -89,7 +89,8 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
                 return $timeout(((function(_this) {
                   return function() {
                     _this.dfd = null;
-                    return $rootScope.$broadcast('auth:failure');
+                    console.log('auth failure reason', reason);
+                    return $rootScope.$broadcast('auth:failure', reason);
                   };
                 })(this)), 0);
               }
@@ -101,7 +102,7 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
               return $timeout(((function(_this) {
                 return function() {
                   _this.dfd = null;
-                  $rootScope.$broadcast('auth:success');
+                  $rootScope.$broadcast('auth:success', _this.user);
                   return $rootScope.$digest();
                 };
               })(this)), 0);
@@ -186,10 +187,10 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
               }
               return this.resolveDfd();
             },
-            cancelAuth: function() {
+            cancelAuth: function(reason) {
               $timeout.cancel(this.t);
-              $rootScope.$broadcast('auth:cancelled');
-              return this.rejectDfd();
+              $rootScope.$broadcast('auth:cancelled', reason);
+              return this.rejectDfd(reason);
             },
             buildAuthToken: function(token, clientId, uid) {
               return "token=" + token + " client=" + clientId + " uid=" + uid;
@@ -234,20 +235,14 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
       }
       if (ev.data.message === 'authFailure') {
         ev.source.close();
-        return $auth.cancelAuth();
+        return $auth.cancelAuth({
+          reason: 'unauthorized',
+          errors: [ev.data.error]
+        });
       }
     };
   })(this));
   $rootScope.user = $auth.user;
-  $rootScope.githubLogin = function() {
-    return $auth.authenticate('github');
-  };
-  $rootScope.facebookLogin = function() {
-    return $auth.authenticate('facebook');
-  };
-  $rootScope.googleLogin = function() {
-    return $auth.authenticate('google');
-  };
   $rootScope.authenticate = function(provider) {
     return $auth.authenticate(provider);
   };
