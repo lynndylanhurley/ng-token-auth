@@ -110,7 +110,7 @@ angular.module('ng-token-auth', ['ngCookies'])
               @dfd.reject(reason)
               $timeout((=> 
                 @dfd = null
-                $rootScope.$broadcast('auth:failure')
+                $rootScope.$broadcast('auth:failure', reason)
               ), 0)
 
 
@@ -120,7 +120,7 @@ angular.module('ng-token-auth', ['ngCookies'])
             @dfd.resolve({id: @user.id})
             $timeout((=>
               @dfd = null
-              $rootScope.$broadcast('auth:success')
+              $rootScope.$broadcast('auth:success', @user)
               $rootScope.$digest()
             ), 0)
 
@@ -225,9 +225,9 @@ angular.module('ng-token-auth', ['ngCookies'])
 
 
           # user closed external auth dialog. cancel authentication
-          cancelAuth: ->
+          cancelAuth: (reason) ->
             $timeout.cancel(@t)
-            $rootScope.$broadcast('auth:cancelled')
+            $rootScope.$broadcast('auth:cancelled', reason)
             @rejectDfd()
 
 
@@ -278,7 +278,10 @@ angular.module('ng-token-auth', ['ngCookies'])
 
       if ev.data.message == 'authFailure'
         ev.source.close()
-        $auth.cancelAuth()
+        $auth.cancelAuth({
+          reason: 'unauthorized'
+          errors: [ev.data.error]
+        })
     )
 
     # bind global user object to auth user

@@ -10,7 +10,8 @@
     "authentication",
     "oauth2",
     "angular",
-    "token"
+    "token",
+    "secure"
   ],
   "license": "MIT",
   "homepage": "http://github.com/lynndylanhurley/ng-token-auth",
