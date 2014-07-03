@@ -88,9 +88,10 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
                 this.dfd.reject(reason);
                 return $timeout(((function(_this) {
                   return function() {
-                    return _this.dfd = null;
+                    _this.dfd = null;
+                    return $rootScope.$broadcast('auth:failure');
                   };
-                })(this)));
+                })(this)), 0);
               }
             },
             resolveDfd: function() {
@@ -100,8 +101,8 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
               return $timeout(((function(_this) {
                 return function() {
                   _this.dfd = null;
-                  $rootScope.$digest();
-                  return console.log('user', _this.user);
+                  $rootScope.$broadcast('auth:success');
+                  return $rootScope.$digest();
                 };
               })(this)), 0);
             },
@@ -187,6 +188,7 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
             },
             cancelAuth: function() {
               $timeout.cancel(this.t);
+              $rootScope.$broadcast('auth:cancelled');
               return this.rejectDfd();
             },
             buildAuthToken: function(token, clientId, uid) {

@@ -108,7 +108,10 @@ angular.module('ng-token-auth', ['ngCookies'])
             @invalidateTokens()
             if @dfd?
               @dfd.reject(reason)
-              $timeout((=> @dfd = null))
+              $timeout((=> 
+                @dfd = null
+                $rootScope.$broadcast('auth:failure')
+              ), 0)
 
 
           # this needs to happen after a reflow so that the promise
@@ -117,8 +120,8 @@ angular.module('ng-token-auth', ['ngCookies'])
             @dfd.resolve({id: @user.id})
             $timeout((=>
               @dfd = null
+              $rootScope.$broadcast('auth:success')
               $rootScope.$digest()
-              console.log 'user', @user
             ), 0)
 
 
@@ -224,6 +227,7 @@ angular.module('ng-token-auth', ['ngCookies'])
           # user closed external auth dialog. cancel authentication
           cancelAuth: ->
             $timeout.cancel(@t)
+            $rootScope.$broadcast('auth:cancelled')
             @rejectDfd()
 
 

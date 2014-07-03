@@ -5,7 +5,7 @@
     "Lynn Dylan Hurley <lynn.dylan.hurley@gmail.com>"
   ],
   "description": "Token based authentication system for angular js. Includes support for oauth2 authentication using Facebook, Github, and Google.",
-  "main": "dist/main.js",
+  "main": "dist/ng-token-auth.js",
   "keywords": [
     "authentication",
     "oauth2",

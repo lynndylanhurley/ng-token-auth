@@ -18,7 +18,7 @@ angular.module('ngTokenAuthTestApp', [
     $urlRouterProvider.otherwise('/404')
 
     $authProvider.configure({
-      apiUrl: '//localhost:3000'
+      apiUrl: '//defsynth-api.dev'
     })
 
     console.log '@-->auth config', $authProvider
