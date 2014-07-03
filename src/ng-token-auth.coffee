@@ -40,7 +40,6 @@ angular.module('ng-token-auth', ['ngCookies'])
           # containing a link to activate the account. the link will
           # redirect to this site.
           submitRegistration: (params) ->
-            console.log 'submitting registration', params
             angular.extend(params, {
               confirm_success_url: config.confirmationSuccessUrl
             })
@@ -49,12 +48,9 @@ angular.module('ng-token-auth', ['ngCookies'])
 
           # capture input from user, authenticate serverside
           submitLogin: (params) ->
-            console.log 'params', params
             @dfd = $q.defer()
             $http.post(@apiUrl() + config.emailSignInPath, params)
               .success((resp) =>
-                console.log 'this', @
-                console.log 'resp', resp.data
                 @handleValidAuth(resp.data)
               )
               .error((resp) =>
@@ -110,7 +106,6 @@ angular.module('ng-token-auth', ['ngCookies'])
               @dfd.reject(reason)
               $timeout((=>
                 @dfd = null
-                console.log 'auth failure reason', reason
                 $rootScope.$broadcast('auth:failure', reason)
               ), 0)
 

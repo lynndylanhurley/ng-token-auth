@@ -203,6 +203,38 @@ The `$auth` module is available for dependency injection during your app's run p
   <button class="btn btn-primary btn-lg" ng-click='signOut()'>Sign out</button>
   ~~~
 
+### Events
+
+The following events are broadcast by the rootscope:
+
+* **auth:success** - broadcast after successful user authentication. event message contains the user object.
+  
+  **Example**:
+  ~~~javascript
+  $rootScope.$on('auth:success', function(user) {
+      console.log('user', user);
+  });
+  ~~~
+
+* **auth:cancelled** - broadcast after the user fails or cancels authentication (opts out, closes auth window, etc).
+  
+  **Example**:
+  ~~~javascript
+  $rootScope.$on('auth:failure', function(reason) {
+      console.log('auth failed because', reason);
+  });
+  ~~~
+
+
+* **auth:failure** - broadcast after user fails authentication.
+  
+  **Example**:
+  ~~~javascript
+  $rootScope.$on('auth:failure', function(reason) {
+      console.log('auth failed because', reason);
+  });
+  ~~~
+
 # Conceptual
 
 ## Oauth2 authentication flow
