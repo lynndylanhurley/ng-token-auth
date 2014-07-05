@@ -1,2 +1,2 @@
-SITE_DOMAIN: 'example.com'
-API_URL: '//api.example.dev/'
+SITE_DOMAIN: 'devise-token-auth-demo.dev'
+API_URL:     '//devise-token-auth-demo.dev/'

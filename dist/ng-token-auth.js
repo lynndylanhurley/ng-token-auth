@@ -30,19 +30,15 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
             config: config,
             user: {},
             submitRegistration: function(params) {
-              console.log('submitting registration', params);
               angular.extend(params, {
                 confirm_success_url: config.confirmationSuccessUrl
               });
               return $http.post(this.apiUrl() + config.emailRegistrationPath, params);
             },
             submitLogin: function(params) {
-              console.log('params', params);
               this.dfd = $q.defer();
               $http.post(this.apiUrl() + config.emailSignInPath, params).success((function(_this) {
                 return function(resp) {
-                  console.log('this', _this);
-                  console.log('resp', resp.data);
                   return _this.handleValidAuth(resp.data);
                 };
               })(this)).error((function(_this) {
@@ -89,7 +85,6 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
                 return $timeout(((function(_this) {
                   return function() {
                     _this.dfd = null;
-                    console.log('auth failure reason', reason);
                     return $rootScope.$broadcast('auth:failure', reason);
                   };
                 })(this)), 0);
@@ -116,7 +111,8 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
                     token = $location.search().token;
                     clientId = $location.search().client_id;
                     uid = $location.search().uid;
-                    this.setAuthHeader(this.buildAuthToken(token, client_id, uid));
+                    $location.url($location.path());
+                    this.setAuthHeader(this.buildAuthToken(token, clientId, uid));
                   } else if ($cookieStore.get('auth_header')) {
                     this.header = $cookieStore.get('auth_header');
                     $http.defaults.headers.common['Authorization'] = this.header;
@@ -182,6 +178,7 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
                 $timeout.cancel(this.t);
               }
               angular.extend(this.user, user);
+              console.log('user', this.user);
               if (setHeader) {
                 this.setAuthHeader(this.buildAuthToken(this.user.auth_token, this.user.client_id, this.user.uid));
               }

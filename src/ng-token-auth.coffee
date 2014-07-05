@@ -134,7 +134,13 @@ angular.module('ng-token-auth', ['ngCookies'])
                   token    = $location.search().token
                   clientId = $location.search().client_id
                   uid      = $location.search().uid
-                  @setAuthHeader(@buildAuthToken(token, client_id, uid))
+
+                  # strip qs from url to prevent re-use of these params
+                  # on page refresh
+                  $location.url($location.path())
+
+                  # persist these values
+                  @setAuthHeader(@buildAuthToken(token, clientId, uid))
 
                 # token cookie is present. user is returning to the site, or
                 # has refreshed the page.
@@ -211,6 +217,8 @@ angular.module('ng-token-auth', ['ngCookies'])
 
             # must extend existing object for scoping reasons
             angular.extend @user, user
+
+            console.log 'user', @user
 
             # postMessage will not contain header. must save headers manually.
             if setHeader

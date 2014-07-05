@@ -1,6 +1,0 @@
-AWS_KEY:                XXXXXXXXXX
-AWS_SECRET:             XXXXXXXXXX
-AWS_STATIC_BUCKET_NAME: 'ng-token-auth-test-production'
-STATIC_URL:             '//s3.amazonaws.com/ng-token-auth-test-production/'
-SITE_DOMAIN:            'ng-token-auth.github.com'
-API_URL:                '//api.ng-token-auth.github.com/'

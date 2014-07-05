@@ -390,6 +390,9 @@ Guidelines will be posted if the need arises.
 
 # TODO
 
+* Only verify tokens that have not expired.
+* Add interceptor to catch 401 responses, hold http requests until user has been authenticated.
+* Only add the auth header if request url matches api url.
 * Tests. This will be difficult because test will require both an API and an oauth2 provider. Please open an issue if you have any suggestions.
 * Example site coming soon.
 
