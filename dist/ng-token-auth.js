@@ -35,8 +35,8 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
               });
               return $http.post(this.apiUrl() + config.emailRegistrationPath, params).success(function() {
                 return $rootScope.$broadcast('auth:registration-email-sent', params);
-              }).error(function() {
-                return $rootScope.$broadcast('auth:registration-email-failed');
+              }).error(function(resp) {
+                return $rootScope.$broadcast('auth:registration-email-failed', resp);
               });
             },
             submitLogin: function(params) {
