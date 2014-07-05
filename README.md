@@ -30,7 +30,7 @@ The following settings correspond to the paths that are available when using the
 angular.module('myApp', ['ng-token-auth'])
 	.config(function($authProvider) {
 		$authProvider.configure({
-			apiUrl: 'http://api.example.com/auth'
+			apiUrl: 'http://api.example.com'
 		});
 	});
 ~~~
