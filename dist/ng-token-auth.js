@@ -33,7 +33,11 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
               angular.extend(params, {
                 confirm_success_url: config.confirmationSuccessUrl
               });
-              return $http.post(this.apiUrl() + config.emailRegistrationPath, params);
+              return $http.post(this.apiUrl() + config.emailRegistrationPath, params).success(function() {
+                return $rootScope.$broadcast('auth:registration-email-sent', params);
+              }).error(function() {
+                return $rootScope.$broadcast('auth:registration-email-failed');
+              });
             },
             submitLogin: function(params) {
               this.dfd = $q.defer();
@@ -178,7 +182,6 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
                 $timeout.cancel(this.t);
               }
               angular.extend(this.user, user);
-              console.log('user', this.user);
               if (setHeader) {
                 this.setAuthHeader(this.buildAuthToken(this.user.auth_token, this.user.client_id, this.user.uid));
               }

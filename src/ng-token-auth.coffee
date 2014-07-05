@@ -44,6 +44,12 @@ angular.module('ng-token-auth', ['ngCookies'])
               confirm_success_url: config.confirmationSuccessUrl
             })
             $http.post(@apiUrl() + config.emailRegistrationPath, params)
+              .success(-> 
+                $rootScope.$broadcast('auth:registration-email-sent', params)
+              )
+              .error(->
+                $rootScope.$broadcast('auth:registration-email-failed')
+              )
 
 
           # capture input from user, authenticate serverside
@@ -217,8 +223,6 @@ angular.module('ng-token-auth', ['ngCookies'])
 
             # must extend existing object for scoping reasons
             angular.extend @user, user
-
-            console.log 'user', @user
 
             # postMessage will not contain header. must save headers manually.
             if setHeader
