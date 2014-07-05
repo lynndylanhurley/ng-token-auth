@@ -44,11 +44,11 @@ angular.module('ng-token-auth', ['ngCookies'])
               confirm_success_url: config.confirmationSuccessUrl
             })
             $http.post(@apiUrl() + config.emailRegistrationPath, params)
-              .success(-> 
+              .success(->
                 $rootScope.$broadcast('auth:registration-email-sent', params)
               )
-              .error(->
-                $rootScope.$broadcast('auth:registration-email-failed')
+              .error((resp) ->
+                $rootScope.$broadcast('auth:registration-email-failed', resp)
               )
 
 
