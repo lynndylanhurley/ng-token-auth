@@ -284,7 +284,8 @@ angular.module('ng-token-auth', ['ngCookies'])
     $httpProvider.interceptors.push ($injector) ->
       response: (response) ->
         $injector.invoke ($http, $auth) ->
-          $auth.setAuthHeader(response.headers('Authorization'))
+          if response.headers('Authorization')
+            $auth.setAuthHeader(response.headers('Authorization'))
         return response
 
 
