@@ -43,14 +43,16 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
               this.dfd = $q.defer();
               $http.post(this.apiUrl() + config.emailSignInPath, params).success((function(_this) {
                 return function(resp) {
-                  return _this.handleValidAuth(resp.data);
+                  _this.handleValidAuth(resp.data);
+                  return $rootScope.$broadcast('auth:login', _this.user);
                 };
               })(this)).error((function(_this) {
                 return function(resp) {
-                  return _this.rejectDfd({
+                  _this.rejectDfd({
                     reason: 'unauthorized',
                     errors: ['Invalid credentials']
                   });
+                  return $rootScope.$broadcast('auth:failure', resp);
                 };
               })(this));
               return this.dfd.promise;
@@ -69,10 +71,11 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
             },
             requestCredentials: function(authWindow) {
               if (authWindow.closed) {
-                return this.rejectDfd({
+                this.rejectDfd({
                   reason: 'unauthorized',
                   errors: ['User canceled login']
                 });
+                return $rootScope.$broadcast('auth:window-closed');
               } else {
                 authWindow.postMessage("requestCredentials", "*");
                 return this.t = $timeout(((function(_this) {
@@ -88,8 +91,7 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
                 this.dfd.reject(reason);
                 return $timeout(((function(_this) {
                   return function() {
-                    _this.dfd = null;
-                    return $rootScope.$broadcast('auth:failure', reason);
+                    return _this.dfd = null;
                   };
                 })(this)), 0);
               }
@@ -101,7 +103,6 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
               return $timeout(((function(_this) {
                 return function() {
                   _this.dfd = null;
-                  $rootScope.$broadcast('auth:success', _this.user);
                   return $rootScope.$digest();
                 };
               })(this)), 0);
@@ -128,6 +129,7 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
                       reason: 'unauthorized',
                       errors: ['No credentials']
                     });
+                    $rootScope.$broadcast('auth:invalid');
                   }
                 } else {
                   this.resolveDfd();
@@ -138,7 +140,8 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
             validateToken: function() {
               return $http.get(this.apiUrl() + config.tokenValidationPath).success((function(_this) {
                 return function(resp) {
-                  return _this.handleValidAuth(resp.data);
+                  _this.handleValidAuth(resp.data);
+                  return $rootScope.$broadcast('auth:validated', _this.user);
                 };
               })(this)).error((function(_this) {
                 return function(data) {
@@ -166,11 +169,13 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
             signOut: function() {
               return $http["delete"](this.apiUrl() + config.signOutUrl).success((function(_this) {
                 return function(resp) {
-                  return _this.invalidateTokens();
+                  _this.invalidateTokens();
+                  return $rootScope.$broadcast('auth:logout-success');
                 };
               })(this)).error((function(_this) {
                 return function(resp) {
-                  return _this.invalidateTokens();
+                  _this.invalidateTokens();
+                  return $rootScope.$broadcast('auth:logout-failure', resp);
                 };
               })(this));
             },
@@ -189,8 +194,8 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
             },
             cancelAuth: function(reason) {
               $timeout.cancel(this.t);
-              $rootScope.$broadcast('auth:cancelled', reason);
-              return this.rejectDfd(reason);
+              this.rejectDfd(reason);
+              return $rootScope.$broadcast('auth:failure', reason);
             },
             buildAuthToken: function(token, clientId, uid) {
               return "token=" + token + " client=" + clientId + " uid=" + uid;
@@ -232,6 +237,7 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
         ev.source.close();
         delete ev.data.message;
         $auth.handleValidAuth(ev.data, true);
+        $rootScope.$broadcast('auth:login', ev.data);
       }
       if (ev.data.message === 'authFailure') {
         ev.source.close();

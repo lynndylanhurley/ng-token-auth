@@ -58,12 +58,14 @@ angular.module('ng-token-auth', ['ngCookies'])
             $http.post(@apiUrl() + config.emailSignInPath, params)
               .success((resp) =>
                 @handleValidAuth(resp.data)
+                $rootScope.$broadcast('auth:login', @user)
               )
               .error((resp) =>
                 @rejectDfd({
                   reason: 'unauthorized'
                   errors: ['Invalid credentials']
                 })
+                $rootScope.$broadcast('auth:failure', resp)
               )
             @dfd.promise
 
@@ -97,6 +99,7 @@ angular.module('ng-token-auth', ['ngCookies'])
                 reason: 'unauthorized'
                 errors: ['User canceled login']
               })
+              $rootScope.$broadcast('auth:window-closed')
 
             # still awaiting user input
             else
@@ -112,7 +115,6 @@ angular.module('ng-token-auth', ['ngCookies'])
               @dfd.reject(reason)
               $timeout((=>
                 @dfd = null
-                $rootScope.$broadcast('auth:failure', reason)
               ), 0)
 
 
@@ -122,7 +124,6 @@ angular.module('ng-token-auth', ['ngCookies'])
             @dfd.resolve({id: @user.id})
             $timeout((=>
               @dfd = null
-              $rootScope.$broadcast('auth:success', @user)
               $rootScope.$digest()
             ), 0)
 
@@ -163,6 +164,7 @@ angular.module('ng-token-auth', ['ngCookies'])
                     reason: 'unauthorized'
                     errors: ['No credentials']
                   })
+                  $rootScope.$broadcast('auth:invalid')
 
               else
                 # user is already logged in
@@ -176,6 +178,7 @@ angular.module('ng-token-auth', ['ngCookies'])
             $http.get(@apiUrl() + config.tokenValidationPath)
               .success((resp) =>
                 @handleValidAuth(resp.data)
+                $rootScope.$broadcast('auth:validated', @user)
               )
               .error((data) =>
                 @dfd.reject({
@@ -212,8 +215,14 @@ angular.module('ng-token-auth', ['ngCookies'])
           # destroy auth token on server, destroy user auth credentials
           signOut: ->
             $http.delete(@apiUrl() + config.signOutUrl)
-              .success((resp) => @invalidateTokens())
-              .error((resp) => @invalidateTokens())
+              .success((resp) =>
+                @invalidateTokens()
+                $rootScope.$broadcast('auth:logout-success')
+              )
+              .error((resp) =>
+                @invalidateTokens()
+                $rootScope.$broadcast('auth:logout-failure', resp)
+              )
 
 
           # handle successful authentication
@@ -235,8 +244,8 @@ angular.module('ng-token-auth', ['ngCookies'])
           # user closed external auth dialog. cancel authentication
           cancelAuth: (reason) ->
             $timeout.cancel(@t)
-            $rootScope.$broadcast('auth:cancelled', reason)
             @rejectDfd(reason)
+            $rootScope.$broadcast('auth:failure', reason)
 
 
           # auth token format. consider making this configurable
@@ -286,6 +295,7 @@ angular.module('ng-token-auth', ['ngCookies'])
         ev.source.close()
         delete ev.data.message
         $auth.handleValidAuth(ev.data, true)
+        $rootScope.$broadcast('auth:login', ev.data)
 
       if ev.data.message == 'authFailure'
         ev.source.close()

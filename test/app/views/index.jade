@@ -2,88 +2,112 @@ h1 Angular.js Token Auth Demo
 
 br
 
-.text-center
-  button.btn.btn-primary(ng-click="authenticate('github')") Github
-  button.btn.btn-primary(ng-click="authenticate('facebook')") Facebook
-  button.btn.btn-primary(ng-click="authenticate('google')") Google
+.row
+  div.col-sm-12
+    h3 <u>current user</u>
 
-br
+    .row
 
-.text-center
-  button.btn.btn-primary(ng-click='signOut()') Sign out
+      .col-sm-8
+        label user id
+        p {{ user.uid || "none" }}
+
+        label user email
+        p {{ user.email || "none" }}
+
+        label client id
+        p {{ user.client_id || "none" }}
+
+        button.btn.btn-primary(ng-click='signOut()', ng-disabled='!user.uid') Sign out
+
+      .col-sm-4(ng-if='user.uid')
+        img(ng-src='{{ user.image }}', width="100%")
 
 
-h2 Register by email
+.row
+  .col-sm-12
+    h2 Authenticate using an oauth2 provider
 
-form(ng-submit='submitRegistration(registrationForm)', role='form', ng-init='registrationForm = {}')
-  .form-group
-    label email
-    input.form-control(
-      type='email'
-      name='email'
-      ng-model='registrationForm.email'
-      required
+    fieldset(ng-disabled='user.uid')
+      button.btn.btn-primary(ng-click="authenticate('github')") Github
+      button.btn.btn-primary(ng-click="authenticate('facebook')") Facebook
+      button.btn.btn-primary(ng-click="authenticate('google')") Google
+
+
+  .col-sm-6
+    h2 Register by email
+
+    form(
+      ng-submit='submitRegistration(registrationForm)'
+      role='form'
+      ng-init='registrationForm = {}'
     )
+      fieldset(ng-disabled='user.uid')
+        .form-group
+          label email
+          input.form-control(
+            type='email'
+            name='email'
+            ng-model='registrationForm.email'
+            required
+          )
 
-  .form-group
-    label password
-    input.form-control(
-      type='password'
-      name='password'
-      ng-model='registrationForm.password'
-      required
+        .form-group
+          label password
+          input.form-control(
+            type='password'
+            name='password'
+            ng-model='registrationForm.password'
+            required
+          )
+
+        .form-group
+          label password confirmation
+          input.form-control(
+            type='password'
+            name='password_confirmation'
+            ng-model='registrationForm.password_confirmation'
+            required
+          )
+
+        button.btn.btn-primary.btn-lg(type='submit') Register
+
+  .col-sm-6
+    h2 Sign in by email
+
+    form(
+      ng-submit='submitLogin(loginForm)'
+      role='form'
+      ng-init='loginForm = {}'
     )
+      fieldset(ng-disabled='user.uid')
+        .form-group
+          label email
+          input.form-control(
+            type='email'
+            name='email'
+            ng-model='loginForm.email'
+            required
+          )
 
-  .form-group
-    label password confirmation
-    input.form-control(
-      type='password'
-      name='password_confirmation'
-      ng-model='registrationForm.password_confirmation'
-      required
-    )
+        .form-group
+          label password
+          input.form-control(
+            type='password'
+            name='password'
+            ng-model='loginForm.password'
+            required
+          )
 
-  button.btn.btn-primary.btn-lg(type='submit') Register
+        button.btn.btn-primary.btn-lg(type='submit') Sign in
 
-h2 Sign in by email
 
-form(ng-submit='submitLogin(loginForm)', role='form', ng-init='loginForm = {}')
-  .form-group
-    label email
-    input.form-control(
-      type='email'
-      name='email'
-      ng-model='loginForm.email'
-      required
-    )
+  div.col-sm-12
+    h3 Restricted routes
+    p(ng-show='user.uid') You are signed in, this will work
+    p(ng-show='!user.uid') You are signed NOT in, this will NOT work
+    button.btn.btn-lg(
+      ng-click='accessRestrictedRoute()'
+      ng-class='{"btn-primary": user.uid, "btn-danger": !user.uid}'
+    ) Access restricted route
 
-  .form-group
-    label password
-    input.form-control(
-      type='password'
-      name='password'
-      ng-model='loginForm.password'
-      required
-    )
-
-  button.btn.btn-primary.btn-lg(type='submit') Sign in
-
-h3 <u>current user</u>
-
-div
-  label user
-  p {{ user.email || "none" }}
-
-  label avatar
-  p {{ user.avatar_url || "none" }}
-
-  label auth token
-  p {{ user.auth_token || "none" }}
-
-div
-  h3 Restricted routes
-  p This should only work for authenticated users.
-  button.btn.btn-lg(
-    ng-click='accessRestrictedRoute()'
-    ng-class='{"btn-primary": user.uid, "btn-danger": !user.uid}'
-  ) Access restricted route
