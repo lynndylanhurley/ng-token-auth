@@ -224,7 +224,9 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
     return {
       response: function(response) {
         $injector.invoke(function($http, $auth) {
-          return $auth.setAuthHeader(response.headers('Authorization'));
+          if (response.headers('Authorization')) {
+            return $auth.setAuthHeader(response.headers('Authorization'));
+          }
         });
         return response;
       }
