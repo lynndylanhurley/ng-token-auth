@@ -25,7 +25,7 @@ var DIST_DIR        = distDir;
 var LIVERELOAD_PORT = 35729;
 
 if (process.env.NODE_ENV) {
-  DIST_DIR += '-'+process.env.NODE_ENV.toLowerCase();
+  DIST_DIR = 'test/dist-'+process.env.NODE_ENV.toLowerCase();
 }
 
 // Load plugins
@@ -253,7 +253,7 @@ gulp.task('useref', function () {
 
 // Update file version refs
 gulp.task('replace', function() {
-  var manifest = require(tmpDir+'rev-manifest');
+  var manifest = require('./'+tmpDir+'rev-manifest');
 
   var patterns = []
   for (var k in manifest) {
@@ -313,7 +313,7 @@ gulp.task('s3', function() {
 // Push to heroku
 gulp.task('push', $.shell.task([
   'git checkout -b '+tag,
-  'cp -R dist/ '+DIST_DIR,
+  'cp -R '+distDir+' '+DIST_DIR,
   'git add -u .',
   'git add .',
   'git commit -am "commit for '+tag+' push"',
@@ -429,8 +429,8 @@ gulp.task('build-prod', function(cb) {
     'build-dev',
     'useref',
     'replace',
-    'cdnize',
-    's3',
+    //'cdnize',
+    //'s3',
     cb
   );
 });
