@@ -35,10 +35,22 @@ angular.module('ngTokenAuthTestApp')
     )
 
     $scope.$on('auth:failure', (ev, data) ->
-      console.log 'ev', ev
-      console.log 'data', data
       $modal({
         title: "Error"
         content: "Authentication failure: " + data.errors[0]
+      })
+    )
+
+    $scope.$on('auth:logout-success', (ev) ->
+      $modal({
+        title: 'Success'
+        content: 'Goodbye'
+      })
+    )
+
+    $scope.$on('auth:logout-failure', (ev) ->
+      $modal({
+        title: 'Error'
+        content: 'Unable to complete logout. Please try again.'
       })
     )
