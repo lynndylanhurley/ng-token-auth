@@ -220,7 +220,6 @@ angular.module('ng-token-auth', ['ngCookies'])
                 $rootScope.$broadcast('auth:logout-success')
               )
               .error((resp) =>
-                @invalidateTokens()
                 $rootScope.$broadcast('auth:logout-failure', resp)
               )
 

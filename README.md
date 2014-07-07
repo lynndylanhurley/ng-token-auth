@@ -211,31 +211,57 @@ The `$auth` module is available for dependency injection during your app's run p
 
 The following events are broadcast by the rootscope:
 
-* **auth:success** - broadcast after successful user authentication. event message contains the user object.
+* **auth:login** - broadcast after successful user authentication. event message contains the user object.
   
   **Example**:
   ~~~javascript
-  $rootScope.$on('auth:success', function(user) {
-      console.log('user', user);
+  $rootScope.$on('auth:success', function(ev, user) {
+      alert('Welcome ', user.email);
   });
   ~~~
-
-* **auth:cancelled** - broadcast after the user fails or cancels authentication (opts out, closes auth window, etc).
-  
-  **Example**:
-  ~~~javascript
-  $rootScope.$on('auth:failure', function(reason) {
-      console.log('auth failed because', reason);
-  });
-  ~~~
-
 
 * **auth:failure** - broadcast after user fails authentication.
   
   **Example**:
   ~~~javascript
-  $rootScope.$on('auth:failure', function(reason) {
-      console.log('auth failed because', reason);
+  $rootScope.$on('auth:failure', function(ev, reason) {
+      alert('auth failed because', reason.errors[0]);
+  });
+  ~~~
+
+* **auth:logout-success** - broadcast after user is successfully logged out. This event does not contain a message.
+
+  **Example**:
+  ~~~javascript
+  $rootScope.$on('auth:logout-success', function(ev) {
+      alert('goodbye');
+  });
+  ~~~
+
+* **auth:logout-failure** - broadcast after failed logout attempts. Message contains the failed logout response.
+
+  **Example**:
+  ~~~javascript
+  $rootScope.$on('auth:logout-success', function(ev, reason) {
+      alert('logout failed because ' + reason.errors[0]);
+  });
+  ~~~
+
+* **auth:registration-email-sent** - broadcast after email registration request completes successfully. Message contains the params that were sent to the server.
+
+  **Example**:
+  ~~~javascript
+  $scope.$on('auth:registration-email-sent', function(ev, message) {
+      alert("A registration email was sent to " + message.email);
+  });
+  ~~~
+
+* **auth:registration-email-failed** - broadcast after email registration request fails. Message contains the error response.
+
+  **Example**:
+  ~~~javascript
+  $scope.$on('auth:registration-email-failed', function(ev, reason) {
+      alert("Registration failed: " + reason.errors[0]);
   });
   ~~~
 
@@ -397,7 +423,7 @@ Guidelines will be posted if the need arises.
 * Only verify tokens that have not expired.
 * Add interceptor to catch 401 responses, hold http requests until user has been authenticated.
 * Only add the auth header if request url matches api url.
-* Tests. This will be difficult because test will require both an API and an oauth2 provider. Please open an issue if you have any suggestions.
+* Tests.
 
 # License
 

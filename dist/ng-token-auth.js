@@ -174,7 +174,6 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
                 };
               })(this)).error((function(_this) {
                 return function(resp) {
-                  _this.invalidateTokens();
                   return $rootScope.$broadcast('auth:logout-failure', resp);
                 };
               })(this));

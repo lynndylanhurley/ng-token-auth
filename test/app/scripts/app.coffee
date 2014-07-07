@@ -23,8 +23,6 @@ angular.module('ngTokenAuthTestApp', [
       #apiUrl: '//devise-token-auth-demo.herokuapp.com'
     })
 
-    console.log '@-->auth config', $authProvider
-
     $stateProvider
       .state 'index',
         url: '/'
