@@ -111,11 +111,11 @@ gulp.task('component-coffee', function() {
 // Images
 gulp.task('images', function () {
   return gulp.src(appDir+'images/**/*')
-    .pipe($.cache($.imagemin({
-      optimizationLevel: 3,
-      progressive: true,
-      interlaced: true
-    })))
+    //.pipe($.cache($.imagemin({
+      //optimizationLevel: 3,
+      //progressive: true,
+      //interlaced: true
+    //})))
     .pipe(gulp.dest(tmpDir+'/images'))
     .pipe($.size());
 });
