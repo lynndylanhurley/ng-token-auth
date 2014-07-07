@@ -10,6 +10,10 @@ env:
 addons:
   sauce_connect: true
 
+cache:
+  directories:
+    - node_modules
+
 before_install:
 - npm install
 - gem install sass
