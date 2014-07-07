@@ -21,6 +21,6 @@ before_install:
 - ../node_modules/.bin/bower install --config.directory=app/bower_components
 
 before_script:
-- cd ../ 
+- cd ../
 - ./node_modules/.bin/gulp dev &
-- sleep 5
+- sleep 20
