@@ -18,9 +18,9 @@ angular.module('ngTokenAuthTestApp', [
     $urlRouterProvider.otherwise('/404')
 
     $authProvider.configure({
-      apiUrl: '//localhost:3000'
+      #apiUrl: '//localhost:3000'
       #apiUrl: '//devise-token-auth-demo.dev'
-      #apiUrl: '//devise-token-auth-demo.herokuapp.com'
+      apiUrl: '//devise-token-auth-demo.herokuapp.com'
     })
 
     $stateProvider
