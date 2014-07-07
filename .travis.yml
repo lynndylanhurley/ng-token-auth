@@ -14,7 +14,7 @@ before_install:
 - npm install
 - gem install sass
 - cd test
-- ../node_modules/.bin/bower install --cwd ../
+- ../node_modules/.bin/bower install --config.directory=app/bower_components
 
 before_script:
 - cd ../ 

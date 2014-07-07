@@ -2,7 +2,7 @@
   "name": "ng-token-auth-test-site",
   "private": true,
   "dependencies": {
-    "bootstrap-sass": "git://github.com/twbs/bootstrap-sass.git#v3.1.0",
+    "bootstrap-sass-official": "~3.2.0",
     "modernizr": "~2.6.2",
     "jquery": "~1.10.2",
     "angular-ui-router": "~0.2.10",
@@ -25,7 +25,7 @@
     "bootstrap": {
       "ignore": true
     },
-    "bootstrap-sass": {
+    "bootstrap-sass-official": {
       "ignore": true
     },
     "Faker": {
