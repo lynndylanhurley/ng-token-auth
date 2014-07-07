@@ -51,7 +51,19 @@
     "lazypipe": "~0.2.1",
     "gulp-frep": "~0.1.1",
     "gulp-cached": "0.0.3",
-    "coffee-script": "~1.7.1"
+    "coffee-script": "~1.7.1",
+    "karma": "~0.10",
+    "protractor": "~0.20.1",
+    "http-server": "^0.6.1",
+    "shelljs": "^0.2.6",
+    "karma-junit-reporter": "^0.2.2"
+  },
+  "scripts": {
+    "preupdate-webdriver": "npm install",
+    "update-webdriver": "webdriver-manager update",
+
+    "preprotractor": "npm run update-webdriver",
+    "protractor": "protractor test/test/protractor-conf.js"
   },
   "engines": {
     "node": ">=0.10.0"
