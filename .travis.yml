@@ -13,8 +13,10 @@ addons:
 before_install:
 - npm install
 - gem install sass
-- cd test && ../node_modules/.bin/bower install --cwd ../
+- cd test
+- ../node_modules/.bin/bower install --cwd ../
 
 before_script:
+- cd ../ 
 - ./node_modules/.bin/gulp dev &
 - sleep 5
