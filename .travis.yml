@@ -12,6 +12,7 @@ addons:
 
 before_install:
 - npm install
+- gem install sass
 
 before_script:
 - ./node_modules/.bin/gulp dev &
