@@ -27,8 +27,6 @@
     "gulp-coffee": "~2.0.1",
     "gulp-changed": "~0.4.0",
     "gulp-if": "1.2.1",
-    "canvas": "~1.1.1",
-    "css-sprite": "~0.7.0-beta3",
     "nib": "~1.0.2",
     "gulp-stylus": "~1.0.2",
     "gulp-awspublish": "0.0.16",

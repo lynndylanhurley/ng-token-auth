@@ -3,7 +3,7 @@
 
 var gulp     = require('gulp');
 var wiredep  = require('wiredep').stream;
-var sprite   = require('css-sprite').stream;
+//var sprite   = require('css-sprite').stream;
 var config   = require('config');
 var cached   = require('gulp-cached');
 var es       = require('event-stream');
@@ -122,19 +122,19 @@ gulp.task('images', function () {
 
 
 // Sprites
-gulp.task('sprites', function() {
-  return gulp.src(appDir+'images/sprites/**/*.png')
-    .pipe(sprite({
-      name:      'sprite.png',
-      style:     'sprite.styl',
-      cssPath:   '/images',
-      processor: 'stylus',
-      retina:    true
-    }))
-    .pipe($.if('*.png', gulp.dest(tmpDir+'/images')))
-    .pipe($.if('*.styl', gulp.dest(tmpDir+'/styles')))
-    .pipe($.size());
-});
+//gulp.task('sprites', function() {
+  //return gulp.src(appDir+'images/sprites/**/*.png')
+    //.pipe(sprite({
+      //name:      'sprite.png',
+      //style:     'sprite.styl',
+      //cssPath:   '/images',
+      //processor: 'stylus',
+      //retina:    true
+    //}))
+    //.pipe($.if('*.png', gulp.dest(tmpDir+'/images')))
+    //.pipe($.if('*.styl', gulp.dest(tmpDir+'/styles')))
+    //.pipe($.size());
+//});
 
 // Stylus
 gulp.task('stylus', function() {
@@ -144,7 +144,7 @@ gulp.task('stylus', function() {
       //set: ['compress'],
       use: [nib()],
       import: [
-        'sprite',
+        //'sprite',
         'globals/*.styl',
         'pages/**/*.xs.styl',
         'pages/**/*.sm.styl',
@@ -378,7 +378,7 @@ gulp.task('watch', function () {
   gulp.watch(appDir+'styles/**/*.styl', ['stylus']);
 
   // Watch sprites
-  gulp.watch(appDir+'images/sprites/**/*.png', ['sprites']);
+  //gulp.watch(appDir+'images/sprites/**/*.png', ['sprites']);
 
   // Watch .js files
   gulp.watch(appDir+'scripts/**/*.js', ['js']);
@@ -406,7 +406,7 @@ gulp.task('watch', function () {
 gulp.task('build-dev', function(cb) {
   seq(
     'clean',
-    'sprites',
+    //'sprites',
     'images',
     'sass',
     'transpile',
