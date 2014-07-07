@@ -13,7 +13,7 @@ addons:
 before_install:
 - npm install
 - gem install sass
-- cd test && bower install --cwd ../
+- cd test && ../node_modules/.bin/bower install --cwd ../
 
 before_script:
 - ./node_modules/.bin/gulp dev &
