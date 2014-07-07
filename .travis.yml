@@ -1,0 +1,26 @@
+language: node_js
+node_js:
+- '0.10'
+
+env:
+  global:
+  - secure: DeOogfCHotEd1+jfWSSsS3F4tnc80J0jLRQcD1g69H/Dl8BlbLPVo9RA0K8KmKMH2hqwi8OR8Bmz2dGZxiw1PLl0Wr1ZPxdBZP1vZsjd+uuqDqmYXqkyWL3aY85U3jDHxd0zS8SNKktQvf2kFbq3hr9sBRbOWgeISl3mEuMec/k=
+  - secure: HTn8l3v3goXUtFzz4CfXsHxPx8lKWwNGyJ2VPmrDaPypdm0X5epAj31g239gZjaAsy/DcaH3IEzTc6zxWlJz6r95DuX40cDFqU96dTf+pzUN95FOOIFD9z4f8B6mFpD9IodnBYP7dC1r+SFY+wsepgE3PQ6UQvcOhWDsnxf8+3M=
+
+addons:
+  sauce_connect: true
+
+cache:
+  directories:
+    - node_modules
+
+before_install:
+- npm install
+- gem install sass
+- cd test
+- ../node_modules/.bin/bower install --config.directory=app/bower_components
+
+before_script:
+- cd ../
+- ./node_modules/.bin/gulp dev &
+- sleep 12

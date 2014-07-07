@@ -4,6 +4,7 @@ var httpProxy = require('http-proxy');
 var CONFIG    = require('config');
 var s3Policy  = require('./server/s3');
 var sm        = require('sitemap');
+var os        = require('os');
 
 var port    = process.env.PORT || 7777;
 var distDir = '/.tmp';
@@ -12,12 +13,11 @@ var app     = express();
 
 // env setup
 // TODO: comment this better
-if (process.env.NODE_ENV) {
+if (process.env.NODE_ENV && process.env.NODE_ENV != 'development') {
   distDir = '/dist-'+process.env.NODE_ENV.toLowerCase();
 } else {
   app.use(require('connect-livereload')());
 }
-
 
 // sitemap
 sitemap = sm.createSitemap({
@@ -93,7 +93,6 @@ app.get(/^(\/[^#\.]+)$/, function(req, res) {
 
   res.redirect('/#'+path);
 });
-
 
 app.use(express.static(__dirname + distDir));
 app.listen(port);
