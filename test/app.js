@@ -4,6 +4,7 @@ var httpProxy = require('http-proxy');
 var CONFIG    = require('config');
 var s3Policy  = require('./server/s3');
 var sm        = require('sitemap');
+var os        = require('os');
 
 var port    = process.env.PORT || 7777;
 var distDir = '/.tmp';
@@ -93,7 +94,7 @@ app.get(/^(\/[^#\.]+)$/, function(req, res) {
   res.redirect('/#'+path);
 });
 
-console.log('@-->running app.js on ', port);
+console.info('@-->running app.js on', os.hostname(), port);
 
 app.use(express.static(__dirname + distDir));
 app.listen(port);
