@@ -23,4 +23,4 @@ before_install:
 before_script:
 - cd ../
 - ./node_modules/.bin/gulp dev &
-- sleep 20
+- sleep 12

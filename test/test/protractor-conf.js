@@ -1,4 +1,5 @@
 require('coffee-script/register');
+var os = require('os');
 
 exports.config = {
   allScriptsTimeout: 11000,
@@ -13,7 +14,7 @@ exports.config = {
     'browserName': 'chrome'
   },
 
-  baseUrl: 'http://localhost:7777/',
+  baseUrl: 'http://'+os.hostname()+':7777/',
 
   framework: 'jasmine',
 

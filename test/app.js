@@ -94,7 +94,5 @@ app.get(/^(\/[^#\.]+)$/, function(req, res) {
   res.redirect('/#'+path);
 });
 
-console.info('@-->running app.js on', os.hostname(), port);
-
 app.use(express.static(__dirname + distDir));
 app.listen(port);
