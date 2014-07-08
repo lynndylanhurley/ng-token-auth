@@ -55,9 +55,6 @@
     "wiredep": "~1.8.1"
   },
   "scripts": {
-    "preupdate-webdriver": "npm install",
-    "update-webdriver": "webdriver-manager update",
-    "pretest": "npm run update-webdriver",
     "test": "protractor test/test/protractor-conf.js"
   },
   "engines": {
