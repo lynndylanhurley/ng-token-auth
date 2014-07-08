@@ -193,7 +193,6 @@ angular.module('ng-token-auth', ['ngCookies'])
                   reason: 'unauthorized'
                   errors: ['Invalid/expired credentials']
                 })
-
                 # wait for reflow, nullify dfd
                 $timeout((=> @dfd = null), 0)
               )
