@@ -21,8 +21,14 @@ angular.module('ngTokenAuthTestApp', [
       #apiUrl: '//localhost:3000'
       #apiUrl: '//devise-token-auth-demo.dev'
       #apiUrl: '//devise-token-auth-demo.herokuapp.com'
-      apiUrl: '//devise-token-auth.192.168.1.102.xip.io'
-      proxyIf: -> true
+      #apiUrl: '//devise-token-auth.192.168.1.102.xip.io'
+      apiUrl: '//devise-token-auth.dev'
+      proxyIf: -> window.isOldIE()
+      authProviderPaths:
+        github:    '/auth/github'
+        facebook:  '/auth/facebook'
+        google:    '/auth/google_oauth2'
+        developer: '/auth/developer'
     })
 
     $stateProvider

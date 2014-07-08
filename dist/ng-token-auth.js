@@ -210,16 +210,7 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
               return $cookieStore.put('auth_header', header);
             },
             useExternalWindow: function() {
-              var nav, out, version;
-              out = true;
-              nav = navigator.userAgent.toLowerCase();
-              if (nav && nav.indexOf('msie') !== -1) {
-                version = parseInt(nav.split('msie')[1]);
-                if (version < 10) {
-                  out = false;
-                }
-              }
-              return out;
+              return !$window.isOldIE();
             },
             apiUrl: function() {
               if (this._apiUrl == null) {
@@ -284,3 +275,16 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
   };
   return $auth.validateUser();
 });
+
+window.isOldIE = function() {
+  var nav, out, version;
+  out = false;
+  nav = navigator.userAgent.toLowerCase();
+  if (nav && nav.indexOf('msie') !== -1) {
+    version = parseInt(nav.split('msie')[1]);
+    if (version < 10) {
+      out = true;
+    }
+  }
+  return out;
+};

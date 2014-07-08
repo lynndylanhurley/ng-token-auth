@@ -10,9 +10,9 @@ angular.module('ng-token-auth', ['ngCookies'])
       proxyIf:                -> false
       proxyUrl:               '/proxy'
       authProviderPaths:
-        github:   '/auth/github'
-        facebook: '/auth/facebook'
-        google:   '/auth/google_oauth2'
+        github:    '/auth/github'
+        facebook:  '/auth/facebook'
+        google:    '/auth/google_oauth2'
 
 
     return {
@@ -265,16 +265,11 @@ angular.module('ng-token-auth', ['ngCookies'])
             @header = $http.defaults.headers.common['Authorization'] = header
             $cookieStore.put('auth_header', header)
 
+
           # ie8 + ie9 cannot use xdomain postMessage
           useExternalWindow: ->
-            out = true
-            nav = navigator.userAgent.toLowerCase()
-            if nav and nav.indexOf('msie') != -1
-              version = parseInt(nav.split('msie')[1])
-              if version < 10
-                out = false
+            not $window.isOldIE()
 
-            out
 
           # use proxy for IE
           apiUrl: ->
@@ -337,3 +332,15 @@ angular.module('ng-token-auth', ['ngCookies'])
 
     # check to see if user is returning user
     $auth.validateUser()
+
+
+# ie8 and ie9 require special handling
+window.isOldIE = ->
+  out = false
+  nav = navigator.userAgent.toLowerCase()
+  if nav and nav.indexOf('msie') != -1
+    version = parseInt(nav.split('msie')[1])
+    if version < 10
+      out = true
+
+  out
