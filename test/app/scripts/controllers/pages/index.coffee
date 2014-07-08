@@ -1,7 +1,7 @@
 angular.module('ngTokenAuthTestApp')
   .controller 'IndexCtrl', ($scope, $auth, $http, $modal) ->
     $scope.accessRestrictedRoute = ->
-      $http.get($auth.config.apiUrl + '/demo/members_only')
+      $http.get($auth.apiUrl() + '/demo/members_only')
         .success((resp) -> alert(resp.data.message))
         .error((resp) -> alert(resp.errors[0]))
 

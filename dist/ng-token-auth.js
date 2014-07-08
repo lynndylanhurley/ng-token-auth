@@ -67,7 +67,13 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
               return this.dfd;
             },
             openAuthWindow: function(provider) {
-              return $window.open(this.apiUrl() + config.authProviderPaths[provider]);
+              var authUrl;
+              authUrl = config.apiUrl + config.authProviderPaths[provider] + '?auth_origin_url=' + window.location.href;
+              if (this.useExternalWindow()) {
+                return $window.open(authUrl);
+              } else {
+                return $window.location.href = $window.location.protocol + authUrl;
+              }
             },
             requestCredentials: function(authWindow) {
               if (authWindow.closed) {
@@ -116,8 +122,8 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
                     token = $location.search().token;
                     clientId = $location.search().client_id;
                     uid = $location.search().uid;
-                    $location.url($location.path());
                     this.setAuthHeader(this.buildAuthToken(token, clientId, uid));
+                    $location.url($location.path() || '/');
                   } else if ($cookieStore.get('auth_header')) {
                     this.header = $cookieStore.get('auth_header');
                     $http.defaults.headers.common['Authorization'] = this.header;
@@ -203,6 +209,18 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
               this.header = $http.defaults.headers.common['Authorization'] = header;
               return $cookieStore.put('auth_header', header);
             },
+            useExternalWindow: function() {
+              var nav, out, version;
+              out = true;
+              nav = navigator.userAgent.toLowerCase();
+              if (nav && nav.indexOf('msie') !== -1) {
+                version = parseInt(nav.split('msie')[1]);
+                if (version < 10) {
+                  out = false;
+                }
+              }
+              return out;
+            },
             apiUrl: function() {
               if (this._apiUrl == null) {
                 if (config.proxyIf()) {
@@ -232,23 +250,25 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
     };
   });
 }).run(function($auth, $window, $rootScope) {
-  $window.addEventListener("message", (function(_this) {
-    return function(ev) {
-      if (ev.data.message === 'deliverCredentials') {
-        ev.source.close();
-        delete ev.data.message;
-        $auth.handleValidAuth(ev.data, true);
-        $rootScope.$broadcast('auth:login', ev.data);
-      }
-      if (ev.data.message === 'authFailure') {
-        ev.source.close();
-        return $auth.cancelAuth({
-          reason: 'unauthorized',
-          errors: [ev.data.error]
-        });
-      }
-    };
-  })(this));
+  if ($window.addEventListener) {
+    $window.addEventListener("message", (function(_this) {
+      return function(ev) {
+        if (ev.data.message === 'deliverCredentials') {
+          ev.source.close();
+          delete ev.data.message;
+          $auth.handleValidAuth(ev.data, true);
+          $rootScope.$broadcast('auth:login', ev.data);
+        }
+        if (ev.data.message === 'authFailure') {
+          ev.source.close();
+          return $auth.cancelAuth({
+            reason: 'unauthorized',
+            errors: [ev.data.error]
+          });
+        }
+      };
+    })(this));
+  }
   $rootScope.user = $auth.user;
   $rootScope.authenticate = function(provider) {
     return $auth.authenticate(provider);

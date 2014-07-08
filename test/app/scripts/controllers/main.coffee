@@ -1,5 +1,5 @@
 angular.module('ngTokenAuthTestApp')
-  .controller 'MainCtrl', ($rootScope, $scope, $location, $state, $stateParams, usSpinnerService, $timeout) ->
+  .controller 'MainCtrl', ($rootScope, $scope, $location, $state, $stateParams, usSpinnerService, $timeout, $auth) ->
     # cache element selectors
     $body = $('body')
 

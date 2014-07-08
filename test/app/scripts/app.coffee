@@ -20,12 +20,19 @@ angular.module('ngTokenAuthTestApp', [
     $authProvider.configure({
       #apiUrl: '//localhost:3000'
       #apiUrl: '//devise-token-auth-demo.dev'
-      apiUrl: '//devise-token-auth-demo.herokuapp.com'
+      #apiUrl: '//devise-token-auth-demo.herokuapp.com'
+      apiUrl: '//devise-token-auth.192.168.1.102.xip.io'
+      proxyIf: -> true
     })
 
     $stateProvider
       .state 'index',
         url: '/'
+        templateUrl: 'index.html'
+        controller: 'IndexCtrl'
+
+      .state 'null',
+        url: ''
         templateUrl: 'index.html'
         controller: 'IndexCtrl'
 

@@ -1,7 +1,7 @@
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 var express   = require('express');
 var request   = require('request');
 var httpProxy = require('http-proxy');
-var CONFIG    = require('config');
 var s3Policy  = require('./server/s3');
 var sm        = require('sitemap');
 var os        = require('os');
@@ -10,6 +10,9 @@ var port    = process.env.PORT || 7777;
 var distDir = '/.tmp';
 var app     = express();
 
+// must override env and then init CONFIG
+process.env.NODE_CONFIG_DIR = './test/config'
+var CONFIG = require('config');
 
 // env setup
 // TODO: comment this better

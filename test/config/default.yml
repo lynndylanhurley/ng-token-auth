@@ -1,2 +1,2 @@
 SITE_DOMAIN: 'devise-token-auth-demo.dev'
-API_URL:     '//devise-token-auth-demo.dev/'
+API_URL:     '//devise-token-auth.192.168.1.102.xip.io/'

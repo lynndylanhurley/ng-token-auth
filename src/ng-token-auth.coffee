@@ -83,7 +83,15 @@ angular.module('ng-token-auth', ['ngCookies'])
 
           # open external window to authentication provider
           openAuthWindow: (provider) ->
-            $window.open(@apiUrl() + config.authProviderPaths[provider])
+            authUrl = config.apiUrl+
+              config.authProviderPaths[provider]+
+              '?auth_origin_url='+
+              window.location.href
+
+            if @useExternalWindow()
+              $window.open(authUrl)
+            else
+              $window.location.href = $window.location.protocol+authUrl
 
 
           # ping auth window to see if user has completed registration.
@@ -142,12 +150,12 @@ angular.module('ng-token-auth', ['ngCookies'])
                   clientId = $location.search().client_id
                   uid      = $location.search().uid
 
-                  # strip qs from url to prevent re-use of these params
-                  # on page refresh
-                  $location.url($location.path())
-
                   # persist these values
                   @setAuthHeader(@buildAuthToken(token, clientId, uid))
+
+                  # strip qs from url to prevent re-use of these params
+                  # on page refresh
+                  $location.url($location.path() || '/')
 
                 # token cookie is present. user is returning to the site, or
                 # has refreshed the page.
@@ -257,6 +265,16 @@ angular.module('ng-token-auth', ['ngCookies'])
             @header = $http.defaults.headers.common['Authorization'] = header
             $cookieStore.put('auth_header', header)
 
+          # ie8 + ie9 cannot use xdomain postMessage
+          useExternalWindow: ->
+            out = true
+            nav = navigator.userAgent.toLowerCase()
+            if nav and nav.indexOf('msie') != -1
+              version = parseInt(nav.split('msie')[1])
+              if version < 10
+                out = false
+
+            out
 
           # use proxy for IE
           apiUrl: ->
@@ -290,20 +308,21 @@ angular.module('ng-token-auth', ['ngCookies'])
 
   .run ($auth, $window, $rootScope) ->
     # add listeners for communication with external auth window
-    $window.addEventListener("message", (ev) =>
-      if ev.data.message == 'deliverCredentials'
-        ev.source.close()
-        delete ev.data.message
-        $auth.handleValidAuth(ev.data, true)
-        $rootScope.$broadcast('auth:login', ev.data)
+    if $window.addEventListener
+      $window.addEventListener("message", (ev) =>
+        if ev.data.message == 'deliverCredentials'
+          ev.source.close()
+          delete ev.data.message
+          $auth.handleValidAuth(ev.data, true)
+          $rootScope.$broadcast('auth:login', ev.data)
 
-      if ev.data.message == 'authFailure'
-        ev.source.close()
-        $auth.cancelAuth({
-          reason: 'unauthorized'
-          errors: [ev.data.error]
-        })
-    )
+        if ev.data.message == 'authFailure'
+          ev.source.close()
+          $auth.cancelAuth({
+            reason: 'unauthorized'
+            errors: [ev.data.error]
+          })
+      )
 
     # bind global user object to auth user
     $rootScope.user = $auth.user
