@@ -104,7 +104,7 @@ The `$auth` module is available for dependency injection during your app's run p
   </button>
   ~~~
 
-* **$auth.validateToken**: return a promise that will resolve if a user's auth token exists and is valid. This method does not take any arguments. [Read more](#token-validation-flow)
+* **$auth.validateUser**: return a promise that will resolve if a user's auth token exists and is valid. This method does not take any arguments. [Read more](#token-validation-flow)
 
   This method is called on page load during the app's run phase so that returning users will not need to manually re-authenticate themselves.
 
@@ -217,7 +217,7 @@ The following events are broadcast by the rootscope:
   
   **Example**:
   ~~~javascript
-  $rootScope.$on('auth:success', function(ev, user) {
+  $rootScope.$on('auth:login', function(ev, user) {
       alert('Welcome ', user.email);
   });
   ~~~
