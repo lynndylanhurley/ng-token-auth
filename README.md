@@ -425,6 +425,7 @@ Guidelines will be posted if the need arises.
 * Only verify tokens that have not expired.
 * Add interceptor to catch 401 responses, hold http requests until user has been authenticated.
 * Only add the auth header if request url matches api url.
+* IE8 + IE9 support just landed in master. Expect a release within the next day or two.
 * Tests.
 
 # License
