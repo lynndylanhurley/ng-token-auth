@@ -12,12 +12,11 @@ var app     = express();
 
 // env setup
 // TODO: comment this better
-if (process.env.NODE_ENV) {
+if (process.env.NODE_ENV && process.env.NODE_ENV != 'development') {
   distDir = '/dist-'+process.env.NODE_ENV.toLowerCase();
 } else {
   app.use(require('connect-livereload')());
 }
-
 
 // sitemap
 sitemap = sm.createSitemap({
@@ -94,6 +93,7 @@ app.get(/^(\/[^#\.]+)$/, function(req, res) {
   res.redirect('/#'+path);
 });
 
+console.log('@-->running app.js on ', port);
 
 app.use(express.static(__dirname + distDir));
 app.listen(port);
