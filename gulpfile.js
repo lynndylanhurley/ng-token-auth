@@ -1,6 +1,8 @@
 'use strict';
 // Generated on 2014-03-18 using generator-gulp-webapp 0.0.4
 
+process.env.NODE_CONFIG_DIR = './test/config'
+
 var gulp     = require('gulp');
 var wiredep  = require('wiredep').stream;
 //var sprite   = require('css-sprite').stream;
@@ -183,11 +185,25 @@ var jadeify = lazypipe()
     pretty: true
   });
 
+// inject global js vars
+var injectGlobals = lazypipe()
+  .pipe($.frep, [
+    {
+      pattern: '@@GLOBALS',
+      replacement: JSON.stringify({
+        apiUrl: config.API_URL
+      })
+    }
+  ]);
+
+console.log('@-->config', config);
+
 // Jade to HTML
 gulp.task('base-tmpl', function() {
   return gulp.src(appDir+'index.jade')
     .pipe($.changed(tmpDir))
     .pipe(jadeify())
+    .pipe(injectGlobals())
     .pipe($.inject($.bowerFiles({
       paths: {bowerJson: "test/bower.json"},
       read: false

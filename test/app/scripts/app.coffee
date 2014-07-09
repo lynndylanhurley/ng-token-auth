@@ -18,11 +18,7 @@ angular.module('ngTokenAuthTestApp', [
     $urlRouterProvider.otherwise('/404')
 
     $authProvider.configure({
-      #apiUrl: '//localhost:3000'
-      #apiUrl: '//devise-token-auth-demo.dev'
-      apiUrl: '//devise-token-auth-demo.herokuapp.com'
-      #apiUrl: '//devise-token-auth.192.168.1.102.xip.io'
-      #apiUrl: '//devise-token-auth.dev'
+      apiUrl:  CONFIG.apiUrl
       proxyIf: -> window.isOldIE()
       authProviderPaths:
         github:    '/auth/github'
