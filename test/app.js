@@ -16,7 +16,7 @@ var CONFIG = require('config');
 
 // env setup
 // TODO: comment this better
-if (process.env.NODE_ENV && process.env.NODE_ENV != 'development') {
+if (process.env.NODE_ENV && process.env.NODE_ENV != 'development' && process.env.NODE_ENV != 'travis') {
   distDir = '/dist-'+process.env.NODE_ENV.toLowerCase();
 } else {
   app.use(require('connect-livereload')());
