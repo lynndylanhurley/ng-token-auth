@@ -1,6 +1,7 @@
 'use strict';
-// Generated on 2014-03-18 using generator-gulp-webapp 0.0.4
 
+// config is in non-standard location. setting this env var will direct
+// node-config to the proper config files.
 process.env.NODE_CONFIG_DIR = './test/config'
 
 var gulp     = require('gulp');

@@ -1,5 +1,6 @@
+process.env.NODE_CONFIG_DIR = './test/config'
 require('coffee-script/register');
-var os = require('os');
+require('config');
 
 exports.config = {
   allScriptsTimeout: 11000,
@@ -17,7 +18,7 @@ exports.config = {
     'build': process.env.TRAVIS_BUILD_NUMBER
   },
 
-  baseUrl: 'http://'+os.hostname()+':7777/',
+  baseUrl: 'http://localhost:7777/',
 
   framework: 'jasmine',
 

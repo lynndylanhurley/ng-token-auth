@@ -9,9 +9,10 @@ angular.module('ngTokenAuthTestApp')
     $scope.$on('auth:registration-email-sent', (ev, data) ->
       $modal({
         title: "Success"
-        content: "A registration email was sent to " + data.email + ". "+
-          "follow the instructions contained in the email to complete "+
-          "registration."
+        html: true
+        content: "<div id='alert-registration-email-sent'>A registration email was "+
+          "sent to " + data.email + ". follow the instructions contained in the "+
+          "email to complete registration.</div>"
       })
 
       delete $scope.registrationForm[field] for field, val of $scope.registrationForm
@@ -20,14 +21,17 @@ angular.module('ngTokenAuthTestApp')
     $scope.$on('auth:registration-email-failed', (ev, data) ->
       $modal({
         title: "Error"
-        content: "Unable to send email registration: " + data.errors[0]
+        html: true
+        content: "<div id='alert-registration-email-failed'>Unable to send email "+
+          "registration: " + _.map(data.errors).toString() + "</div>"
       })
     )
 
     $scope.$on('auth:login', (ev, user) ->
       $modal({
         title: "Success"
-        content: "Welcome back " + user.email
+        html: true
+        content: "<div id='alert-auth-login'>Welcome back " + user.email + '</div>'
       })
 
       delete $scope.loginForm[field] for field, val of $scope.loginForm
@@ -37,20 +41,25 @@ angular.module('ngTokenAuthTestApp')
     $scope.$on('auth:failure', (ev, data) ->
       $modal({
         title: "Error"
-        content: "Authentication failure: " + data.errors[0]
+        html: true
+        content: "<div id='alert-failure'>Authentication failure: " +
+          data.errors[0] + '</div>'
       })
     )
 
     $scope.$on('auth:logout-success', (ev) ->
       $modal({
         title: 'Success'
-        content: 'Goodbye'
+        html: true
+        content: "<div id='alert-logout-success'>Goodbye</div>"
       })
     )
 
     $scope.$on('auth:logout-failure', (ev) ->
       $modal({
         title: 'Error'
-        content: 'Unable to complete logout. Please try again.'
+        html: true
+        content: "<div id='alert-logout-failure'>Unable to complete logout. "+
+          "Please try again.</div>"
       })
     )
