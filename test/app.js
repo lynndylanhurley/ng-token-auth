@@ -14,9 +14,12 @@ var app     = express();
 process.env.NODE_CONFIG_DIR = './test/config'
 var CONFIG = require('config');
 
+console.log('@-->API URL', CONFIG.API_URL);
+console.log('@-->NODE_ENV', process.env.NODE_ENV);
+
 // env setup
 // TODO: comment this better
-if (process.env.NODE_ENV && process.env.NODE_ENV != 'development') {
+if (process.env.NODE_ENV && process.env.NODE_ENV != 'development' && process.env.NODE_ENV != 'travis') {
   distDir = '/dist-'+process.env.NODE_ENV.toLowerCase();
 } else {
   app.use(require('connect-livereload')());
