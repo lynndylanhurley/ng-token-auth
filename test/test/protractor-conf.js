@@ -1,4 +1,5 @@
 require('coffee-script/register');
+var os = require('os');
 
 exports.config = {
   allScriptsTimeout: 11000,
