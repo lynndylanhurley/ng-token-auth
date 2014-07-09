@@ -14,6 +14,8 @@ var app     = express();
 process.env.NODE_CONFIG_DIR = './test/config'
 var CONFIG = require('config');
 
+console.log('@-->API URL', CONFIG.API_URL);
+
 // env setup
 // TODO: comment this better
 if (process.env.NODE_ENV && process.env.NODE_ENV != 'development' && process.env.NODE_ENV != 'travis') {
