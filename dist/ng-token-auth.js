@@ -57,6 +57,13 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
               })(this));
               return this.dfd.promise;
             },
+            requestPasswordReset: function(params) {
+              return $http.post(this.apiUrl() + config.passwordResetPath, params).success(function() {
+                return $rootScope.$broadcast('auth:password-reset-sent', params);
+              }).error(function(resp) {
+                return $rootScope.$broadcast('auth:password-reset-failed', resp);
+              });
+            },
             authenticate: function(provider) {
               var authWindow;
               if (this.dfd == null) {

@@ -70,6 +70,17 @@ angular.module('ng-token-auth', ['ngCookies'])
             @dfd.promise
 
 
+          # request password reset from API
+          requestPasswordReset: (params) ->
+            $http.post(@apiUrl() + config.passwordResetPath, params)
+              .success(->
+                $rootScope.$broadcast('auth:password-reset-sent', params)
+              )
+              .error((resp) ->
+                $rootScope.$broadcast('auth:password-reset-failed', resp)
+              )
+
+
           # open external auth provider in separate window, send requests for
           # credentials until api auth callback page responds.
           authenticate: (provider) ->

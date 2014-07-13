@@ -36,6 +36,15 @@ angular.module('ngTokenAuthTestApp')
       })
     )
 
+    $scope.$on('auth:password-reset-sent', (ev, params) ->
+      $modal({
+        title: "Success"
+        html: true
+        content: "<div id='alert-password-reset-sent'>Unable to send email "+
+          "password reset instructions sent to " + params.email + "</div>"
+      })
+    )
+
     $scope.$on('auth:login', (ev, user) ->
       $modal({
         title: "Success"
