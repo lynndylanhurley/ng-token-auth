@@ -105,10 +105,15 @@ br
 
   div.col-sm-12
     h3 Restricted routes
-    p(ng-show='user.uid') You are signed in, this will work
-    p(ng-show='!user.uid') You are signed NOT in, this will NOT work
+    p(ng-show='user.uid') You are signed in, these will work
+    p(ng-show='!user.uid') You are signed NOT in, these will NOT work
+
     button.btn.btn-lg(
       ng-click='accessRestrictedRoute()'
       ng-class='{"btn-primary": user.uid, "btn-danger": !user.uid}'
-    ) Access restricted route
+    ) Access single restricted route
 
+    button.btn.btn-lg(
+      ng-click='restrictedRoutesBatch()'
+      ng-class='{"btn-primary": user.uid, "btn-danger": !user.uid}'
+    ) Access multiple concurrent restricted routes

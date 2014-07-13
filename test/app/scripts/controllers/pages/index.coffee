@@ -1,9 +1,18 @@
 angular.module('ngTokenAuthTestApp')
-  .controller 'IndexCtrl', ($scope, $auth, $http, $modal) ->
+  .controller 'IndexCtrl', ($scope, $auth, $http, $modal, $q) ->
     $scope.accessRestrictedRoute = ->
       $http.get($auth.apiUrl() + '/demo/members_only')
         .success((resp) -> alert(resp.data.message))
         .error((resp) -> alert(resp.errors[0]))
+
+
+    $scope.restrictedRoutesBatch = ->
+      $q.all([
+        $http.get($auth.apiUrl() + '/demo/members_only')
+        $http.get($auth.apiUrl() + '/demo/members_only')
+      ])
+        .then((resp) -> alert('Multiple requests succeeded'))
+        .catch((resp) -> alert('Multiple requests failed'))
 
 
     $scope.$on('auth:registration-email-sent', (ev, data) ->

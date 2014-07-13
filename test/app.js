@@ -45,7 +45,7 @@ app.get('/sitemap.xml', function(req, res) {
 // proxy api requests (for older IE browsers)
 app.all('/proxy/*', function(req, res, next) {
   // transform request URL into remote URL
-  var apiUrl = 'http:'+CONFIG.API_URL+req.params[0];
+  var apiUrl = 'http:'+CONFIG.API_URL+'/'+req.params[0];
   var r = null;
 
   // preserve GET params

@@ -155,7 +155,7 @@ angular.module('ng-token-auth', ['ngCookies'])
 
                   # strip qs from url to prevent re-use of these params
                   # on page refresh
-                  $location.url($location.path() || '/')
+                  $location.url(($location.path() || '/'))
 
                 # token cookie is present. user is returning to the site, or
                 # has refreshed the page.

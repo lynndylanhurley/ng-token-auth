@@ -147,7 +147,7 @@ The `$auth` module is available for dependency injection during your app's run p
     });
   ~~~
 
-  Note that this is not secure, and that access to any restricted content should be limited by the server as well.
+  This example shows how to implement access control on the client side, however access to restricted information should be limited on the server as well (using something like [pundit](https://github.com/elabs/pundit) if you're using Rails).
 
 * **$auth.submitRegistration**: Users can register by email using this method. [Read more](#email-registration-flow). Accepts an object with the following params:
   * **email**
@@ -349,10 +349,10 @@ This module also provides support for email registration. The following diagram 
 The user's authentication information is included by the client in the `Authorization` header of each request. If you're using the [devise token auth](https://github.com/lynndylanhurley/devise_token_auth) gem, the header must follow this format:
 
 ~~~
-token=xxxxx client=yyyyy uid=zzzzz
+token=wwwww client=xxxxx expiry=yyyyy uid=zzzzz
 ~~~
 
-Replace `xxxxx` with the user's `auth_token` and `zzzzz` with the user's `uid`. The `client` field exists to allow for multiple simultaneous sessions per user. The `client` field defaults to `default` if omitted.
+Replace `xxxxx` with the user's `auth_token` and `zzzzz` with the user's `uid`. The `client` field exists to allow for multiple simultaneous sessions per user. The `client` field defaults to `default` if omitted. `expiry` is used by the client to invalidate expired tokens without making an API request. A more in depth explanation of these values is [here](https://github.com/lynndylanhurley/devise_token_auth#identifying-users-in-controllers).
 
 This will all happen automatically when using this module.
 
@@ -425,7 +425,7 @@ Guidelines will be posted if the need arises.
 * Only verify tokens that have not expired.
 * Add interceptor to catch 401 responses, hold http requests until user has been authenticated.
 * Only add the auth header if request url matches api url.
-* IE8 + IE9 support just landed in master. Expect a release within the next day or two.
+* IE8 + IE9 CORS is not ideal. Consider adding support for [xdomain](https://github.com/jpillora/xdomain).
 * Tests.
 
 # License
