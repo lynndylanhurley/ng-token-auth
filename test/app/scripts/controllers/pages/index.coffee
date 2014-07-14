@@ -45,11 +45,11 @@ angular.module('ngTokenAuthTestApp')
       })
     )
 
-    $scope.$on('auth:password-reset-failed', (ev, data) ->
+    $scope.$on('auth:password-reset-error', (ev, data) ->
       $modal({
         title: "Error"
         html: true
-        content: "<div id='alert-password-reset-failed'>Error: "+
+        content: "<div id='alert-password-reset-error'>Error: "+
           _.map(data.errors).toString() + "</div>"
       })
     )
@@ -99,22 +99,22 @@ angular.module('ngTokenAuthTestApp')
       passwordChangeModal.show()
     )
 
-    $scope.$on('auth:login', (ev, user) ->
+    $scope.$on('auth:login-success', (ev, user) ->
       $modal({
         title: "Success"
         html: true
-        content: "<div id='alert-auth-login'>Welcome back " + user.email + '</div>'
+        content: "<div id='alert-auth-login-success'>Welcome back " + user.email + '</div>'
       })
 
       delete $scope.loginForm[field] for field, val of $scope.loginForm
       delete $scope.registrationForm[field] for field, val of $scope.registrationForm
     )
 
-    $scope.$on('auth:failure', (ev, data) ->
+    $scope.$on('auth:login-error', (ev, data) ->
       $modal({
         title: "Error"
         html: true
-        content: "<div id='alert-failure'>Authentication failure: " +
+        content: "<div id='alert-login-error'>Authentication failure: " +
           data.errors[0] + '</div>'
       })
     )
@@ -127,11 +127,11 @@ angular.module('ngTokenAuthTestApp')
       })
     )
 
-    $scope.$on('auth:logout-failure', (ev) ->
+    $scope.$on('auth:logout-error', (ev) ->
       $modal({
         title: 'Error'
         html: true
-        content: "<div id='alert-logout-failure'>Unable to complete logout. "+
+        content: "<div id='alert-logout-error'>Unable to complete logout. "+
           "Please try again.</div>"
       })
     )

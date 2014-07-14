@@ -209,7 +209,10 @@ The `$auth` module is available for dependency injection during your app's run p
   <button class="btn btn-primary btn-lg" ng-click='signOut()'>Sign out</button>
   ~~~
 
-* **$auth.requestPasswordReset**: send password reset instructions to a user. This only applies to users that have registered using email. This method accepts an object containing the target email address. This method is also available in the `$rootScope` for use in templates.
+* **$auth.requestPasswordReset**: send password reset instructions to a user. This only applies to users that have registered using email. This method accepts an object with the following param:
+  * **email** 
+  
+  This method is also available in the `$rootScope` for use in templates.
 
   ##### Example use in a template:
   ~~~html
@@ -223,7 +226,11 @@ The `$auth` module is available for dependency injection during your app's run p
   </form>
   ~~~
 
-* **$auth.updatePassword**: change an authenticated user's password. This only applies to users that have registered using email. This method accepts an object containing `password` and `password_confirmation` params (both are required, must match). This method is also available in the `$rootScope` for use in templates.
+* **$auth.updatePassword**: change an authenticated user's password. This only applies to users that have registered using email. This method accepts an object with the following params:
+  * **password**
+  * **password_confirmation** 
+  
+  The two params must match. This method is also available in the `$rootScope` for use in templates.
 
   ##### Example use in a template
   ~~~html
@@ -241,9 +248,10 @@ The `$auth` module is available for dependency injection during your app's run p
     <button type="submit" class="btn btn-primary btn-lg">Change your password</button>
   </form>
   ~~~
+
 ### Events
 
-The following events are broadcast by the rootscope:
+The following events are broadcast by the `$rootScope`:
 
 * **auth:login-success** - broadcast after successful user authentication. event message contains the user object.
   
@@ -285,7 +293,7 @@ The following events are broadcast by the rootscope:
 
   **Example**:
   ~~~javascript
-  $scope.$on('auth:registration-email-sent', function(ev, message) {
+  $scope.$on('auth:registration-email-success', function(ev, message) {
       alert("A registration email was sent to " + message.email);
   });
   ~~~
@@ -294,7 +302,7 @@ The following events are broadcast by the rootscope:
 
   **Example**:
   ~~~javascript
-  $scope.$on('auth:registration-email-failed', function(ev, reason) {
+  $scope.$on('auth:registration-email-error', function(ev, reason) {
       alert("Registration failed: " + reason.errors[0]);
   });
   ~~~
@@ -464,8 +472,21 @@ This will all happen automatically when using this module.
 
 **Note**: If you require a different authorization header format, post an issue. I will make it a configuration option if there is a demand.
 
-# Proxy CORS requests
-Older browsers (IE8, IE9) have trouble with CORS requests. You will need to set up a proxy to support them.
+# IE8 and IE9
+
+IE8 and IE9 present the following obstacles:
+
+* They don't really support cross origin requests (CORS).
+* Their `postMessage` implementations don't work for our purposes.
+
+The following measures are necessary when dealing with these older browsers.
+
+#### IE8 and IE9 must proxy CORS requests
+
+You will need to set up an API proxy if the following are both true:
+
+* the API lives on a different domain than the client
+* you wish to support IE8 and IE9
 
 ##### Example proxy using express for node.js
 ~~~javascript
@@ -502,6 +523,17 @@ app.all('/proxy/*', function(req, res, next) {
 
 The above example assumes that you're using [express](http://expressjs.com/), [request](https://github.com/mikeal/request), and [http-proxy](https://github.com/nodejitsu/node-http-proxy), and that you have set the API_URL value using [node-config](https://github.com/lorenwest/node-config).
 
+#### IE8 and IE9 must use hard redirects for provider authentication
+
+Modern browsers can communicate across tabs and windows using [postMessage](https://developer.mozilla.org/en-US/docs/Web/API/Window.postMessage). This doesn't work for older browsers such as IE8 and IE9. In these cases the client must take the following steps when performing provider authentication (facebook, github, etc.):
+
+1. navigate from the client site to the API
+1. navigate from the API to the provider
+1. navigate from the provider to the API
+1. navigate from the API back to the client
+
+These steps are taken automatically when using this module with IE8 and IE9. I am currently investigating several `postMessage` polyfills, and hopefully this issue will be resolved shortly.
+
 ---
 
 # Development
@@ -531,7 +563,7 @@ Guidelines will be posted if the need arises.
 * Only verify tokens that have not expired.
 * Add interceptor to catch 401 responses, hold http requests until user has been authenticated.
 * Only add the auth header if request url matches api url.
-* IE8 + IE9 CORS is not ideal. Consider adding support for [xdomain](https://github.com/jpillora/xdomain).
+* The IE8 + IE9 CORS situation is dismal. Consider adding support for [xdomain](https://github.com/jpillora/xdomain).
 * Tests.
 
 # License

@@ -62,14 +62,14 @@ angular.module('ng-token-auth', ['ngCookies'])
             $http.post(@apiUrl() + config.emailSignInPath, params)
               .success((resp) =>
                 @handleValidAuth(resp.data)
-                $rootScope.$broadcast('auth:login', @user)
+                $rootScope.$broadcast('auth:login-success', @user)
               )
               .error((resp) =>
                 @rejectDfd({
                   reason: 'unauthorized'
                   errors: ['Invalid credentials']
                 })
-                $rootScope.$broadcast('auth:failure', resp)
+                $rootScope.$broadcast('auth:login-error', resp)
               )
             @dfd.promise
 
@@ -262,7 +262,7 @@ angular.module('ng-token-auth', ['ngCookies'])
                 $rootScope.$broadcast('auth:logout-success')
               )
               .error((resp) =>
-                $rootScope.$broadcast('auth:logout-failure', resp)
+                $rootScope.$broadcast('auth:logout-error', resp)
               )
 
 
@@ -286,7 +286,7 @@ angular.module('ng-token-auth', ['ngCookies'])
           cancelAuth: (reason) ->
             $timeout.cancel(@t)
             @rejectDfd(reason)
-            $rootScope.$broadcast('auth:failure', reason)
+            $rootScope.$broadcast('auth:login-error', reason)
 
 
           # auth token format. consider making this configurable
@@ -343,7 +343,7 @@ angular.module('ng-token-auth', ['ngCookies'])
           ev.source.close()
           delete ev.data.message
           $auth.handleValidAuth(ev.data, true)
-          $rootScope.$broadcast('auth:login', ev.data)
+          $rootScope.$broadcast('auth:login-success', ev.data)
 
         if ev.data.message == 'authFailure'
           ev.source.close()

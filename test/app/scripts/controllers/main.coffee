@@ -28,15 +28,6 @@ angular.module('ngTokenAuthTestApp')
       ), 0)
 
 
-    $rootScope.$on 'auth:failure', (event, reason) ->
-      console.log 'auth failure', reason
-
-    $rootScope.$on 'auth:success', (ev, user) ->
-      console.log 'auth success', user
-
-    $rootScope.$on 'auth:registration-email-sent', (ev, params) ->
-      console.log 'auth sent email', params
-
     # redraw the current page. useful for updating content when
     # data has changed server-side.
     $rootScope.refresh = ->
