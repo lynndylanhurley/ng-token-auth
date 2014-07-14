@@ -491,7 +491,7 @@ The following measures are necessary when dealing with these older browsers.
 
 You will need to set up an API proxy if the following conditions are both true:
 
-* the API lives on a different domain than the client
+* your API lives on a different domain than your client
 * you wish to support IE8 and IE9
 
 ##### Example proxy using express for node.js
