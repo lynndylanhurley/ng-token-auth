@@ -209,24 +209,56 @@ The `$auth` module is available for dependency injection during your app's run p
   <button class="btn btn-primary btn-lg" ng-click='signOut()'>Sign out</button>
   ~~~
 
+* **$auth.requestPasswordReset**: send password reset instructions to a user. This only applies to users that have registered using email. This method accepts an object containing the target email address. This method is also available in the `$rootScope` for use in templates.
+
+  ##### Example use in a template:
+  ~~~html
+  <form ng-submit="requestPasswordReset(passwordResetForm)" role="form" ng-init="passwordResetForm = {}">
+    <div class="form-group">
+      <label>email</label>
+      <input type="email" name="email" ng-model="passwordResetForm.email" required="required" class="form-control"/>
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-lg">Request password reset</button>
+  </form>
+  ~~~
+
+* **$auth.updatePassword**: change an authenticated user's password. This only applies to users that have registered using email. This method accepts an object containing `password` and `password_confirmation` params (both are required, must match). This method is also available in the `$rootScope` for use in templates.
+
+  ##### Example use in a template
+  ~~~html
+  <form ng-submit="updatePassword(changePasswordForm)" role="form" ng-init="changePasswordForm = {}">
+    <div class="form-group">
+      <label>password</label>
+      <input type="password" name="password" ng-model="changePasswordForm.password" required="required" class="form-control"/>
+    </div>
+
+    <div class="form-group">
+      <label>password confirmation</label>
+      <input type="password" name="password_confirmation" ng-model="changePasswordForm.password_confirmation" required="required" class="form-control"/>
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-lg">Change your password</button>
+  </form>
+  ~~~
 ### Events
 
 The following events are broadcast by the rootscope:
 
-* **auth:login** - broadcast after successful user authentication. event message contains the user object.
+* **auth:login-success** - broadcast after successful user authentication. event message contains the user object.
   
   **Example**:
   ~~~javascript
-  $rootScope.$on('auth:login', function(ev, user) {
+  $rootScope.$on('auth:login-success', function(ev, user) {
       alert('Welcome ', user.email);
   });
   ~~~
 
-* **auth:failure** - broadcast after user fails authentication.
+* **auth:login-error** - broadcast after user fails authentication.
   
   **Example**:
   ~~~javascript
-  $rootScope.$on('auth:failure', function(ev, reason) {
+  $rootScope.$on('auth:login-error', function(ev, reason) {
       alert('auth failed because', reason.errors[0]);
   });
   ~~~
@@ -240,16 +272,16 @@ The following events are broadcast by the rootscope:
   });
   ~~~
 
-* **auth:logout-failure** - broadcast after failed logout attempts. Message contains the failed logout response.
+* **auth:logout-error** - broadcast after failed logout attempts. Message contains the failed logout response.
 
   **Example**:
   ~~~javascript
-  $rootScope.$on('auth:logout-success', function(ev, reason) {
+  $rootScope.$on('auth:logout-error', function(ev, reason) {
       alert('logout failed because ' + reason.errors[0]);
   });
   ~~~
 
-* **auth:registration-email-sent** - broadcast after email registration request completes successfully. Message contains the params that were sent to the server.
+* **auth:registration-email-success** - broadcast after email registration request completes successfully. Message contains the params that were sent to the server.
 
   **Example**:
   ~~~javascript
@@ -258,12 +290,46 @@ The following events are broadcast by the rootscope:
   });
   ~~~
 
-* **auth:registration-email-failed** - broadcast after email registration request fails. Message contains the error response.
+* **auth:registration-email-error** - broadcast after email registration request fails. Message contains the error response.
 
   **Example**:
   ~~~javascript
   $scope.$on('auth:registration-email-failed', function(ev, reason) {
       alert("Registration failed: " + reason.errors[0]);
+  });
+  ~~~
+
+* **auth:password-reset-prompt** - broadcast when users arrive from links contained in password reset emails. This will be the signal for your app to prompt the user to reset their password. [Read more](#password-reset-flow).
+
+  The following example demonstrates one way to handle an `auth:password-reset-prompt` event. This example assumes that [angular ui-router](https://github.com/angular-ui/ui-router) is used for routing, and that there is a state called `account.password-reset` that contains instructions for changing the user's password.
+
+  **Password reset prompt example**:
+  ~~~javascript
+  angular.module('myApp')
+    .run(function($rootScope, $state) {
+      $rootScope.$on('auth:password-reset-prompt', function() {
+        $state.go('account.password-reset');
+      });
+    });
+  ~~~
+
+  You could also choose to display a modal, or you can ignore the event completely. What you do with the `auth:password-reset-prompt` event is entirely your choice.
+
+* **auth:password-change-success** - broadcast when users successfully update their password using the `$auth.updatePassword` method. [Read more](#password-reset-flow).
+  
+  **Example**:
+  ~~~javascript
+  $scope.$on('auth:password-change-success', function(ev) {
+    alert("Your password has been successfully updated!");
+  });
+  ~~~
+
+* **auth:password-change-error** - broadcast when the request resulting from the `$auth.updatePassword` method fails. [Read more](#password-reset-flow).
+  
+  **Example**:
+  ~~~javascript
+  $scope.$on('auth:registration-change-error', function(ev, reason) {
+    alert("Registration failed: " + reason.errors[0]);
   });
   ~~~
 
@@ -343,6 +409,46 @@ This module also provides support for email registration. The following diagram 
 ## Email sign in flow
 
 ![email sign in flow](https://github.com/lynndylanhurley/ng-token-auth/raw/master/test/app/images/flow/email-sign-in-flow.jpg)
+
+## Password reset flow
+
+The password reset flow is similar to the email registration flow.
+
+![password reset flow](https://github.com/lynndylanhurley/ng-token-auth/raw/master/test/app/images/flow/password-reset-flow.jpg)
+
+When the user visits the link contained in the resulting email, they will be authenticated for a single session. An event will be broadcast that can be used to prompt the user to update their password. See the [`auth:password-reset-prompt`](#events) event for details.
+
+## About batch requests
+
+By default, the API should update the auth token for each request. But sometimes it's neccessary to make several simultaneous requests to the API:
+
+#####Batch request example
+~~~javascript
+$scope.getResourceData = function() {
+
+  $http.get('/api/restricted_resource_1').success(function(resp) {
+    // handle response
+    $scope.resource1 = resp.data;
+  });
+
+  $http.get('/api/restricted_resource_2').success(function(resp) {
+    // handle response
+    $scope.resource2 = resp.data;
+  });
+};
+~~~
+
+In this case, it's impossible to update the header after the first request because the first request will not complete before the second one begins. The server must allow these batches of concurrent requests to share the same auth token. This diagram illustrates the grouping of batch requests over time:
+
+![batch request overview](https://github.com/lynndylanhurley/ng-token-auth/raw/master/test/app/images/flow/batch-request-overview.jpg)
+
+The following diagram details the relationship between the client, server, and access tokens used over time when dealing with batch requests:
+
+![batch request detail](https://github.com/lynndylanhurley/ng-token-auth/raw/master/test/app/images/flow/batch-request-detail.jpg)
+
+Note that when the server identifies that a request is part of a batch request, the user's auth token is not updated. The same updated auth token will be returned in the responses for each request in the batch (as is shown in the diagram).
+
+The [devise token auth](https://github.com/lynndylanhurley/devise_token_auth) gem automatically manages batch requests, and it provides settings to fine-tune how batch request groups are identified.
 
 # Identifying users on the server.
 
