@@ -73,16 +73,16 @@ angular.module('myApp', ['ng-token-auth'])
 
 ##### Config options:
 * **apiUrl**: the base route to your api. Each of the following paths will be relative to this URL.
-* **authProviderPaths**: an object containing paths to auth endpoints. keys are names of the providers, values are their auth paths relative to the `apiUrl`.
-* **tokenValidationPath**: relative path to validate authentication tokens.
+* **authProviderPaths**: an object containing paths to auth endpoints. keys are names of the providers, values are their auth paths relative to the `apiUrl`. [Read more](oauth2-authentication-flow).
+* **tokenValidationPath**: relative path to validate authentication tokens. [Read more](#token-validation-flow).
+* **emailRegistrationPath**: path for submitting new email registrations. [Read more](#email-registration-flow).
 * **signOutUrl**: relative path to sign user out. this will destroy the user's token both server-side and client-side.
-* **emailRegistrationPath**: path for submitting new email registrations.
-* **confirmationSuccessUrl**: this value is passed to the API for email registration. I use it to redirect after email registration, but that can also be set server-side or ignored. this is useful when working with APIs that have multiple client domains.
+* **confirmationSuccessUrl**: the url to which the API should redirect after users visit the link contained in email-registration emails. [Read more](#email-registration-flow).
+* **emailSignInPath**: path for signing in using email credentials. [Read more](#email-sign-in-flow).
 * **passwordResetPath**: path for requesting password reset emails. [Read more](#password-reset-flow).
 * **passwordUpdatePath**: path for submitting new passwords for authenticated users. [Read more](#password-reset-flow).
-* **emailSignInPath**: path for signing in using email credentials.
-* **passwordResetSuccessUrl**: the URL to which the API should redirect after users visit the links contained in password-reset emails.
-* **proxyIf**: older browsers have trouble with CORS ([read more](#proxy-cors-requests)). pass a method here to determine whether or not a proxy should be used. example: `function() { return !Modernizr.cors }`
+* **passwordResetSuccessUrl**: the URL to which the API should redirect after users visit the links contained in password-reset emails. [Read more](#password-reset-flow).
+* **proxyIf**: older browsers have trouble with CORS ([read more](#ie8-and-ie9)). pass a method here to determine whether or not a proxy should be used. example: `function() { return !Modernizr.cors }`
 * **proxyUrl**: proxy url if proxy is to be used
 
 
@@ -434,7 +434,7 @@ When the user visits the link contained in the resulting email, they will be aut
 
 ## About batch requests
 
-By default, the API should update the auth token for each request. But sometimes it's neccessary to make several simultaneous requests to the API:
+By default, the API should update the auth token for each request. But sometimes it's neccessary to make several concurrent requests to the API:
 
 #####Batch request example
 ~~~javascript
