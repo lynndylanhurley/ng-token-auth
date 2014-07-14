@@ -36,6 +36,15 @@ angular.module('ngTokenAuthTestApp')
       })
     )
 
+    $scope.$on('auth:email-confirmation-success', (ev, data) ->
+      $modal({
+        title: "Success!"
+        html: true
+        content: "<div id='alert-email-confirmation-success'>Welcome "+
+          data.email+". Your account has been successfully created."
+      })
+    )
+
     $scope.$on('auth:password-reset-success', (ev, params) ->
       $modal({
         title: "Success"

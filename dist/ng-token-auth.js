@@ -48,7 +48,7 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
               $http.post(this.apiUrl() + config.emailSignInPath, params).success((function(_this) {
                 return function(resp) {
                   _this.handleValidAuth(resp.data);
-                  return $rootScope.$broadcast('auth:login', _this.user);
+                  return $rootScope.$broadcast('auth:login-success', _this.user);
                 };
               })(this)).error((function(_this) {
                 return function(resp) {
@@ -56,7 +56,7 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
                     reason: 'unauthorized',
                     errors: ['Invalid credentials']
                   });
-                  return $rootScope.$broadcast('auth:failure', resp);
+                  return $rootScope.$broadcast('auth:login-error', resp);
                 };
               })(this));
               return this.dfd.promise;
@@ -145,6 +145,7 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
                     clientId = $location.search().client_id;
                     uid = $location.search().uid;
                     this.mustResetPassword = $location.search().reset_password;
+                    this.firstTimeLogin = $location.search().account_confirmation_success;
                     this.setAuthHeader(this.buildAuthToken(token, clientId, uid));
                     $location.url($location.path() || '/');
                   } else if ($cookieStore.get('auth_header')) {
@@ -170,6 +171,9 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
               return $http.get(this.apiUrl() + config.tokenValidationPath).success((function(_this) {
                 return function(resp) {
                   _this.handleValidAuth(resp.data);
+                  if (_this.firstTimeLogin) {
+                    $rootScope.$broadcast('auth:email-confirmation-success', _this.user);
+                  }
                   if (_this.mustResetPassword) {
                     return $rootScope.$broadcast('auth:password-reset-prompt', _this.user);
                   } else {
@@ -207,7 +211,7 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
                 };
               })(this)).error((function(_this) {
                 return function(resp) {
-                  return $rootScope.$broadcast('auth:logout-failure', resp);
+                  return $rootScope.$broadcast('auth:logout-error', resp);
                 };
               })(this));
             },
@@ -227,7 +231,7 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
             cancelAuth: function(reason) {
               $timeout.cancel(this.t);
               this.rejectDfd(reason);
-              return $rootScope.$broadcast('auth:failure', reason);
+              return $rootScope.$broadcast('auth:login-error', reason);
             },
             buildAuthToken: function(token, clientId, uid) {
               return "token=" + token + " client=" + clientId + " uid=" + uid;
@@ -275,7 +279,7 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
           ev.source.close();
           delete ev.data.message;
           $auth.handleValidAuth(ev.data, true);
-          $rootScope.$broadcast('auth:login', ev.data);
+          $rootScope.$broadcast('auth:login-success', ev.data);
         }
         if (ev.data.message === 'authFailure') {
           ev.source.close();

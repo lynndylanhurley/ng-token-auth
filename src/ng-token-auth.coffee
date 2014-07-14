@@ -182,6 +182,9 @@ angular.module('ng-token-auth', ['ngCookies'])
                   # check if redirected from password reset link
                   @mustResetPassword = $location.search().reset_password
 
+                  # check if redirected from email confirmation link
+                  @firstTimeLogin = $location.search().account_confirmation_success
+
                   # persist these values
                   @setAuthHeader(@buildAuthToken(token, clientId, uid))
 
@@ -218,6 +221,11 @@ angular.module('ng-token-auth', ['ngCookies'])
             $http.get(@apiUrl() + config.tokenValidationPath)
               .success((resp) =>
                 @handleValidAuth(resp.data)
+
+                # broadcast event for first time login
+                if @firstTimeLogin
+                  $rootScope.$broadcast('auth:email-confirmation-success', @user)
+
                 if @mustResetPassword
                   $rootScope.$broadcast('auth:password-reset-prompt', @user)
                 else
