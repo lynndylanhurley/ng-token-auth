@@ -313,6 +313,15 @@ The following events are broadcast by the `$rootScope`:
   });
   ~~~
 
+* **auth:email-confirmation-success** - broadcast when users arrive from links contained in password reset emails. You can use this to trigger "welcome" notifications to new users if you like.
+  
+  **Example**:
+  ~~~javascript
+  $scope.$on('auth:email-confirmation-success', function(ev, user) {
+      alert("Welcome, "+user.email+". Your account has been verified.");
+  });
+  ~~~
+
 * **auth:password-reset-prompt** - broadcast when users arrive from links contained in password reset emails. This will be the signal for your app to prompt the user to reset their password. [Read more](#password-reset-flow).
 
   The following example demonstrates one way to handle an `auth:password-reset-prompt` event. This example assumes that [angular ui-router](https://github.com/angular-ui/ui-router) is used for routing, and that there is a state called `account.password-reset` that contains instructions for changing the user's password.
