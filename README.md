@@ -51,14 +51,17 @@ angular.module('myApp', ['ng-token-auth'])
     // will extend the defaults using angular.extend
 
     $authProvider.configure({
-      apiUrl:                 '/api',
-      tokenValidationPath:    '/auth/validate_token',
-      signOutUrl:             '/auth/sign_out',
-      emailRegistrationPath:  '/auth',
-      confirmationSuccessUrl: window.location.href,
-      emailSignInPath:        '/auth/sign_in',
-      proxyIf:                function() { return false; },
-      proxyUrl:               '/proxy',
+      apiUrl:                  '/api',
+      tokenValidationPath:     '/auth/validate_token',
+      signOutUrl:              '/auth/sign_out',
+      emailRegistrationPath:   '/auth',
+      confirmationSuccessUrl:  window.location.href,
+      passwordResetPath:       '/auth/password'
+      passwordUpdatePath:      '/auth/password'
+      passwordResetSuccessUrl: window.location.href
+      emailSignInPath:         '/auth/sign_in',
+      proxyIf:                 function() { return false; },
+      proxyUrl:                '/proxy',
       authProviderPaths: {
         github:   '/auth/github',
         facebook: '/auth/facebook',
@@ -75,7 +78,10 @@ angular.module('myApp', ['ng-token-auth'])
 * **signOutUrl**: relative path to sign user out. this will destroy the user's token both server-side and client-side.
 * **emailRegistrationPath**: path for submitting new email registrations.
 * **confirmationSuccessUrl**: this value is passed to the API for email registration. I use it to redirect after email registration, but that can also be set server-side or ignored. this is useful when working with APIs that have multiple client domains.
+* **passwordResetPath**: path for requesting password reset emails. [Read more](#password-reset-flow).
+* **passwordUpdatePath**: path for submitting new passwords for authenticated users. [Read more](#password-reset-flow).
 * **emailSignInPath**: path for signing in using email credentials.
+* **passwordResetSuccessUrl**: the URL to which the API should redirect after users visit the links contained in password-reset emails.
 * **proxyIf**: older browsers have trouble with CORS ([read more](#proxy-cors-requests)). pass a method here to determine whether or not a proxy should be used. example: `function() { return !Modernizr.cors }`
 * **proxyUrl**: proxy url if proxy is to be used
 
