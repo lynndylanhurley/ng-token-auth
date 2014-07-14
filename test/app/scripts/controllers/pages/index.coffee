@@ -15,7 +15,7 @@ angular.module('ngTokenAuthTestApp')
         .catch((resp) -> alert('Multiple requests failed'))
 
 
-    $scope.$on('auth:registration-email-sent', (ev, data) ->
+    $scope.$on('auth:registration-email-success', (ev, data) ->
       $modal({
         title: "Success"
         html: true
@@ -27,7 +27,7 @@ angular.module('ngTokenAuthTestApp')
       delete $scope.registrationForm[field] for field, val of $scope.registrationForm
     )
 
-    $scope.$on('auth:registration-email-failed', (ev, data) ->
+    $scope.$on('auth:registration-email-error', (ev, data) ->
       $modal({
         title: "Error"
         html: true
@@ -36,13 +36,67 @@ angular.module('ngTokenAuthTestApp')
       })
     )
 
-    $scope.$on('auth:password-reset-sent', (ev, params) ->
+    $scope.$on('auth:password-reset-success', (ev, params) ->
       $modal({
         title: "Success"
         html: true
-        content: "<div id='alert-password-reset-sent'>Unable to send email "+
-          "password reset instructions sent to " + params.email + "</div>"
+        content: "<div id='alert-password-reset-failed'>Password reset "+
+          "instructions have been sent to " + params.email + "</div>"
       })
+    )
+
+    $scope.$on('auth:password-reset-failed', (ev, data) ->
+      $modal({
+        title: "Error"
+        html: true
+        content: "<div id='alert-password-reset-failed'>Error: "+
+          _.map(data.errors).toString() + "</div>"
+      })
+    )
+
+    passwordChangeModal = $modal({
+      title: "Change your password!"
+      html: true
+      show: false
+      contentTemplate: 'partials/password-reset-modal.html'
+    })
+
+    passwordChangeSuccessModal = $modal({
+      title: "Success"
+      html: true
+      show: false
+      content: "<div id='alert-password-change-success'>Your password "+
+        "has been successfully updated."
+    })
+
+    passwordChangeErrorScope = $scope.$new()
+    passwordChangeErrorModal = $modal({
+      title: "Error"
+      html: true
+      show: false
+      scope: passwordChangeErrorScope
+      contentTemplate: 'partials/password-change-error-modal.html'
+    })
+
+    $scope.showPasswordChangeModal = -> passwordChangeModal.show()
+
+    $scope.$on('auth:password-reset-prompt', -> passwordChangeModal.show())
+
+    $scope.$on('auth:password-change-success', ->
+      console.log 'password change success'
+      passwordChangeModal.hide()
+      passwordChangeSuccessModal.show()
+    )
+
+    $scope.$on('auth:password-change-error', (ev, data) ->
+      console.log 'password change failed'
+      passwordChangeErrorScope.errors = data.errors
+      passwordChangeModal.hide()
+      passwordChangeErrorModal.show()
+    )
+
+    passwordChangeErrorScope.$on('modal.hide', ->
+      passwordChangeModal.show()
     )
 
     $scope.$on('auth:login', (ev, user) ->

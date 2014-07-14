@@ -102,8 +102,35 @@ br
 
         button.btn.btn-primary.btn-lg(type='submit') Sign in
 
+.row
+  div.col-sm-6
+    h3 Reset password
 
-  div.col-sm-12
+    form(
+      ng-submit='requestPasswordReset(passwordResetForm)'
+      role='form'
+      ng-init='passwordResetForm = {}'
+    )
+      fieldset
+        .form-group
+          label email
+          input.form-control(
+            type='email'
+            name='email'
+            ng-model='passwordResetForm.email'
+            required
+          )
+
+        button.btn.btn-primary.btn-lg(type='submit') Send password reset email
+
+        button.btn.btn-primary.btn-lg(
+          type='button'
+          ng-click='showPasswordChangeModal()'
+          ng-disabled='!user.uid'
+        ) Change password
+
+.row
+  div.col-sm-6
     h3 Restricted routes
     p(ng-show='user.uid') You are signed in, these will work
     p(ng-show='!user.uid') You are signed NOT in, these will NOT work
@@ -111,9 +138,9 @@ br
     button.btn.btn-lg(
       ng-click='accessRestrictedRoute()'
       ng-class='{"btn-primary": user.uid, "btn-danger": !user.uid}'
-    ) Access single restricted route
+    ) Make single <br />privileged request
 
     button.btn.btn-lg(
       ng-click='restrictedRoutesBatch()'
       ng-class='{"btn-primary": user.uid, "btn-danger": !user.uid}'
-    ) Access multiple concurrent restricted routes
+    ) Make multiple <br />privileged requests
