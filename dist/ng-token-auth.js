@@ -6,6 +6,9 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
     emailSignInPath: '/auth/sign_in',
     emailRegistrationPath: '/auth',
     confirmationSuccessUrl: window.location.href,
+    passwordResetPath: '/auth/password',
+    passwordUpdatePath: '/auth/password',
+    passwordResetSuccessUrl: window.location.href,
     tokenValidationPath: '/auth/validate_token',
     proxyIf: function() {
       return false;
@@ -29,14 +32,15 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
             dfd: null,
             config: config,
             user: {},
+            mustResetPassword: false,
             submitRegistration: function(params) {
               angular.extend(params, {
                 confirm_success_url: config.confirmationSuccessUrl
               });
               return $http.post(this.apiUrl() + config.emailRegistrationPath, params).success(function() {
-                return $rootScope.$broadcast('auth:registration-email-sent', params);
+                return $rootScope.$broadcast('auth:registration-email-success', params);
               }).error(function(resp) {
-                return $rootScope.$broadcast('auth:registration-email-failed', resp);
+                return $rootScope.$broadcast('auth:registration-email-error', resp);
               });
             },
             submitLogin: function(params) {
@@ -56,6 +60,24 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
                 };
               })(this));
               return this.dfd.promise;
+            },
+            requestPasswordReset: function(params) {
+              params.redirect_url = config.passwordResetSuccessUrl;
+              return $http.post(this.apiUrl() + config.passwordResetPath, params).success(function() {
+                return $rootScope.$broadcast('auth:password-reset-success', params);
+              }).error(function(resp) {
+                return $rootScope.$broadcast('auth:password-reset-error', resp);
+              });
+            },
+            updatePassword: function(params) {
+              return $http.put(this.apiUrl() + config.passwordUpdatePath, params).success((function(_this) {
+                return function(resp) {
+                  $rootScope.$broadcast('auth:password-change-success', resp);
+                  return _this.mustResetPassword = false;
+                };
+              })(this)).error(function(resp) {
+                return $rootScope.$broadcast('auth:password-change-error', resp);
+              });
             },
             authenticate: function(provider) {
               var authWindow;
@@ -122,6 +144,7 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
                     token = $location.search().token;
                     clientId = $location.search().client_id;
                     uid = $location.search().uid;
+                    this.mustResetPassword = $location.search().reset_password;
                     this.setAuthHeader(this.buildAuthToken(token, clientId, uid));
                     $location.url($location.path() || '/');
                   } else if ($cookieStore.get('auth_header')) {
@@ -147,7 +170,11 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
               return $http.get(this.apiUrl() + config.tokenValidationPath).success((function(_this) {
                 return function(resp) {
                   _this.handleValidAuth(resp.data);
-                  return $rootScope.$broadcast('auth:validated', _this.user);
+                  if (_this.mustResetPassword) {
+                    return $rootScope.$broadcast('auth:password-reset-prompt', _this.user);
+                  } else {
+                    return $rootScope.$broadcast('auth:validated', _this.user);
+                  }
                 };
               })(this)).error((function(_this) {
                 return function(data) {
@@ -272,6 +299,12 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
   };
   $rootScope.submitLogin = function(params) {
     return $auth.submitLogin(params);
+  };
+  $rootScope.requestPasswordReset = function(params) {
+    return $auth.requestPasswordReset(params);
+  };
+  $rootScope.updatePassword = function(params) {
+    return $auth.updatePassword(params);
   };
   return $auth.validateUser();
 });

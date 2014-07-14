@@ -1,14 +1,17 @@
 angular.module('ng-token-auth', ['ngCookies'])
   .provider '$auth', ->
     config =
-      apiUrl:                 '/api'
-      signOutUrl:             '/auth/sign_out'
-      emailSignInPath:        '/auth/sign_in'
-      emailRegistrationPath:  '/auth'
-      confirmationSuccessUrl: window.location.href
-      tokenValidationPath:    '/auth/validate_token'
-      proxyIf:                -> false
-      proxyUrl:               '/proxy'
+      apiUrl:                  '/api'
+      signOutUrl:              '/auth/sign_out'
+      emailSignInPath:         '/auth/sign_in'
+      emailRegistrationPath:   '/auth'
+      confirmationSuccessUrl:  window.location.href
+      passwordResetPath:       '/auth/password'
+      passwordUpdatePath:      '/auth/password'
+      passwordResetSuccessUrl: window.location.href
+      tokenValidationPath:     '/auth/validate_token'
+      proxyIf:                 -> false
+      proxyUrl:                '/proxy'
       authProviderPaths:
         github:    '/auth/github'
         facebook:  '/auth/facebook'
@@ -30,10 +33,11 @@ angular.module('ng-token-auth', ['ngCookies'])
         '$timeout'
         '$rootScope'
         ($http, $q, $location, $cookies, $cookieStore, $window, $timeout, $rootScope) =>
-          header:   null
-          dfd:      null
-          config:   config
-          user:     {}
+          header:            null
+          dfd:               null
+          config:            config
+          user:              {}
+          mustResetPassword: false
 
 
           # register by email. server will send confirmation email
@@ -45,10 +49,10 @@ angular.module('ng-token-auth', ['ngCookies'])
             })
             $http.post(@apiUrl() + config.emailRegistrationPath, params)
               .success(->
-                $rootScope.$broadcast('auth:registration-email-sent', params)
+                $rootScope.$broadcast('auth:registration-email-success', params)
               )
               .error((resp) ->
-                $rootScope.$broadcast('auth:registration-email-failed', resp)
+                $rootScope.$broadcast('auth:registration-email-error', resp)
               )
 
 
@@ -68,6 +72,31 @@ angular.module('ng-token-auth', ['ngCookies'])
                 $rootScope.$broadcast('auth:failure', resp)
               )
             @dfd.promise
+
+
+          # request password reset from API
+          requestPasswordReset: (params) ->
+            params.redirect_url = config.passwordResetSuccessUrl
+
+            $http.post(@apiUrl() + config.passwordResetPath, params)
+              .success(->
+                $rootScope.$broadcast('auth:password-reset-success', params)
+              )
+              .error((resp) ->
+                $rootScope.$broadcast('auth:password-reset-error', resp)
+              )
+
+
+          # update user password
+          updatePassword: (params) ->
+            $http.put(@apiUrl() + config.passwordUpdatePath, params)
+              .success((resp) =>
+                $rootScope.$broadcast('auth:password-change-success', resp)
+                @mustResetPassword = false
+              )
+              .error((resp) ->
+                $rootScope.$broadcast('auth:password-change-error', resp)
+              )
 
 
           # open external auth provider in separate window, send requests for
@@ -150,6 +179,9 @@ angular.module('ng-token-auth', ['ngCookies'])
                   clientId = $location.search().client_id
                   uid      = $location.search().uid
 
+                  # check if redirected from password reset link
+                  @mustResetPassword = $location.search().reset_password
+
                   # persist these values
                   @setAuthHeader(@buildAuthToken(token, clientId, uid))
 
@@ -186,7 +218,10 @@ angular.module('ng-token-auth', ['ngCookies'])
             $http.get(@apiUrl() + config.tokenValidationPath)
               .success((resp) =>
                 @handleValidAuth(resp.data)
-                $rootScope.$broadcast('auth:validated', @user)
+                if @mustResetPassword
+                  $rootScope.$broadcast('auth:password-reset-prompt', @user)
+                else
+                  $rootScope.$broadcast('auth:validated', @user)
               )
               .error((data) =>
                 @dfd.reject({
@@ -325,9 +360,11 @@ angular.module('ng-token-auth', ['ngCookies'])
     $rootScope.authenticate  = (provider) -> $auth.authenticate(provider)
 
     # template access to view actions
-    $rootScope.signOut            = -> $auth.signOut()
-    $rootScope.submitRegistration = (params) -> $auth.submitRegistration(params)
-    $rootScope.submitLogin        = (params) -> $auth.submitLogin(params)
+    $rootScope.signOut              = -> $auth.signOut()
+    $rootScope.submitRegistration   = (params) -> $auth.submitRegistration(params)
+    $rootScope.submitLogin          = (params) -> $auth.submitLogin(params)
+    $rootScope.requestPasswordReset = (params) -> $auth.requestPasswordReset(params)
+    $rootScope.updatePassword       = (params) -> $auth.updatePassword(params)
 
     # check to see if user is returning user
     $auth.validateUser()
