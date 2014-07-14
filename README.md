@@ -554,7 +554,7 @@ There is a test project in the `test` directory of this app. To start a dev serv
 
 A dev server will start on [localhost:7777](http://localhost:7777).
 
-This module was built against [this API](https://github.com/lynndylanhurley/ng-token-auth-api-rails). You can use this, or feel free to use your own.
+This module was built against [this API](https://github.com/lynndylanhurley/devise_token_auth_demo). You can use this, or feel free to use your own.
 
 There are more detailed instructions in `test/README.md`.
 
