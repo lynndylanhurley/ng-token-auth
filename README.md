@@ -447,7 +447,7 @@ Tokens should be invalidated after each request to the API. The following diagra
 
 ![password reset flow](https://github.com/lynndylanhurley/ng-token-auth/raw/master/test/app/images/flow/token-update-detail.jpg)
 
-During each request, a new token is generated. The `Authorization` header that should be used in the next request is returned the `Authorization` header of the response. The last request in the diagram fails because it tries to use a token that was invalidated by the previous request.
+During each request, a new token is generated. The `Authorization` header that should be used in the next request is returned the `Authorization` header of the response to the last request. The last request in the diagram fails because it tries to use a token that was invalidated by the previous request.
 
 The only case where an expired token is allowed is during a [batch requets](#about-batch-requests).
 
