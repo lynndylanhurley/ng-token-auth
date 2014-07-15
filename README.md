@@ -455,7 +455,7 @@ Token management is handled by default when using this module with the [devise t
 
 ## About batch requests
 
-By default, the API should update the auth token for each request ([read more](#about-token-management)). But sometimes it's neccessary to make several concurrent requests to the API as in the following example:
+By default, the API should update the auth token for each request ([read more](#about-token-management)). But sometimes it's neccessary to make several concurrent requests to the API, for example:
 
 #####Batch request example
 ~~~javascript
