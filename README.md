@@ -483,7 +483,7 @@ The following diagram details the relationship between the client, server, and a
 
 ![batch request detail](https://github.com/lynndylanhurley/ng-token-auth/raw/master/test/app/images/flow/batch-request-detail.jpg)
 
-Note that when the server identifies that a request is part of a batch request, the user's auth token is not updated. The same updated auth token will be returned in the responses for each request in the batch (as is shown in the diagram).
+Note that when the server identifies that a request is part of a batch request, the user's auth token is not updated. The auth token will be updated for the first request in the batch, and then that same token will be returned in the responses for each subsequent request in the batch (as shown in the diagram).
 
 The [devise token auth](https://github.com/lynndylanhurley/devise_token_auth) gem automatically manages batch requests, and it provides settings to fine-tune how batch request groups are identified.
 
