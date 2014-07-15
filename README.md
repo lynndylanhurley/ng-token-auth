@@ -441,6 +441,18 @@ The password reset flow is similar to the email registration flow.
 
 When the user visits the link contained in the resulting email, they will be authenticated for a single session. An event will be broadcast that can be used to prompt the user to update their password. See the [`auth:password-reset-prompt`](#events) event for details.
 
+## About token management
+
+Tokens should be invalidated after each request to the API. The following diagram illustrates this concept:
+
+![password reset flow](https://github.com/lynndylanhurley/ng-token-auth/raw/master/test/app/images/flow/token-update-detail.jpg)
+
+During each request, a new token is generated. The `Authorization` header that should be used in the next request is returned the `Authorization` header of the response. The last request in the diagram fails because it tries to use a token that was invalidated by the previous request.
+
+The only case where an expired token is allowed is during a [batch requets](#about-batch-requests).
+
+Token management is done by default when using this module with the [devise token auth](https://github.com/lynndylanhurley/devise_token_auth) gem.
+
 ## About batch requests
 
 By default, the API should update the auth token for each request. But sometimes it's neccessary to make several concurrent requests to the API:
