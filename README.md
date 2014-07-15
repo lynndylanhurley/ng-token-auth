@@ -451,7 +451,7 @@ During each request, a new token is generated. The `Authorization` header that s
 
 The only case where an expired token is allowed is during [batch requests](#about-batch-requests).
 
-Token management is done by default when using this module with the [devise token auth](https://github.com/lynndylanhurley/devise_token_auth) gem.
+Token management is handled by default when using this module with the [devise token auth](https://github.com/lynndylanhurley/devise_token_auth) gem.
 
 ## About batch requests
 
