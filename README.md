@@ -455,7 +455,7 @@ Token management is handled by default when using this module with the [devise t
 
 ## About batch requests
 
-By default, the API should update the auth token for each request. But sometimes it's neccessary to make several concurrent requests to the API:
+By default, the API should update the auth token for each request. But sometimes it's neccessary to make several concurrent requests to the API as in the following example:
 
 #####Batch request example
 ~~~javascript
@@ -473,9 +473,11 @@ $scope.getResourceData = function() {
 };
 ~~~
 
-In this case, it's impossible to update the header after the first request because the first request will not complete before the second one begins. The server must allow these batches of concurrent requests to share the same auth token. This diagram illustrates the grouping of batch requests over time:
+In this case, it's impossible to update the `Authorization` header for the second request with the `Authorization` header of the first response because the second request will begin before the first one has finished. The server must allow these batches of concurrent requests to share the same auth token. This diagram illustrates how batch requests are identified by the server:
 
 ![batch request overview](https://github.com/lynndylanhurley/ng-token-auth/raw/master/test/app/images/flow/batch-request-overview.jpg)
+
+The "5 second" buffer in the diagram is the default used by the [devise token auth](https://github.com/lynndylanhurley/devise_token_auth) gem.
 
 The following diagram details the relationship between the client, server, and access tokens used over time when dealing with batch requests:
 
@@ -559,7 +561,7 @@ Modern browsers can communicate across tabs and windows using [postMessage](http
 1. navigate from the provider to the API
 1. navigate from the API back to the client
 
-These steps are taken automatically when using this module with IE8 and IE9. I am currently investigating several `postMessage` polyfills, and hopefully this issue will be resolved shortly.
+These steps are taken automatically when using this module with IE8 and IE9. I am currently investigating several `postMessage` polyfills. Hopefully this issue will be resolved shortly.
 
 ---
 
