@@ -473,7 +473,7 @@ $scope.getResourceData = function() {
 };
 ~~~
 
-In this case, it's impossible to update the `Authorization` header for the second request with the `Authorization` header of the first response because the second request will begin before the first one has finished. The server must allow these batches of concurrent requests to share the same auth token. This diagram illustrates how batch requests are identified by the server:
+In this case, it's impossible to update the `Authorization` header for the second request with the `Authorization` header of the first response because the second request will begin before the first one is complete. The server must allow these batches of concurrent requests to share the same auth token. This diagram illustrates how batch requests are identified by the server:
 
 ![batch request overview](https://github.com/lynndylanhurley/ng-token-auth/raw/master/test/app/images/flow/batch-request-overview.jpg)
 
