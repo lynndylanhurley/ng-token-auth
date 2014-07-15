@@ -342,8 +342,6 @@ angular.module('ng-token-auth', ['ngCookies'])
             $auth.setAuthHeader(response.headers('Authorization'))
         return response
 
-    console.log '@-->headers', $httpProvider.defaults.headers
-
     # disable IE ajax request caching
     $httpProvider.defaults.headers.get    ?= {}
     $httpProvider.defaults.headers.post   ?= {}

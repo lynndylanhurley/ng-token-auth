@@ -272,7 +272,6 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
       }
     };
   });
-  console.log('@-->headers', $httpProvider.defaults.headers);
   if ((_base = $httpProvider.defaults.headers).get == null) {
     _base.get = {};
   }

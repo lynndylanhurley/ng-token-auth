@@ -601,7 +601,6 @@ Guidelines will be posted if the need arises.
 * Only verify tokens that have not expired.
 * Add interceptor to catch 401 responses, hold http requests until user has been authenticated.
 * Only add the auth header if request url matches api url.
-* The IE8 + IE9 CORS situation is dismal. Consider adding support for [xdomain](https://github.com/jpillora/xdomain).
 * Tests.
 
 # License
