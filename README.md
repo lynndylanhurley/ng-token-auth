@@ -507,8 +507,17 @@ IE8 and IE9 present the following obstacles:
 
 * They don't really support cross origin requests (CORS).
 * Their `postMessage` implementations don't work for our purposes.
+* They both try to cache ajax requests.
 
 The following measures are necessary when dealing with these older browsers.
+
+#### AJAX cache must be disabled for IE8 + IE9
+
+IE8 + IE9 will try to cache ajax requests. This results in an issue where the request return 304 status with `Content-Type` set to `html` and everything goes haywire. 
+
+The solution to this problem is to set the `If-Modified-Since` headers to `'0'` on each of the request methods that we use in our app. This is done by default when using this module.
+
+The solution was lifted from [this stackoverflow post](http://stackoverflow.com/questions/16098430/angular-ie-caching-issue-for-http).
 
 #### IE8 and IE9 must proxy CORS requests
 

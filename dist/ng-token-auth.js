@@ -259,7 +259,8 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
     ]
   };
 }).config(function($httpProvider) {
-  return $httpProvider.interceptors.push(function($injector) {
+  var _base, _base1, _base2, _base3, _base4;
+  $httpProvider.interceptors.push(function($injector) {
     return {
       response: function(response) {
         $injector.invoke(function($http, $auth) {
@@ -271,6 +272,27 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
       }
     };
   });
+  console.log('@-->headers', $httpProvider.defaults.headers);
+  if ((_base = $httpProvider.defaults.headers).get == null) {
+    _base.get = {};
+  }
+  if ((_base1 = $httpProvider.defaults.headers).post == null) {
+    _base1.post = {};
+  }
+  if ((_base2 = $httpProvider.defaults.headers).put == null) {
+    _base2.put = {};
+  }
+  if ((_base3 = $httpProvider.defaults.headers).patch == null) {
+    _base3.patch = {};
+  }
+  if ((_base4 = $httpProvider.defaults.headers)["delete"] == null) {
+    _base4["delete"] = {};
+  }
+  $httpProvider.defaults.headers.get['If-Modified-Since'] = '0';
+  $httpProvider.defaults.headers.post['If-Modified-Since'] = '0';
+  $httpProvider.defaults.headers.put['If-Modified-Since'] = '0';
+  $httpProvider.defaults.headers.patch['If-Modified-Since'] = '0';
+  return $httpProvider.defaults.headers["delete"]['If-Modified-Since'] = '0';
 }).run(function($auth, $window, $rootScope) {
   if ($window.addEventListener) {
     $window.addEventListener("message", (function(_this) {

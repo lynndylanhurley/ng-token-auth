@@ -342,6 +342,21 @@ angular.module('ng-token-auth', ['ngCookies'])
             $auth.setAuthHeader(response.headers('Authorization'))
         return response
 
+    console.log '@-->headers', $httpProvider.defaults.headers
+
+    # disable IE ajax request caching
+    $httpProvider.defaults.headers.get    ?= {}
+    $httpProvider.defaults.headers.post   ?= {}
+    $httpProvider.defaults.headers.put    ?= {}
+    $httpProvider.defaults.headers.patch  ?= {}
+    $httpProvider.defaults.headers.delete ?= {}
+
+    $httpProvider.defaults.headers.get['If-Modified-Since']    = '0'
+    $httpProvider.defaults.headers.post['If-Modified-Since']   = '0'
+    $httpProvider.defaults.headers.put['If-Modified-Since']    = '0'
+    $httpProvider.defaults.headers.patch['If-Modified-Since']  = '0'
+    $httpProvider.defaults.headers.delete['If-Modified-Since'] = '0'
+
 
   .run ($auth, $window, $rootScope) ->
     # add listeners for communication with external auth window
