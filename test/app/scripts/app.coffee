@@ -25,6 +25,18 @@ angular.module('ngTokenAuthTestApp', [
         facebook:  '/auth/facebook'
         google:    '/auth/google_oauth2'
         developer: '/auth/developer'
+
+      ### uncomment to test alternate user model ###
+      #signOutUrl:              '/bong/sign_out'
+      #emailSignInPath:         '/bong/sign_in'
+      #emailRegistrationPath:   '/bong'
+      #passwordResetPath:       '/bong/password'
+      #passwordUpdatePath:      '/bong/password'
+      #tokenValidationPath:     '/bong/validate_token'
+      #authProviderPaths:
+        #github:    '/bong/github'
+        #facebook:  '/bong/facebook'
+        #google:    '/bong/google_oauth2'
     })
 
     $stateProvider
