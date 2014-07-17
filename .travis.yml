@@ -17,11 +17,9 @@ cache:
 
 before_install:
 - npm install
-- gem install sass
 - cd test
 - ../node_modules/.bin/bower install --config.directory=app/bower_components
-
-before_script:
 - cd ../
-- ./node_modules/.bin/gulp dev &
-- sleep 30
+
+after_success:
+- CODECLIMATE_REPO_TOKEN=3190c235d12d91187eea9e2f447d3006e4ed896a6b696398ddf55be8ccac60e2 codeclimate coverage/*/lcov.info

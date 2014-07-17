@@ -7,3 +7,4 @@ test/app/bower_components
 test/app/bower_components
 test/config/development.yml
 test/config/production.yml
+coverage
