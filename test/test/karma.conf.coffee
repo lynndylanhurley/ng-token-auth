@@ -55,8 +55,8 @@ module.exports = (config) ->
 
     frameworks: ['mocha', 'chai', 'sinon', 'chai-as-promised']
 
-    #browsers: Object.keys(customLaunchers)
-    browsers: ['Chrome']
+    browsers: Object.keys(customLaunchers)
+    #browsers: ['Chrome']
 
     colors: true
 
@@ -64,12 +64,12 @@ module.exports = (config) ->
       mocha:
         ui: 'tdd'
 
-    #sauceLabs:
-      #testName:         'ng-token-auth unit tests'
-      #startConnect:     false
-      #tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER
+    sauceLabs:
+      testName:         'ng-token-auth unit tests'
+      startConnect:     false
+      tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER
 
-    #customLaunchers: customLaunchers
+    customLaunchers: customLaunchers
 
     coverageReporter:
       type: 'lcov'

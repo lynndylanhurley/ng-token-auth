@@ -22,4 +22,4 @@ before_install:
 - cd ../
 
 after_success:
-- CODECLIMATE_REPO_TOKEN=3190c235d12d91187eea9e2f447d3006e4ed896a6b696398ddf55be8ccac60e2 codeclimate coverage/*/lcov.info
+- CODECLIMATE_REPO_TOKEN=3190c235d12d91187eea9e2f447d3006e4ed896a6b696398ddf55be8ccac60e2 node_modules/.bin/codeclimate coverage/*/lcov.info
