@@ -1,4 +1,39 @@
 module.exports = (config) ->
+  customLaunchers =
+    'SL_Chrome':
+      base: 'SauceLabs'
+      browserName: 'chrome'
+
+    #'SL_Firefox'
+      #base: 'SauceLabs'
+      #browserName: 'firefox'
+      #version: '26'
+
+    #'SL_Safari':
+      #base: 'SauceLabs'
+      #browserName: 'safari'
+      #platform: 'OS X 10.9'
+      #version: '7'
+
+    #'SL_IE_9':
+      #base: 'SauceLabs'
+      #browserName: 'internet explorer'
+      #platform: 'Windows 2008'
+      #version: '9'
+
+    #'SL_IE_10':
+      #base: 'SauceLabs'
+      #browserName: 'internet explorer'
+      #platform: 'Windows 2012'
+      #version: '10'
+
+    #'SL_IE_11':
+      #base: 'SauceLabs'
+      #browserName: 'internet explorer'
+      #platform: 'Windows 8.1'
+      #version: '11'
+
+
   config.set
     basePath : '../../'
 
@@ -8,7 +43,6 @@ module.exports = (config) ->
 
     files : [
       'test/app/bower_components/angular/angular.js'
-      'test/app/bower_components/angular-route/angular-route.js'
       'test/app/bower_components/angular-cookies/angular-cookies.js'
       'test/app/bower_components/angular-mocks/angular-mocks.js'
       'src/*.coffee'
@@ -18,11 +52,11 @@ module.exports = (config) ->
 
     autoWatch: true
 
-    reporters: ['spec']
+    reporters: ['spec', 'saucelabs']
 
     frameworks: ['mocha', 'chai', 'sinon', 'chai-as-promised']
 
-    browsers: ['sl_chrome']
+    browsers: Object.keys(customLaunchers)
 
     colors: true
 
@@ -32,18 +66,13 @@ module.exports = (config) ->
 
     sauceLabs:
       testName:         'ng-token-auth unit tests'
-      browsers:         ['sl_chrome']
       username:         process.env.SAUCE_USERNAME
       accessKey:        process.env.SAUCE_ACCESS_KEY
       startConnect:     true
       build:            process.env.TRAVIS_BUILD_NUMBER
       tunnelIdentifier: process.env.TRAVIS_BUILD_NUMBER
 
-      customLaunchers: [
-        base:        'SauceLabs'
-        browserName: 'chrome'
-        platform:    'Windows 7'
-      ]
+    customLaunchers: customLaunchers
 
     #coverageReporter:
       #type: 'lcov'

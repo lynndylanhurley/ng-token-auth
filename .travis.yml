@@ -17,7 +17,6 @@ cache:
 
 before_install:
 - npm install
-- gem install sass
 - cd test
 - ../node_modules/.bin/bower install --config.directory=app/bower_components
 - cd ../
