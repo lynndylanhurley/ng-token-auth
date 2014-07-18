@@ -63,6 +63,7 @@ module.exports = (config) ->
 
     colors: true
 
+
     client:
       mocha:
         ui: 'tdd'
@@ -70,6 +71,7 @@ module.exports = (config) ->
     sauceLabs:
       testName:         'ng-token-auth unit tests'
       startConnect:     false
+      tunnelIdentifier: process.env.TRAVIS_BUILD_NUMBER
 
     customLaunchers: customLaunchers
 
