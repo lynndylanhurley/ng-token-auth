@@ -69,8 +69,6 @@ module.exports = (config) ->
 
     sauceLabs:
       testName:         'ng-token-auth unit tests'
-      username:         process.env.SAUCE_USERNAME
-      accessKey:        process.env.SAUCE_ACCESS_KEY
       startConnect:     false
 
     customLaunchers: customLaunchers
