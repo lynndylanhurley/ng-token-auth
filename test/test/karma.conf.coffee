@@ -33,9 +33,8 @@ module.exports = (config) ->
       #platform: 'Windows 8.1'
       #version: '11'
 
-  console.log 'sauce user', process.env.SAUCE_USERNAME
-  console.log 'sauce key', process.env.SAUCE_ACCESS_KEY
-
+  console.log 'sauce tunnel id', process.env.TRAVIS_BUILD_NUMBER
+  console.log 'build', process.env.TRAVIS_BUILD_NUMBER
 
   config.set
     basePath : '../../'
@@ -71,7 +70,7 @@ module.exports = (config) ->
     sauceLabs:
       testName:         'ng-token-auth unit tests'
       startConnect:     false
-      tunnelIdentifier: process.env.TRAVIS_BUILD_NUMBER
+      tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER
 
     customLaunchers: customLaunchers
 
