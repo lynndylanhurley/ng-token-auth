@@ -20,8 +20,4 @@ before_install:
 - gem install sass
 - cd test
 - ../node_modules/.bin/bower install --config.directory=app/bower_components
-
-before_script:
 - cd ../
-- ./node_modules/.bin/gulp dev &
-- sleep 30

@@ -22,7 +22,7 @@ module.exports = (config) ->
 
     frameworks: ['mocha', 'chai', 'sinon', 'chai-as-promised']
 
-    browsers: ['Chrome']
+    browsers: ['sl_chrome']
 
     colors: true
 
