@@ -12,6 +12,7 @@ angular.module('ng-token-auth', ['ngCookies'])
       tokenValidationPath:     '/auth/validate_token'
       proxyIf:                 -> false
       proxyUrl:                '/proxy'
+      validateOnPageLoad:      true
       authProviderPaths:
         github:    '/auth/github'
         facebook:  '/auth/facebook'
@@ -80,10 +81,10 @@ angular.module('ng-token-auth', ['ngCookies'])
 
             $http.post(@apiUrl() + config.passwordResetPath, params)
               .success(->
-                $rootScope.$broadcast('auth:password-reset-success', params)
+                $rootScope.$broadcast('auth:password-reset-request-success', params)
               )
               .error((resp) ->
-                $rootScope.$broadcast('auth:password-reset-error', resp)
+                $rootScope.$broadcast('auth:password-reset-request-error', resp)
               )
 
 
@@ -107,7 +108,7 @@ angular.module('ng-token-auth', ['ngCookies'])
               authWindow = @openAuthWindow(provider)
               @requestCredentials(authWindow)
 
-            @dfd
+            @dfd.promise
 
 
           # open external window to authentication provider
@@ -158,6 +159,7 @@ angular.module('ng-token-auth', ['ngCookies'])
           # this needs to happen after a reflow so that the promise
           # can be rejected properly before it is destroyed.
           resolveDfd: ->
+            console.log 'resolving dfd'
             @dfd.resolve({id: @user.id})
             $timeout((=>
               @dfd = null
@@ -227,11 +229,20 @@ angular.module('ng-token-auth', ['ngCookies'])
                   $rootScope.$broadcast('auth:email-confirmation-success', @user)
 
                 if @mustResetPassword
-                  $rootScope.$broadcast('auth:password-reset-prompt', @user)
-                else
-                  $rootScope.$broadcast('auth:validated', @user)
+                  $rootScope.$broadcast('auth:password-reset-confirm-success', @user)
+
+                $rootScope.$broadcast('auth:validation-success', @user)
               )
               .error((data) =>
+                # broadcast event for first time login failure
+                if @firstTimeLogin
+                  $rootScope.$broadcast('auth:email-confirmation-error', data)
+
+                if @mustResetPassword
+                  $rootScope.$broadcast('auth:password-reset-confirm-error', data)
+
+                $rootScope.$broadcast('auth:validation-error', data)
+
                 @dfd.reject({
                   reason: 'unauthorized'
                   errors: ['Invalid/expired credentials']
@@ -388,7 +399,7 @@ angular.module('ng-token-auth', ['ngCookies'])
     $rootScope.updatePassword       = (params) -> $auth.updatePassword(params)
 
     # check to see if user is returning user
-    $auth.validateUser()
+    $auth.validateUser() if $auth.validateOnPageLoad
 
 
 # ie8 and ie9 require special handling
