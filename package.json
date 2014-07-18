@@ -65,7 +65,7 @@
     "wiredep": "~1.8.1"
   },
   "scripts": {
-    "test": "node_modules/.bin/karma start test/test/karam.conf.coffee --single-run"
+    "test": "node_modules/.bin/karma start test/test/karma.conf.coffee --single-run"
   },
   "engines": {
     "node": ">=0.10.0"
