@@ -20,7 +20,6 @@ before_install:
 - cd test
 - ../node_modules/.bin/bower install --config.directory=app/bower_components
 - cd ../
-- ls -al node_modules/.bin
 
 after_success:
-- CODECLIMATE_REPO_TOKEN=3190c235d12d91187eea9e2f447d3006e4ed896a6b696398ddf55be8ccac60e2 node_modules/.bin/codeclimate coverage/*/lcov.info
+- CODECLIMATE_REPO_TOKEN=3190c235d12d91187eea9e2f447d3006e4ed896a6b696398ddf55be8ccac60e2 node_modules/.bin/codeclimate < coverage/*/lcov.info
