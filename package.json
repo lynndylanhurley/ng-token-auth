@@ -7,7 +7,6 @@
     "express": "~3.5.1",
     "http-proxy": "~1.1.4",
     "js-yaml": "~3.0.2",
-    "karma": "^0.12.17",
     "request": "~2.36.0",
     "sitemap": "~0.7.3"
   },
