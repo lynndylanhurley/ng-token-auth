@@ -1,6 +1,7 @@
 # Angular Token Auth
 
 [![Build Status](https://travis-ci.org/lynndylanhurley/ng-token-auth.svg?branch=master)](https://travis-ci.org/lynndylanhurley/ng-token-auth)
+[![Test Coverage](https://codeclimate.com/github/lynndylanhurley/ng-token-auth/coverage.png)](https://codeclimate.com/github/lynndylanhurley/ng-token-auth)
 
 This module provides a simple method of client authentication that can be configured to work with any api.
 
