@@ -16,6 +16,7 @@
     "angular-sanitize": "~1.2.15",
     "angular-cookies": "~1.2.16",
     "angular-resource": "~1.2.16",
+    "angular-mocks": "~1.2.16",
     "matchmedia-ng": "~1.0.2",
     "angular-spinner": "~0.4.0",
     "respond": "~1.4.2"
