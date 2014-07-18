@@ -4,7 +4,7 @@ module.exports = (config) ->
       base: 'SauceLabs'
       browserName: 'chrome'
 
-    #'SL_Firefox'
+    #'SL_Firefox':
       #base: 'SauceLabs'
       #browserName: 'firefox'
       #version: '26'
@@ -32,6 +32,9 @@ module.exports = (config) ->
       #browserName: 'internet explorer'
       #platform: 'Windows 8.1'
       #version: '11'
+
+  console.log 'sauce user', process.env.SAUCE_USERNAME
+  console.log 'sauce key', process.env.SAUCE_ACCESS_KEY
 
 
   config.set
@@ -68,9 +71,7 @@ module.exports = (config) ->
       testName:         'ng-token-auth unit tests'
       username:         process.env.SAUCE_USERNAME
       accessKey:        process.env.SAUCE_ACCESS_KEY
-      startConnect:     true
-      build:            process.env.TRAVIS_BUILD_NUMBER
-      tunnelIdentifier: process.env.TRAVIS_BUILD_NUMBER
+      startConnect:     false
 
     customLaunchers: customLaunchers
 
