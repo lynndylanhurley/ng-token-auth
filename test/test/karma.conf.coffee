@@ -1,43 +1,9 @@
 module.exports = (config) ->
-  customLaunchers =
-    'SL_Chrome':
-      base: 'SauceLabs'
-      browserName: 'chrome'
-
-    #'SL_Firefox':
-      #base: 'SauceLabs'
-      #browserName: 'firefox'
-      #version: '26'
-
-    #'SL_Safari':
-      #base: 'SauceLabs'
-      #browserName: 'safari'
-      #platform: 'OS X 10.9'
-      #version: '7'
-
-    #'SL_IE_9':
-      #base: 'SauceLabs'
-      #browserName: 'internet explorer'
-      #platform: 'Windows 2008'
-      #version: '9'
-
-    #'SL_IE_10':
-      #base: 'SauceLabs'
-      #browserName: 'internet explorer'
-      #platform: 'Windows 2012'
-      #version: '10'
-
-    #'SL_IE_11':
-      #base: 'SauceLabs'
-      #browserName: 'internet explorer'
-      #platform: 'Windows 8.1'
-      #version: '11'
-
   config.set
     basePath : '../../'
 
     preprocessors: 
-      'src/*.coffee': ['coffee', 'coverage']
+      'src/*.coffee': ['coverage']
       'test/test/**/*.coffee': ['coffee']
 
     files : [
@@ -51,12 +17,11 @@ module.exports = (config) ->
 
     autoWatch: true
 
-    reporters: ['spec', 'saucelabs', 'coverage']
+    reporters: ['spec', 'coverage']
 
     frameworks: ['mocha', 'chai', 'sinon', 'chai-as-promised']
 
-    browsers: Object.keys(customLaunchers)
-    #browsers: ['Chrome']
+    browsers: ['Chrome']
 
     colors: true
 
@@ -64,15 +29,6 @@ module.exports = (config) ->
       mocha:
         ui: 'tdd'
 
-    sauceLabs:
-      testName:         'ng-token-auth unit tests'
-      startConnect:     false
-      tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER
-
-    customLaunchers: customLaunchers
-
     coverageReporter:
       type: 'lcov'
       dir: 'coverage/'
-      instrumenter:
-        '**/*.coffee': 'istanbul'

@@ -1,11 +1,13 @@
 # global injectors
-$httpBackend = null
-$rootScope   = null
-$location    = null
-$window      = null
-
 $authProvider = null
+$httpBackend  = null
+$rootScope    = null
+$location     = null
+$provider     = null
+$timeout      = null
+$window       = null
 $auth         = null
+$q            = null
 
 # global mock vars
 validToken      = '123xyz'
@@ -22,19 +24,24 @@ validUser =
   email: validEmail
   uid:   validUid
 
+
 # run before each test
 setup ->
-  module('ng-token-auth')
+  module 'ng-token-auth', (_$authProvider_, $provide) ->
+    $authProvider = _$authProvider_
+    $authProvider.configure({
+      validateOnPageLoad: false
+    })
+    return false
 
   inject ($injector) ->
     $httpBackend = $injector.get('$httpBackend')
     $rootScope   = $injector.get('$rootScope')
     $location    = $injector.get('$location')
+    $timeout     = $injector.get('$timeout')
     $window      = $injector.get('$window')
     $auth        = $injector.get('$auth')
-
-  # settings
-  $auth.validateOnPageLoad = false
+    $q           = $injector.get('$q')
 
   # listen for broadcast events
   sinon.spy($rootScope, '$broadcast')
@@ -44,6 +51,7 @@ setup ->
 teardown ->
   $httpBackend.verifyNoOutstandingExpectation()
   $httpBackend.verifyNoOutstandingRequest()
+  $auth.destroy()
 
 
 ### helper methods ###

@@ -14,13 +14,13 @@ suite 'email registration confirmation', ->
       $auth.validateUser()
       $httpBackend.flush()
 
-    test 'that new user is defined in the root scope', ->
+    test 'new user is defined in the root scope', ->
       assert.equal(validUser.uid, $rootScope.user.uid)
 
-    test 'that $rootScope broadcast validation success event', ->
+    test '$rootScope broadcast validation success event', ->
       assert $rootScope.$broadcast.calledWith('auth:validation-success')
 
-    test 'that $rootScope broadcast email confirmation success event', ->
+    test '$rootScope broadcast email confirmation success event', ->
       assert $rootScope.$broadcast.calledWith('auth:email-confirmation-success')
 
 
@@ -39,11 +39,11 @@ suite 'email registration confirmation', ->
       $auth.validateUser()
       $httpBackend.flush()
 
-    test 'that new user is not defined in the root scope', ->
+    test 'new user is not defined in the root scope', ->
       assert.equal(undefined, $rootScope.user.uid)
 
-    test 'that $rootScope broadcast validation error event', ->
+    test '$rootScope broadcast validation error event', ->
       assert $rootScope.$broadcast.calledWith('auth:validation-error')
 
-    test 'that $rootScope broadcast email confirmation error event', ->
+    test '$rootScope broadcast email confirmation error event', ->
       assert $rootScope.$broadcast.calledWith('auth:email-confirmation-error')

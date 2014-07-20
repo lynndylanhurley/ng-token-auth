@@ -5,20 +5,39 @@ suite 'email registration submission', ->
         .expectPOST('/api/auth')
         .respond(201, {success: true})
 
-      $auth.submitRegistration({
+    suite 'service module', ->
+      setup ->
+        $auth.submitRegistration({
+          email: validEmail
+          password: 'secret123'
+          password_confirmation: 'secret123'
+        })
+
+        $httpBackend.flush()
+
+      test '$rootScope should broadcast success event', ->
+        assert $rootScope.$broadcast.calledWithMatch('auth:registration-email-success')
+
+    suite 'directive access', ->
+      args =
         email: validEmail
         password: 'secret123'
         password_confirmation: 'secret123'
-      })
 
-      $httpBackend.flush()
+      setup ->
+        sinon.spy $auth, 'submitRegistration'
 
-    test '$rootScope should broadcast success event', ->
-      assert $rootScope.$broadcast.calledWithMatch('auth:registration-email-success')
+        $auth.submitRegistration(args)
+
+        $httpBackend.flush()
+
+      test '$auth.submitRegistration should have been called', ->
+        assert $auth.submitRegistration.calledWithMatch(args)
+
 
   suite 'failed submission', ->
     suite 'mismatched password', ->
-      errorResp = 
+      errorResp =
         success: false
         errors: ['balls']
         fieldErrors: {

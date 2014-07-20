@@ -1,5 +1,5 @@
 angular.module('ng-token-auth', ['ngCookies'])
-  .provider '$auth', ->
+  .provider('$auth', ->
     config =
       apiUrl:                  '/api'
       signOutUrl:              '/auth/sign_out'
@@ -13,6 +13,7 @@ angular.module('ng-token-auth', ['ngCookies'])
       proxyIf:                 -> false
       proxyUrl:                '/proxy'
       validateOnPageLoad:      true
+      forceHardRedirect:       false
       authProviderPaths:
         github:    '/auth/github'
         facebook:  '/auth/facebook'
@@ -34,11 +35,77 @@ angular.module('ng-token-auth', ['ngCookies'])
         '$timeout'
         '$rootScope'
         ($http, $q, $location, $cookies, $cookieStore, $window, $timeout, $rootScope) =>
+          shit:              null
           header:            null
           dfd:               null
           config:            config
           user:              {}
           mustResetPassword: false
+          listener:          null
+
+
+          initialize: ->
+            @shit = new Date().getTime() * Math.random()
+            @initializeListeners()
+            @addScopeMethods()
+
+
+          initializeListeners: ->
+            @listener = @handlePostMessage.bind(@)
+            if $window.addEventListener
+              $window.addEventListener("message", @listener, false)
+
+
+          cancel: (reason) ->
+            if @t?
+              $timeout.cancel(@t)
+
+            if @dfd?
+              @rejectDfd(reason)
+
+            return $timeout((=> @t = null), 0)
+
+
+          destroy: ->
+            @cancel()
+
+            if $window.removeEventListener
+              $window.removeEventListener("message", @listener, false)
+
+
+          handlePostMessage: (ev) ->
+            if ev.data.message == 'deliverCredentials'
+              delete ev.data.message
+              @handleValidAuth(ev.data, true)
+              $rootScope.$broadcast('auth:login-success', ev.data)
+
+            if ev.data.message == 'authFailure'
+              @cancel({
+                reason: 'unauthorized'
+                errors: [ev.data.error]
+              })
+
+              $rootScope.$broadcast('auth:login-error', reason || {})
+
+
+          addScopeMethods: ->
+            # bind global user object to auth user
+            $rootScope.user = @user
+
+            # template access to authentication method
+            $rootScope.authenticate  = (provider) -> @authenticate(provider)
+
+            # template access to view actions
+            $rootScope.signOut              = -> @signOut()
+            $rootScope.submitRegistration   = (params) -> @submitRegistration(params)
+            $rootScope.submitLogin          = (params) -> @submitLogin(params)
+            $rootScope.requestPasswordReset = (params) -> @requestPasswordReset(params)
+            $rootScope.updatePassword       = (params) -> @updatePassword(params)
+
+            # check to see if user is returning user
+            if @config.validateOnPageLoad
+              throw 'what the fuck are you doinggggg'
+              @validateUser()
 
 
           # register by email. server will send confirmation email
@@ -59,7 +126,7 @@ angular.module('ng-token-auth', ['ngCookies'])
 
           # capture input from user, authenticate serverside
           submitLogin: (params) ->
-            @dfd = $q.defer()
+            @initDfd()
             $http.post(@apiUrl() + config.emailSignInPath, params)
               .success((resp) =>
                 @handleValidAuth(resp.data)
@@ -104,24 +171,27 @@ angular.module('ng-token-auth', ['ngCookies'])
           # credentials until api auth callback page responds.
           authenticate: (provider) ->
             unless @dfd?
-              @dfd = $q.defer()
-              authWindow = @openAuthWindow(provider)
-              @requestCredentials(authWindow)
+              @initDfd()
+              @openAuthWindow(provider)
 
             @dfd.promise
 
 
           # open external window to authentication provider
           openAuthWindow: (provider) ->
-            authUrl = config.apiUrl+
-              config.authProviderPaths[provider]+
-              '?auth_origin_url='+
-              window.location.href
+            authUrl = @buildAuthUrl(provider)
 
             if @useExternalWindow()
-              $window.open(authUrl)
+              @requestCredentials($window.open(authUrl))
             else
-              $window.location.href = $window.location.protocol+authUrl
+              $location.replace(authUrl)
+
+
+          buildAuthUrl: (provider) ->
+            authUrl  = config.apiUrl
+            authUrl += config.authProviderPaths[provider]
+            authUrl += '?auth_origin_url='
+            authUrl += $location.href
 
 
           # ping auth window to see if user has completed registration.
@@ -133,7 +203,7 @@ angular.module('ng-token-auth', ['ngCookies'])
             # user has closed the external provider's auth window without
             # completing login.
             if authWindow.closed
-              @rejectDfd({
+              @cancel({
                 reason: 'unauthorized'
                 errors: ['User canceled login']
               })
@@ -145,21 +215,10 @@ angular.module('ng-token-auth', ['ngCookies'])
               @t = $timeout((=>@requestCredentials(authWindow)), 500)
 
 
-          # failed login. invalidate auth header and reject promise.
-          # defered object must be destroyed after reflow.
-          rejectDfd: (reason) ->
-            @invalidateTokens()
-            if @dfd?
-              @dfd.reject(reason)
-              $timeout((=>
-                @dfd = null
-              ), 0)
-
 
           # this needs to happen after a reflow so that the promise
           # can be rejected properly before it is destroyed.
           resolveDfd: ->
-            console.log 'resolving dfd'
             @dfd.resolve({id: @user.id})
             $timeout((=>
               @dfd = null
@@ -171,7 +230,7 @@ angular.module('ng-token-auth', ['ngCookies'])
           # of pages that have restricted access
           validateUser: ->
             unless @dfd?
-              @dfd = $q.defer()
+              @initDfd()
 
               unless @header and @user.id
                 # token querystring is present. user most likely just came from
@@ -243,12 +302,10 @@ angular.module('ng-token-auth', ['ngCookies'])
 
                 $rootScope.$broadcast('auth:validation-error', data)
 
-                @dfd.reject({
+                @rejectDfd({
                   reason: 'unauthorized'
                   errors: ['Invalid/expired credentials']
                 })
-                # wait for reflow, nullify dfd
-                $timeout((=> @dfd = null), 0)
               )
 
 
@@ -301,13 +358,6 @@ angular.module('ng-token-auth', ['ngCookies'])
             @resolveDfd()
 
 
-          # user closed external auth dialog. cancel authentication
-          cancelAuth: (reason) ->
-            $timeout.cancel(@t)
-            @rejectDfd(reason)
-            $rootScope.$broadcast('auth:login-error', reason)
-
-
           # auth token format. consider making this configurable
           buildAuthToken: (token, clientId, uid) ->
             "token=#{token} client=#{clientId} uid=#{uid}"
@@ -321,7 +371,22 @@ angular.module('ng-token-auth', ['ngCookies'])
 
           # ie8 + ie9 cannot use xdomain postMessage
           useExternalWindow: ->
-            not $window.isOldIE()
+            not (config.forceHardRedirect || $window.isOldIE())
+
+
+          initDfd: ->
+            @dfd = $q.defer()
+
+
+          # failed login. invalidate auth header and reject promise.
+          # defered object must be destroyed after reflow.
+          rejectDfd: (reason) ->
+            @invalidateTokens()
+            if @dfd?
+              @dfd.reject(reason)
+
+              # must nullify after reflow so promises can be rejected
+              $timeout((=> @dfd = null), 0)
 
 
           # use proxy for IE
@@ -335,11 +400,12 @@ angular.module('ng-token-auth', ['ngCookies'])
             @_apiUrl
       ]
     }
+  )
 
 
   # each response will contain auth headers that have been updated by
   # the server. copy those headers for use in the next request.
-  .config ($httpProvider) ->
+  .config(($httpProvider) ->
     # this is ugly...
     # we need to configure an interceptor (must be done in the configuration
     # phase), but we need access to the $http service, which is only available
@@ -353,53 +419,18 @@ angular.module('ng-token-auth', ['ngCookies'])
             $auth.setAuthHeader(response.headers('Authorization'))
         return response
 
-    # disable IE ajax request caching
-    $httpProvider.defaults.headers.get    ?= {}
-    $httpProvider.defaults.headers.post   ?= {}
-    $httpProvider.defaults.headers.put    ?= {}
-    $httpProvider.defaults.headers.patch  ?= {}
-    $httpProvider.defaults.headers.delete ?= {}
+    # define http methods that may need to carry auth headers
+    httpMethods = ['get', 'post', 'put', 'patch', 'delete']
 
-    $httpProvider.defaults.headers.get['If-Modified-Since']    = '0'
-    $httpProvider.defaults.headers.post['If-Modified-Since']   = '0'
-    $httpProvider.defaults.headers.put['If-Modified-Since']    = '0'
-    $httpProvider.defaults.headers.patch['If-Modified-Since']  = '0'
-    $httpProvider.defaults.headers.delete['If-Modified-Since'] = '0'
+    # disable IE ajax request caching for each of the necessary http methods
+    angular.forEach(httpMethods, (method) ->
+      $httpProvider.defaults.headers[method] ?= method
+      $httpProvider.defaults.headers[method]['If-Modified-Since'] = '0'
+    )
 
+  )
 
-  .run ($auth, $window, $rootScope) ->
-    # add listeners for communication with external auth window
-    if $window.addEventListener
-      $window.addEventListener("message", (ev) =>
-        if ev.data.message == 'deliverCredentials'
-          ev.source.close()
-          delete ev.data.message
-          $auth.handleValidAuth(ev.data, true)
-          $rootScope.$broadcast('auth:login-success', ev.data)
-
-        if ev.data.message == 'authFailure'
-          ev.source.close()
-          $auth.cancelAuth({
-            reason: 'unauthorized'
-            errors: [ev.data.error]
-          })
-      )
-
-    # bind global user object to auth user
-    $rootScope.user = $auth.user
-
-    # template access to authentication method
-    $rootScope.authenticate  = (provider) -> $auth.authenticate(provider)
-
-    # template access to view actions
-    $rootScope.signOut              = -> $auth.signOut()
-    $rootScope.submitRegistration   = (params) -> $auth.submitRegistration(params)
-    $rootScope.submitLogin          = (params) -> $auth.submitLogin(params)
-    $rootScope.requestPasswordReset = (params) -> $auth.requestPasswordReset(params)
-    $rootScope.updatePassword       = (params) -> $auth.updatePassword(params)
-
-    # check to see if user is returning user
-    $auth.validateUser() if $auth.validateOnPageLoad
+  .run(($auth, $window, $rootScope) -> $auth.initialize())
 
 
 # ie8 and ie9 require special handling

@@ -1,47 +1,132 @@
 suite 'oauth2 login', ->
-  suite 'success', ->
-    suite 'using postMessage', ->
-      dfd = null
+  dfd = null
 
-      setup ->
-        # disable popup behavior
-        $window.open = ->
-          closed: false
-          postMessage: ->
+  suite 'using postMessage', ->
+    popupWindow =
+      closed: false
+      postMessage: ->
 
-        # verify that popup was initiated
-        sinon.spy($window, 'open')
+    setup ->
+      # disable popup behavior
+      $window.open = -> popupWindow
 
-        dfd = $auth.authenticate('github')
+      # verify that popup was initiated
+      sinon.spy($window, 'open')
 
-        # fake response from api redirect
-        $window.postMessage({
-          message:    "deliverCredentials"
+      dfd = $auth.authenticate('github')
+
+      return false
+
+    test 'user should be authenticated', (done)->
+      called = false
+      dfd.then(=>
+        assert.deepEqual($rootScope.user, {
           id:         validUser.id
           uid:        validUser.uid
           email:      validUser.email
           auth_token: validToken
           client_id:  validClient
-        }, '*')
+        })
+        called = true
+      )
 
-      test 'user should be authenticated', (done) ->
-        dfd.then(=>
-          assert.deepEqual($rootScope.user, {
-            id:         validUser.id
-            uid:        validUser.uid
-            email:      validUser.email
-            auth_token: validToken
-            client_id:  validClient
-          })
-        )
+      # fake response from api redirect
+      $window.postMessage({
+        message:    "deliverCredentials"
+        id:         validUser.id
+        uid:        validUser.uid
+        email:      validUser.email
+        auth_token: validToken
+        client_id:  validClient
+      }, '*')
 
-        setTimeout(done, 1500)
+      $timeout.flush()
 
-    suite 'using hard redirect', ->
-      successResp =
-        success: true
-        data: validUser
+      assert(true, called)
 
+      done()
+
+    suite 'window closed', ->
+      setup ->
+        sinon.spy($auth, 'cancel')
+
+      teardown ->
+        popupWindow.closed = false
+
+      test 'window is closed', (done) ->
+        called = false
+
+        dfd.catch =>
+          called = true
+
+        popupWindow.closed = true
+
+        $timeout.flush()
+
+        assert $auth.cancel.called
+        assert.equal(true, called)
+        assert.equal(null, $auth.t)
+        done()
+
+
+    suite 'cancel authentication', ->
+      test 'timer is rejected then nullified', (done) ->
+        called = false
+
+        $auth.t.catch =>
+          called = true
+
+        $auth.cancel()
+
+        # wait for reflow
+        setTimeout((->
+          $timeout.flush()
+          assert.equal(true, called)
+          assert.equal(null, $auth.t)
+          done()
+        ), 0)
+
+      test 'promise is rejected then nullified', (done) ->
+        called = false
+
+        $auth.dfd.promise.catch ->
+          called = true
+
+        $auth.cancel()
+
+        # wait for reflow
+        setTimeout((->
+          $timeout.flush()
+          assert.equal(true, called)
+          assert.equal(null, $auth.dfd)
+          done()
+        ), 0)
+
+  suite 'using hard redirect', ->
+    successResp =
+      success: true
+      data: validUser
+
+    suite 'to api', ->
+      redirectUrl = null
+
+      setup ->
+        redirectUrl = $auth.buildAuthUrl('github')
+        $authProvider.configure({forceHardRedirect: true})
+
+        # mock location replace, create spy
+        sinon.stub($location, 'replace').returns(null)
+
+        $auth.authenticate('github')
+        return false
+
+      teardown ->
+        $authProvider.configure({forceHardRedirect: false})
+
+      test 'location should be replaced', ->
+        assert($location.replace.calledWithMatch(redirectUrl))
+
+    suite 'on return from api', ->
       setup ->
         $httpBackend
           .expectGET('/api/auth/validate_token')
@@ -52,8 +137,8 @@ suite 'oauth2 login', ->
         $auth.validateUser()
         $httpBackend.flush()
 
-      test 'that new user is not defined in the root scope', ->
+      test 'new user is not defined in the root scope', ->
         assert.equal(validUser.uid, $rootScope.user.uid)
 
-      test 'that $rootScope broadcast validation success event', ->
+      test '$rootScope broadcast validation success event', ->
         assert $rootScope.$broadcast.calledWithMatch('auth:validation-success', validUser)
