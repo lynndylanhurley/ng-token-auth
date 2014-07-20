@@ -17,43 +17,74 @@ suite 'oauth2 login', ->
 
       return false
 
-    test 'user should be authenticated', (done)->
-      called = false
-      dfd.then(=>
-        assert.deepEqual($rootScope.user, {
+    suite 'postMessage success', ->
+      test 'user should be authenticated', (done)->
+        called = false
+        dfd.then(=>
+          called = true
+        )
+
+        # fake response from api redirect
+        $window.postMessage({
+          message:    "deliverCredentials"
           id:         validUser.id
           uid:        validUser.uid
           email:      validUser.email
           auth_token: validToken
           client_id:  validClient
-        })
-        called = true
-      )
+        }, '*')
 
-      # fake response from api redirect
-      $window.postMessage({
-        message:    "deliverCredentials"
-        id:         validUser.id
-        uid:        validUser.uid
-        email:      validUser.email
-        auth_token: validToken
-        client_id:  validClient
-      }, '*')
+        setTimeout((->
+          $timeout.flush()
 
-      $timeout.flush()
+          assert.deepEqual($rootScope.user, {
+            id:         validUser.id
+            uid:        validUser.uid
+            email:      validUser.email
+            auth_token: validToken
+            client_id:  validClient
+          })
 
-      assert(true, called)
+          assert(true, called)
 
-      done()
+          done()
+        ))
 
-    suite 'window closed', ->
+    suite 'postMessage error', (done) ->
+      errorResponse =
+        message: 'authFailure'
+        errors: ['420']
+
+      setup ->
+        sinon.spy($auth, 'cancel')
+
+      test 'error response cancels authentication', (done) ->
+        called = false
+
+        dfd.finally(->
+          called = true
+        )
+
+        # fake response from api redirect
+        $window.postMessage(errorResponse, '*')
+
+        setTimeout((->
+          $timeout.flush()
+          assert true, called
+          assert $auth.cancel.called
+          assert $rootScope.$broadcast.calledWith('auth:login-error')
+          done()
+        ), 0)
+
+
+    suite 'postMessage window closed before message is sent', ->
       setup ->
         sinon.spy($auth, 'cancel')
 
       teardown ->
         popupWindow.closed = false
 
-      test 'window is closed', (done) ->
+      test 'auth is cancelled', (done) ->
         called = false
 
         dfd.catch =>
@@ -69,7 +100,7 @@ suite 'oauth2 login', ->
         done()
 
 
-    suite 'cancel authentication', ->
+    suite 'cancel method', ->
       test 'timer is rejected then nullified', (done) ->
         called = false
 

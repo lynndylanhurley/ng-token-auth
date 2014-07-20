@@ -45,7 +45,6 @@ angular.module('ng-token-auth', ['ngCookies'])
 
 
           initialize: ->
-            @shit = new Date().getTime() * Math.random()
             @initializeListeners()
             @addScopeMethods()
 
@@ -80,12 +79,12 @@ angular.module('ng-token-auth', ['ngCookies'])
               $rootScope.$broadcast('auth:login-success', ev.data)
 
             if ev.data.message == 'authFailure'
-              @cancel({
+              error = {
                 reason: 'unauthorized'
                 errors: [ev.data.error]
-              })
-
-              $rootScope.$broadcast('auth:login-error', reason || {})
+              }
+              @cancel(error)
+              $rootScope.$broadcast('auth:login-error', error)
 
 
           addScopeMethods: ->
