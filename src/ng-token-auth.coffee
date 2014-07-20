@@ -35,7 +35,6 @@ angular.module('ng-token-auth', ['ngCookies'])
         '$timeout'
         '$rootScope'
         ($http, $q, $location, $cookies, $cookieStore, $window, $timeout, $rootScope) =>
-          shit:              null
           header:            null
           dfd:               null
           config:            config
@@ -103,7 +102,6 @@ angular.module('ng-token-auth', ['ngCookies'])
 
             # check to see if user is returning user
             if @config.validateOnPageLoad
-              throw 'what the fuck are you doinggggg'
               @validateUser()
 
 

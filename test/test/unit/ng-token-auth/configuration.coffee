@@ -2,8 +2,11 @@ suite 'configuration', ->
   apiUrl = '/kronos'
 
   setup ->
+    sinon.spy($auth, 'validateUser')
+
     $authProvider.configure({
       apiUrl: apiUrl
+      validateOnPageLoad: true
     })
 
   # restore defaults

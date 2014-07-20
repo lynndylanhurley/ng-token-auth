@@ -1,5 +1,6 @@
 # global injectors
 $authProvider = null
+$cookieStore  = null
 $httpBackend  = null
 $rootScope    = null
 $location     = null
@@ -36,6 +37,7 @@ setup ->
 
   inject ($injector) ->
     $httpBackend = $injector.get('$httpBackend')
+    $cookieStore = $injector.get('$cookieStore')
     $rootScope   = $injector.get('$rootScope')
     $location    = $injector.get('$location')
     $timeout     = $injector.get('$timeout')
