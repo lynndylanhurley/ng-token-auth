@@ -365,7 +365,7 @@ The following events are broadcast by the `$rootScope`:
     });
   ~~~
 
-  You could also choose to display a modal, or you can ignore the event completely. What you do with the `auth:password-reset-prompt` event is entirely your choice.
+  You could also choose to display a modal, or you can ignore the event completely. What you do with the `auth:password-reset-confirm-success` event is entirely your choice.
 
 
 * **auth:password-reset-confirm-error** - broadcast when users arrive from links contained in password reset emails, but the server fails to validate their password reset token.
@@ -480,7 +480,7 @@ The password reset flow is similar to the email registration flow.
 
 ![password reset flow](https://github.com/lynndylanhurley/ng-token-auth/raw/master/test/app/images/flow/password-reset-flow.jpg)
 
-When the user visits the link contained in the resulting email, they will be authenticated for a single session. An event will be broadcast that can be used to prompt the user to update their password. See the [`auth:password-reset-prompt`](#events) event for details.
+When the user visits the link contained in the resulting email, they will be authenticated for a single session. An event will be broadcast that can be used to prompt the user to update their password. See the [`auth:password-reset-confirm-success`](#events) event for details.
 
 ## About token management
 
