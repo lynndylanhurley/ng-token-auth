@@ -8,7 +8,7 @@ This module provides a simple method of client authentication that can be config
 
 This module was designed to work out of the box with the outstanding [devise token auth](https://github.com/lynndylanhurley/devise_token_auth) gem, but I've been able to use it in other environments as well ([go](http://golang.org/), [gorm](https://github.com/jinzhu/gorm) and [gomniauth](https://github.com/stretchr/gomniauth) for example).
 
-Token based authentication requires coordination between the client and the server. Diagrams are included to illustrate this relationship.
+Token based authentication requires coordination between the client and the server. [Diagrams](#conceptual) are included to illustrate this relationship.
 
 **About security**: [read here](http://stackoverflow.com/questions/18605294/is-devises-token-authenticatable-secure) for more information on securing your token auth system. The [devise token auth](https://github.com/lynndylanhurley/devise_token_auth#security) gem has adequate security measures in place, and the gem works seamlessly with this module.
 
@@ -396,6 +396,8 @@ The following events are broadcast by the `$rootScope`:
   ~~~
 
 # Conceptual
+
+The following is a high-level overview of this module's implementation.
 
 ## Oauth2 authentication flow
 
