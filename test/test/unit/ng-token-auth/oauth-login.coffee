@@ -50,6 +50,20 @@ suite 'oauth2 login', ->
           done()
         ))
 
+    suite 'directive access', ->
+      args = 'github'
+
+      setup ->
+        sinon.spy($auth, 'authenticate')
+        $rootScope.authenticate('github')
+        $timeout.flush()
+
+      test '$auth.authenticate was called from $rootScope', ->
+        assert $auth.authenticate.calledWithMatch(args)
+
+
+
+
     suite 'postMessage error', (done) ->
       errorResponse =
         message: 'authFailure'

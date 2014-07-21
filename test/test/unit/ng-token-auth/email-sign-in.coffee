@@ -21,6 +21,30 @@ suite 'email user sign in', ->
     test 'success event should return user info', ->
       assert $rootScope.$broadcast.calledWithMatch('auth:login-success', validUser)
 
+  suite 'directive access', ->
+    args =
+      email: validUser.email
+      password: 'secret123'
+
+    setup ->
+      $httpBackend
+        .expectPOST('/api/auth/sign_in')
+        .respond(201, {
+          success: true
+          data: validUser
+        })
+
+      sinon.spy($auth, 'submitLogin')
+
+      $rootScope.submitLogin(args)
+
+      $httpBackend.flush()
+
+    test '$auth.submitLogin was called from $rootScope', ->
+      assert $auth.submitLogin.calledWithMatch(args)
+
+
+
   suite 'failed sign in', ->
     errorResp =
       success: false

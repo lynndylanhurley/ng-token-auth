@@ -14,6 +14,8 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
       return false;
     },
     proxyUrl: '/proxy',
+    validateOnPageLoad: true,
+    forceHardRedirect: false,
     authProviderPaths: {
       github: '/auth/github',
       facebook: '/auth/facebook',
@@ -33,6 +35,89 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
             config: config,
             user: {},
             mustResetPassword: false,
+            listener: null,
+            initialize: function() {
+              this.initializeListeners();
+              return this.addScopeMethods();
+            },
+            initializeListeners: function() {
+              this.listener = this.handlePostMessage.bind(this);
+              if ($window.addEventListener) {
+                return $window.addEventListener("message", this.listener, false);
+              }
+            },
+            cancel: function(reason) {
+              if (this.t != null) {
+                $timeout.cancel(this.t);
+              }
+              if (this.dfd != null) {
+                this.rejectDfd(reason);
+              }
+              return $timeout(((function(_this) {
+                return function() {
+                  return _this.t = null;
+                };
+              })(this)), 0);
+            },
+            destroy: function() {
+              this.cancel();
+              if ($window.removeEventListener) {
+                return $window.removeEventListener("message", this.listener, false);
+              }
+            },
+            handlePostMessage: function(ev) {
+              var error;
+              if (ev.data.message === 'deliverCredentials') {
+                delete ev.data.message;
+                this.handleValidAuth(ev.data, true);
+                $rootScope.$broadcast('auth:login-success', ev.data);
+              }
+              if (ev.data.message === 'authFailure') {
+                error = {
+                  reason: 'unauthorized',
+                  errors: [ev.data.error]
+                };
+                this.cancel(error);
+                return $rootScope.$broadcast('auth:login-error', error);
+              }
+            },
+            addScopeMethods: function() {
+              $rootScope.user = this.user;
+              $rootScope.authenticate = (function(_this) {
+                return function(provider) {
+                  return _this.authenticate(provider);
+                };
+              })(this);
+              console.log('@-->this', this);
+              $rootScope.signOut = (function(_this) {
+                return function() {
+                  return _this.signOut();
+                };
+              })(this);
+              $rootScope.submitRegistration = (function(_this) {
+                return function(params) {
+                  return _this.submitRegistration(params);
+                };
+              })(this);
+              $rootScope.submitLogin = (function(_this) {
+                return function(params) {
+                  return _this.submitLogin(params);
+                };
+              })(this);
+              $rootScope.requestPasswordReset = (function(_this) {
+                return function(params) {
+                  return _this.requestPasswordReset(params);
+                };
+              })(this);
+              $rootScope.updatePassword = (function(_this) {
+                return function(params) {
+                  return _this.updatePassword(params);
+                };
+              })(this);
+              if (this.config.validateOnPageLoad) {
+                return this.validateUser();
+              }
+            },
             submitRegistration: function(params) {
               angular.extend(params, {
                 confirm_success_url: config.confirmationSuccessUrl
@@ -44,7 +129,7 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
               });
             },
             submitLogin: function(params) {
-              this.dfd = $q.defer();
+              this.initDfd();
               $http.post(this.apiUrl() + config.emailSignInPath, params).success((function(_this) {
                 return function(resp) {
                   _this.handleValidAuth(resp.data);
@@ -64,9 +149,9 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
             requestPasswordReset: function(params) {
               params.redirect_url = config.passwordResetSuccessUrl;
               return $http.post(this.apiUrl() + config.passwordResetPath, params).success(function() {
-                return $rootScope.$broadcast('auth:password-reset-success', params);
+                return $rootScope.$broadcast('auth:password-reset-request-success', params);
               }).error(function(resp) {
-                return $rootScope.$broadcast('auth:password-reset-error', resp);
+                return $rootScope.$broadcast('auth:password-reset-request-error', resp);
               });
             },
             updatePassword: function(params) {
@@ -80,26 +165,31 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
               });
             },
             authenticate: function(provider) {
-              var authWindow;
               if (this.dfd == null) {
-                this.dfd = $q.defer();
-                authWindow = this.openAuthWindow(provider);
-                this.requestCredentials(authWindow);
+                this.initDfd();
+                this.openAuthWindow(provider);
               }
-              return this.dfd;
+              return this.dfd.promise;
             },
             openAuthWindow: function(provider) {
               var authUrl;
-              authUrl = config.apiUrl + config.authProviderPaths[provider] + '?auth_origin_url=' + window.location.href;
+              authUrl = this.buildAuthUrl(provider);
               if (this.useExternalWindow()) {
-                return $window.open(authUrl);
+                return this.requestCredentials($window.open(authUrl));
               } else {
-                return $window.location.href = $window.location.protocol + authUrl;
+                return $location.replace(authUrl);
               }
+            },
+            buildAuthUrl: function(provider) {
+              var authUrl;
+              authUrl = config.apiUrl;
+              authUrl += config.authProviderPaths[provider];
+              authUrl += '?auth_origin_url=';
+              return authUrl += $location.href;
             },
             requestCredentials: function(authWindow) {
               if (authWindow.closed) {
-                this.rejectDfd({
+                this.cancel({
                   reason: 'unauthorized',
                   errors: ['User canceled login']
                 });
@@ -113,17 +203,6 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
                 })(this)), 500);
               }
             },
-            rejectDfd: function(reason) {
-              this.invalidateTokens();
-              if (this.dfd != null) {
-                this.dfd.reject(reason);
-                return $timeout(((function(_this) {
-                  return function() {
-                    return _this.dfd = null;
-                  };
-                })(this)), 0);
-              }
-            },
             resolveDfd: function() {
               this.dfd.resolve({
                 id: this.user.id
@@ -131,14 +210,16 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
               return $timeout(((function(_this) {
                 return function() {
                   _this.dfd = null;
-                  return $rootScope.$digest();
+                  if (!$rootScope.$$phase) {
+                    return $rootScope.$digest();
+                  }
                 };
               })(this)), 0);
             },
             validateUser: function() {
               var clientId, token, uid;
               if (this.dfd == null) {
-                this.dfd = $q.defer();
+                this.initDfd();
                 if (!(this.header && this.user.id)) {
                   if ($location.search().token !== void 0) {
                     token = $location.search().token;
@@ -175,20 +256,23 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
                     $rootScope.$broadcast('auth:email-confirmation-success', _this.user);
                   }
                   if (_this.mustResetPassword) {
-                    return $rootScope.$broadcast('auth:password-reset-prompt', _this.user);
-                  } else {
-                    return $rootScope.$broadcast('auth:validated', _this.user);
+                    $rootScope.$broadcast('auth:password-reset-confirm-success', _this.user);
                   }
+                  return $rootScope.$broadcast('auth:validation-success', _this.user);
                 };
               })(this)).error((function(_this) {
                 return function(data) {
-                  _this.dfd.reject({
+                  if (_this.firstTimeLogin) {
+                    $rootScope.$broadcast('auth:email-confirmation-error', data);
+                  }
+                  if (_this.mustResetPassword) {
+                    $rootScope.$broadcast('auth:password-reset-confirm-error', data);
+                  }
+                  $rootScope.$broadcast('auth:validation-error', data);
+                  return _this.rejectDfd({
                     reason: 'unauthorized',
                     errors: ['Invalid/expired credentials']
                   });
-                  return $timeout((function() {
-                    return _this.dfd = null;
-                  }), 0);
                 };
               })(this));
             },
@@ -228,11 +312,6 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
               }
               return this.resolveDfd();
             },
-            cancelAuth: function(reason) {
-              $timeout.cancel(this.t);
-              this.rejectDfd(reason);
-              return $rootScope.$broadcast('auth:login-error', reason);
-            },
             buildAuthToken: function(token, clientId, uid) {
               return "token=" + token + " client=" + clientId + " uid=" + uid;
             },
@@ -241,7 +320,21 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
               return $cookieStore.put('auth_header', header);
             },
             useExternalWindow: function() {
-              return !$window.isOldIE();
+              return !(config.forceHardRedirect || $window.isOldIE());
+            },
+            initDfd: function() {
+              return this.dfd = $q.defer();
+            },
+            rejectDfd: function(reason) {
+              this.invalidateTokens();
+              if (this.dfd != null) {
+                this.dfd.reject(reason);
+                return $timeout(((function(_this) {
+                  return function() {
+                    return _this.dfd = null;
+                  };
+                })(this)), 0);
+              }
             },
             apiUrl: function() {
               if (this._apiUrl == null) {
@@ -259,7 +352,7 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
     ]
   };
 }).config(function($httpProvider) {
-  var _base, _base1, _base2, _base3, _base4;
+  var httpMethods;
   $httpProvider.interceptors.push(function($injector) {
     return {
       response: function(response) {
@@ -272,66 +365,16 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
       }
     };
   });
-  if ((_base = $httpProvider.defaults.headers).get == null) {
-    _base.get = {};
-  }
-  if ((_base1 = $httpProvider.defaults.headers).post == null) {
-    _base1.post = {};
-  }
-  if ((_base2 = $httpProvider.defaults.headers).put == null) {
-    _base2.put = {};
-  }
-  if ((_base3 = $httpProvider.defaults.headers).patch == null) {
-    _base3.patch = {};
-  }
-  if ((_base4 = $httpProvider.defaults.headers)["delete"] == null) {
-    _base4["delete"] = {};
-  }
-  $httpProvider.defaults.headers.get['If-Modified-Since'] = '0';
-  $httpProvider.defaults.headers.post['If-Modified-Since'] = '0';
-  $httpProvider.defaults.headers.put['If-Modified-Since'] = '0';
-  $httpProvider.defaults.headers.patch['If-Modified-Since'] = '0';
-  return $httpProvider.defaults.headers["delete"]['If-Modified-Since'] = '0';
+  httpMethods = ['get', 'post', 'put', 'patch', 'delete'];
+  return angular.forEach(httpMethods, function(method) {
+    var _base;
+    if ((_base = $httpProvider.defaults.headers)[method] == null) {
+      _base[method] = method;
+    }
+    return $httpProvider.defaults.headers[method]['If-Modified-Since'] = '0';
+  });
 }).run(function($auth, $window, $rootScope) {
-  if ($window.addEventListener) {
-    $window.addEventListener("message", (function(_this) {
-      return function(ev) {
-        if (ev.data.message === 'deliverCredentials') {
-          ev.source.close();
-          delete ev.data.message;
-          $auth.handleValidAuth(ev.data, true);
-          $rootScope.$broadcast('auth:login-success', ev.data);
-        }
-        if (ev.data.message === 'authFailure') {
-          ev.source.close();
-          return $auth.cancelAuth({
-            reason: 'unauthorized',
-            errors: [ev.data.error]
-          });
-        }
-      };
-    })(this));
-  }
-  $rootScope.user = $auth.user;
-  $rootScope.authenticate = function(provider) {
-    return $auth.authenticate(provider);
-  };
-  $rootScope.signOut = function() {
-    return $auth.signOut();
-  };
-  $rootScope.submitRegistration = function(params) {
-    return $auth.submitRegistration(params);
-  };
-  $rootScope.submitLogin = function(params) {
-    return $auth.submitLogin(params);
-  };
-  $rootScope.requestPasswordReset = function(params) {
-    return $auth.requestPasswordReset(params);
-  };
-  $rootScope.updatePassword = function(params) {
-    return $auth.updatePassword(params);
-  };
-  return $auth.validateUser();
+  return $auth.initialize();
 });
 
 window.isOldIE = function() {

@@ -20,6 +20,22 @@ suite 'sign out', ->
       assert $rootScope.$broadcast.calledWith('auth:logout-success')
 
 
+  suite 'directive access', ->
+    setup ->
+      $httpBackend
+        .expectDELETE('/api/auth/sign_out')
+        .respond(201, successResp)
+
+      sinon.spy($auth, 'signOut')
+
+      $rootScope.signOut()
+
+      $httpBackend.flush()
+
+    test '$auth.signOut was called from $rootScope', ->
+      assert $auth.signOut.called
+
+
   suite 'failed request', ->
     setup ->
       $httpBackend

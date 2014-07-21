@@ -27,7 +27,7 @@ suite 'email registration submission', ->
       setup ->
         sinon.spy $auth, 'submitRegistration'
 
-        $auth.submitRegistration(args)
+        $rootScope.submitRegistration(args)
 
         $httpBackend.flush()
 

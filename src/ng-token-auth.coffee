@@ -91,14 +91,14 @@ angular.module('ng-token-auth', ['ngCookies'])
             $rootScope.user = @user
 
             # template access to authentication method
-            $rootScope.authenticate  = (provider) -> @authenticate(provider)
+            $rootScope.authenticate  = (provider) => @authenticate(provider)
 
             # template access to view actions
-            $rootScope.signOut              = -> @signOut()
-            $rootScope.submitRegistration   = (params) -> @submitRegistration(params)
-            $rootScope.submitLogin          = (params) -> @submitLogin(params)
-            $rootScope.requestPasswordReset = (params) -> @requestPasswordReset(params)
-            $rootScope.updatePassword       = (params) -> @updatePassword(params)
+            $rootScope.signOut              = => @signOut()
+            $rootScope.submitRegistration   = (params) => @submitRegistration(params)
+            $rootScope.submitLogin          = (params) => @submitLogin(params)
+            $rootScope.requestPasswordReset = (params) => @requestPasswordReset(params)
+            $rootScope.updatePassword       = (params) => @updatePassword(params)
 
             # check to see if user is returning user
             if @config.validateOnPageLoad
@@ -388,13 +388,10 @@ angular.module('ng-token-auth', ['ngCookies'])
 
           # use proxy for IE
           apiUrl: ->
-            unless @_apiUrl?
-              if config.proxyIf()
-                @_apiUrl = '/proxy'
-              else
-                @_apiUrl = config.apiUrl
-
-            @_apiUrl
+            if config.proxyIf()
+              config.proxyUrl
+            else
+              config.apiUrl
       ]
     }
   )

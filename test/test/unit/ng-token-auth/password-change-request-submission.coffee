@@ -14,6 +14,24 @@ suite 'email user password change request', ->
     test '$rootScope should broadcast success event', ->
       assert $rootScope.$broadcast.calledWith('auth:password-reset-request-success')
 
+  suite 'directive access', ->
+    args =
+      email: validUser.email
+
+    setup ->
+      $httpBackend
+        .expectPOST('/api/auth/password')
+        .respond(201, {success: true})
+
+      sinon.spy($auth, 'requestPasswordReset')
+
+      $rootScope.requestPasswordReset(args)
+
+      $httpBackend.flush()
+
+    test '$rootScope should broadcast success event', ->
+      assert $auth.requestPasswordReset.calledWithMatch(args)
+
   suite 'failed request', ->
     errorResp =
       success: false
