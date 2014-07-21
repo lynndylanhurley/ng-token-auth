@@ -218,8 +218,8 @@ The `$auth` module is available for dependency injection during your app's run p
   ~~~
 
 * **$auth.requestPasswordReset**: send password reset instructions to a user. This only applies to users that have registered using email. This method accepts an object with the following param:
-  * **email** 
-  
+  * **email**
+
   This method is also available in the `$rootScope` for use in templates.
 
   ##### Example use in a template:
@@ -236,8 +236,8 @@ The `$auth` module is available for dependency injection during your app's run p
 
 * **$auth.updatePassword**: change an authenticated user's password. This only applies to users that have registered using email. This method accepts an object with the following params:
   * **password**
-  * **password_confirmation** 
-  
+  * **password_confirmation**
+
   The two params must match. This method is also available in the `$rootScope` for use in templates.
 
   ##### Example use in a template
@@ -262,7 +262,7 @@ The `$auth` module is available for dependency injection during your app's run p
 The following events are broadcast by the `$rootScope`:
 
 * **auth:login-success** - broadcast after successful user authentication. event message contains the user object.
-  
+
   **Example**:
   ~~~javascript
   $rootScope.$on('auth:login-success', function(ev, user) {
@@ -271,7 +271,7 @@ The following events are broadcast by the `$rootScope`:
   ~~~
 
 * **auth:login-error** - broadcast after user fails authentication.
-  
+
   **Example**:
   ~~~javascript
   $rootScope.$on('auth:login-error', function(ev, reason) {
@@ -316,7 +316,7 @@ The following events are broadcast by the `$rootScope`:
   ~~~
 
 * **auth:email-confirmation-success** - broadcast when users arrive from links contained in password reset emails. You can use this to trigger "welcome" notifications to new users if you like.
-  
+
   **Example**:
   ~~~javascript
   $scope.$on('auth:email-confirmation-success', function(ev, user) {
@@ -324,15 +324,24 @@ The following events are broadcast by the `$rootScope`:
   });
   ~~~
 
-* **auth:password-reset-prompt** - broadcast when users arrive from links contained in password reset emails. This will be the signal for your app to prompt the user to reset their password. [Read more](#password-reset-flow).
+* **auth:email-confirmation-error** - broadcast when users arrive from links contained in password reset emails and their confirmation tokens fail to validate.
 
-  The following example demonstrates one way to handle an `auth:password-reset-prompt` event. This example assumes that [angular ui-router](https://github.com/angular-ui/ui-router) is used for routing, and that there is a state called `account.password-reset` that contains instructions for changing the user's password.
+  **Example**:
+  ~~~javascript
+  $scope.$on('auth:email-confirmation-error', function(ev, reason) {
+      alert("There was an error with your registration.");
+  });
+  ~~~
+
+* **auth:password-reset-confirm-success** - broadcast when users arrive from links contained in password reset emails. This will be the signal for your app to prompt the user to reset their password. [Read more](#password-reset-flow).
+
+  The following example demonstrates one way to handle an `auth:password-reset-confirm-success` event. This example assumes that [angular ui-router](https://github.com/angular-ui/ui-router) is used for routing, and that there is a state called `account.password-reset` that contains instructions for changing the user's password.
 
   **Password reset prompt example**:
   ~~~javascript
   angular.module('myApp')
     .run(function($rootScope, $state) {
-      $rootScope.$on('auth:password-reset-prompt', function() {
+      $rootScope.$on('auth:password-reset-confirm-success', function() {
         $state.go('account.password-reset');
       });
     });
@@ -340,8 +349,18 @@ The following events are broadcast by the `$rootScope`:
 
   You could also choose to display a modal, or you can ignore the event completely. What you do with the `auth:password-reset-prompt` event is entirely your choice.
 
+
+* **auth:password-reset-confirm-error** - broadcast when users arrive from links contained in password reset emails, but the server fails to validate their password reset token.
+
+  **Example**:
+  ~~~javascript
+  $scope.$on('auth:password-reset-confirm-error', function(ev, reason) {
+      alert("Unable to verify your account. Please try again.");
+  });
+  ~~~
+
 * **auth:password-change-success** - broadcast when users successfully update their password using the `$auth.updatePassword` method. [Read more](#password-reset-flow).
-  
+
   **Example**:
   ~~~javascript
   $scope.$on('auth:password-change-success', function(ev) {
@@ -350,7 +369,7 @@ The following events are broadcast by the `$rootScope`:
   ~~~
 
 * **auth:password-change-error** - broadcast when the request resulting from the `$auth.updatePassword` method fails. [Read more](#password-reset-flow).
-  
+
   **Example**:
   ~~~javascript
   $scope.$on('auth:registration-change-error', function(ev, reason) {
@@ -515,7 +534,7 @@ The following measures are necessary when dealing with these older browsers.
 
 #### AJAX cache must be disabled for IE8 + IE9
 
-IE8 + IE9 will try to cache ajax requests. This results in an issue where the request return 304 status with `Content-Type` set to `html` and everything goes haywire. 
+IE8 + IE9 will try to cache ajax requests. This results in an issue where the request return 304 status with `Content-Type` set to `html` and everything goes haywire.
 
 The solution to this problem is to set the `If-Modified-Since` headers to `'0'` on each of the request methods that we use in our app. This is done by default when using this module.
 
