@@ -279,7 +279,7 @@ The following events are broadcast by the `$rootScope`:
   });
   ~~~
 
-* **auth:logout-success** - broadcast after user is successfully logged out. This event does not contain a message.
+* **auth:logout-success** - broadcast after user is successfully logged out using the `$auth.signOut` method. This event does not contain a message.
 
   **Example**:
   ~~~javascript
@@ -288,7 +288,7 @@ The following events are broadcast by the `$rootScope`:
   });
   ~~~
 
-* **auth:logout-error** - broadcast after failed logout attempts. Message contains the failed logout response.
+* **auth:logout-error** - broadcast after failed logout attempts using the `$auth.signOut` method. Message contains the failed logout response.
 
   **Example**:
   ~~~javascript
@@ -297,7 +297,7 @@ The following events are broadcast by the `$rootScope`:
   });
   ~~~
 
-* **auth:registration-email-success** - broadcast after email registration request completes successfully. Message contains the params that were sent to the server.
+* **auth:registration-email-success** - broadcast after email registration requests complete successfully using the `$auth.submitRegistration` method. Message contains the params that were sent to the server.
 
   **Example**:
   ~~~javascript
@@ -306,7 +306,7 @@ The following events are broadcast by the `$rootScope`:
   });
   ~~~
 
-* **auth:registration-email-error** - broadcast after email registration request fails. Message contains the error response.
+* **auth:registration-email-error** - broadcast after failed email registration requests using the `$auth.submitRegistration` method. Message contains the error response.
 
   **Example**:
   ~~~javascript
@@ -330,6 +330,24 @@ The following events are broadcast by the `$rootScope`:
   ~~~javascript
   $scope.$on('auth:email-confirmation-error', function(ev, reason) {
       alert("There was an error with your registration.");
+  });
+  ~~~
+
+* **auth:password-reset-request-success** - broadcast when users successfully submit the password reset form using the `$auth.requestPasswordReset` method.
+
+  **Password reset request example**:
+  ~~~javascript
+  $scope.$on('auth:password-reset-request-success', function(ev, data) {
+      alert("Password reset instructions were sent to " + data.email);
+  });
+  ~~~
+
+* **auth:password-reset-request-error** - broadcast after failed requests using the `$auth.requestPasswordReset` method. Message contains the error response.
+
+  **Example**:
+  ~~~javascript
+  $scope.$on('auth:password-reset-request-error', function(ev, resp) {
+      alert("Password reset request failed: " + resp.errors[0]);
   });
   ~~~
 
@@ -368,7 +386,7 @@ The following events are broadcast by the `$rootScope`:
   });
   ~~~
 
-* **auth:password-change-error** - broadcast when the request resulting from the `$auth.updatePassword` method fails. [Read more](#password-reset-flow).
+* **auth:password-change-error** - broadcast when requests resulting from the `$auth.updatePassword` method fail. [Read more](#password-reset-flow).
 
   **Example**:
   ~~~javascript

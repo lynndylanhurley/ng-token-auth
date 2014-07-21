@@ -41,24 +41,35 @@ angular.module('ngTokenAuthTestApp')
         title: "Success!"
         html: true
         content: "<div id='alert-email-confirmation-success'>Welcome "+
-          data.email+". Your account has been successfully created."
+          data.email+". Your account has been successfully created."+
+          "</div>"
       })
     )
 
-    $scope.$on('auth:password-reset-success', (ev, params) ->
+    $scope.$on('auth:email-confirmation-error', (ev, data) ->
+      $modal({
+        title: "Error!"
+        html: true
+        content: "<div id='alert-email-confirmation-error'>Unable to confirm "+
+          "your account. Request a password reset to verify your identity."+
+          "</div>"
+      })
+    )
+
+    $scope.$on('auth:password-reset-request-success', (ev, params) ->
       $modal({
         title: "Success"
         html: true
-        content: "<div id='alert-password-reset-failed'>Password reset "+
+        content: "<div id='alert-password-reset-request-success'>Password reset "+
           "instructions have been sent to " + params.email + "</div>"
       })
     )
 
-    $scope.$on('auth:password-reset-error', (ev, data) ->
+    $scope.$on('auth:password-reset-request-error', (ev, data) ->
       $modal({
         title: "Error"
         html: true
-        content: "<div id='alert-password-reset-error'>Error: "+
+        content: "<div id='alert-password-reset-request-error'>Error: "+
           _.map(data.errors).toString() + "</div>"
       })
     )
