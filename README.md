@@ -640,7 +640,6 @@ Guidelines will be posted if the need arises.
 * Only verify tokens that have not expired.
 * Add interceptor to catch 401 responses, hold http requests until user has been authenticated.
 * Only add the auth header if request url matches api url.
-* Tests.
 
 # License
 
