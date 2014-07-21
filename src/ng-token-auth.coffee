@@ -219,7 +219,7 @@ angular.module('ng-token-auth', ['ngCookies'])
             @dfd.resolve({id: @user.id})
             $timeout((=>
               @dfd = null
-              $rootScope.$digest()
+              $rootScope.$digest() unless $rootScope.$$phase
             ), 0)
 
 

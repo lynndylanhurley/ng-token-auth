@@ -1,5 +1,6 @@
 # Angular Token Auth
 
+[![Bower version](https://badge.fury.io/bo/ng-token-auth.svg)](http://badge.fury.io/bo/ng-token-auth)
 [![Build Status](https://travis-ci.org/lynndylanhurley/ng-token-auth.svg?branch=master)](https://travis-ci.org/lynndylanhurley/ng-token-auth)
 [![Test Coverage](https://codeclimate.com/github/lynndylanhurley/ng-token-auth/coverage.png)](https://codeclimate.com/github/lynndylanhurley/ng-token-auth)
 
