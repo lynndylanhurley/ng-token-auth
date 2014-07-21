@@ -88,7 +88,6 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
                   return _this.authenticate(provider);
                 };
               })(this);
-              console.log('@-->this', this);
               $rootScope.signOut = (function(_this) {
                 return function() {
                   return _this.signOut();
@@ -337,14 +336,11 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
               }
             },
             apiUrl: function() {
-              if (this._apiUrl == null) {
-                if (config.proxyIf()) {
-                  this._apiUrl = '/proxy';
-                } else {
-                  this._apiUrl = config.apiUrl;
-                }
+              if (config.proxyIf()) {
+                return config.proxyUrl;
+              } else {
+                return config.apiUrl;
               }
-              return this._apiUrl;
             }
           };
         };

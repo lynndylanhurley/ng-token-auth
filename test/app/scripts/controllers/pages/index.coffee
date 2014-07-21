@@ -74,6 +74,15 @@ angular.module('ngTokenAuthTestApp')
       })
     )
 
+    $scope.$on('auth:password-reset-confirm-error', (ev, data) ->
+      $modal({
+        title: "Error"
+        html: true
+        content: "<div id='alert-password-reset-request-error'>Error: "+
+          _.map(data.errors).toString() + "</div>"
+      })
+    )
+
     passwordChangeModal = $modal({
       title: "Change your password!"
       html: true
@@ -100,7 +109,7 @@ angular.module('ngTokenAuthTestApp')
 
     $scope.showPasswordChangeModal = -> passwordChangeModal.show()
 
-    $scope.$on('auth:password-reset-prompt', -> passwordChangeModal.show())
+    $scope.$on('auth:password-reset-confirm-success', -> passwordChangeModal.show())
 
     $scope.$on('auth:password-change-success', ->
       console.log 'password change success'
