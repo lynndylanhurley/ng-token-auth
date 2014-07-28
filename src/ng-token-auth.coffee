@@ -254,7 +254,6 @@ angular.module('ng-token-auth', ['ngCookies'])
                 # has refreshed the page.
                 else if $cookieStore.get('auth_header')
                   @header = $cookieStore.get('auth_header')
-                  $http.defaults.headers.common['Authorization'] = @header
 
                 if @header
                   @validateToken()
@@ -323,9 +322,6 @@ angular.module('ng-token-auth', ['ngCookies'])
             # kill cookies, otherwise session will resume on page reload
             delete $cookies['auth_header']
 
-            # kill default auth header
-            $http.defaults.headers.common['Authorization'] = ''
-
 
           # destroy auth token on server, destroy user auth credentials
           signOut: ->
@@ -362,7 +358,7 @@ angular.module('ng-token-auth', ['ngCookies'])
 
           # persist authentication token, client id, uid
           setAuthHeader: (header) ->
-            @header = $http.defaults.headers.common['Authorization'] = header
+            @header = header
             $cookieStore.put('auth_header', header)
 
 
@@ -407,6 +403,12 @@ angular.module('ng-token-auth', ['ngCookies'])
     # stackoverflow post:
     # http://stackoverflow.com/questions/14681654/i-need-two-instances-of-angularjs-http-service-or-what
     $httpProvider.interceptors.push ($injector) ->
+      request: (req) ->
+        $injector.invoke ($http, $auth) ->
+          if req.url.match($auth.config.apiUrl)
+            req.headers['Authorization'] = $auth.header
+        return req
+
       response: (response) ->
         $injector.invoke ($http, $auth) ->
           if response.headers('Authorization')

@@ -7,6 +7,7 @@ $location     = null
 $provider     = null
 $timeout      = null
 $window       = null
+$http         = null
 $auth         = null
 $q            = null
 
@@ -42,6 +43,7 @@ setup ->
     $location    = $injector.get('$location')
     $timeout     = $injector.get('$timeout')
     $window      = $injector.get('$window')
+    $http        = $injector.get('$http')
     $auth        = $injector.get('$auth')
     $q           = $injector.get('$q')
 

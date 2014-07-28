@@ -25,6 +25,31 @@ suite 'cookie store', ->
     test 'headers should be updated', ->
       assert.equal(newAuthHeader, $auth.header)
 
+    test 'header is included with the next request to the api', ->
+      $httpBackend
+        .expectGET('/api/test', (headers) ->
+          assert.equal(newAuthHeader, headers.Authorization)
+          headers
+        )
+        .respond(201, successResp, {'Authorization', 'whatever'})
+
+      $http.get('/api/test')
+
+      $httpBackend.flush()
+
+    test 'header is not included in requests to alternate apis', ->
+      $httpBackend
+        .expectGET('/alternate-api/test', (headers) ->
+          assert.equal(null, headers.Authorization)
+          headers
+        )
+        .respond(201, successResp, {'Authorization', 'whatever'})
+
+      $http.get('/alternate-api/test')
+
+      $httpBackend.flush()
+
+
     test 'promise should be resolved', (done) ->
       dfd.then(->
         assert true
