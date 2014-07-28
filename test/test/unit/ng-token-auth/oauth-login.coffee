@@ -31,6 +31,7 @@ suite 'oauth2 login', ->
           uid:        validUser.uid
           email:      validUser.email
           auth_token: validToken
+          expiry:     validExpiry
           client_id:  validClient
         }, '*')
 
@@ -42,6 +43,7 @@ suite 'oauth2 login', ->
             uid:        validUser.uid
             email:      validUser.email
             auth_token: validToken
+            expiry:     validExpiry
             client_id:  validClient
           })
 

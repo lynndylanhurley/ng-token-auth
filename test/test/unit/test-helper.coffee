@@ -15,7 +15,8 @@ $q            = null
 validToken      = '123xyz'
 validClient     = 'abc123'
 validUid        = 123
-validAuthHeader = "token=#{validToken} client=#{validClient} expiry=12345 uid=#{validUid}"
+validExpiry     = (new Date().getTime() / 1000) + 500 | 0
+validAuthHeader = "token=#{validToken} client=#{validClient} expiry=#{validExpiry} uid=#{validUid}"
 
 validEmail        = 'test@test.com'
 existingUserEmail = 'testExisting@test.com'

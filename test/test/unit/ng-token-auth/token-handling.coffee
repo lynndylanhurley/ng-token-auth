@@ -1,5 +1,5 @@
 suite 'cookie store', ->
-  newAuthHeader = "token=(^_^) client=#{validClient} expiry=12345 uid=#{validUid}"
+  newAuthHeader = "token=(^_^) client=#{validClient} expiry=#{validExpiry} uid=#{validUid}"
   dfd = null
 
   successResp =
@@ -16,7 +16,7 @@ suite 'cookie store', ->
         .expectGET('/api/auth/validate_token')
         .respond(201, successResp, {'Authorization': newAuthHeader})
 
-      $cookieStore.put('auth_header', '(^^,)')
+      $cookieStore.put('auth_header', validAuthHeader)
 
       dfd = $auth.validateUser()
 
@@ -88,4 +88,18 @@ suite 'cookie store', ->
 
     test '$rootScope broadcasts invalid auth event', ->
       assert $rootScope.$broadcast.calledWithMatch('auth:validation-error', errorResp)
+      $timeout.flush()
+
+  suite 'expired headers', ->
+    expiredExpiry  = (new Date().getTime() / 1000) - 500 | 0
+    expiredHeaders = "token=(x_x) client=#{validClient} expiry=#{expiredExpiry} uid=#{validUid}"
+
+    setup ->
+      $cookieStore.put('auth_header', expiredHeaders)
+
+    test 'promise should be rejected without making request', (done) ->
+      $auth.validateUser().catch(->
+        assert true
+        done()
+      )
       $timeout.flush()

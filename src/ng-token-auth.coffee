@@ -275,34 +275,56 @@ angular.module('ng-token-auth', ['ngCookies'])
 
           # confirm that user's auth token is still valid.
           validateToken: () ->
-            $http.get(@apiUrl() + config.tokenValidationPath)
-              .success((resp) =>
-                @handleValidAuth(resp.data)
+            unless @tokenHasExpired()
+              $http.get(@apiUrl() + config.tokenValidationPath)
+                .success((resp) =>
+                  @handleValidAuth(resp.data)
 
-                # broadcast event for first time login
-                if @firstTimeLogin
-                  $rootScope.$broadcast('auth:email-confirmation-success', @user)
+                  # broadcast event for first time login
+                  if @firstTimeLogin
+                    $rootScope.$broadcast('auth:email-confirmation-success', @user)
 
-                if @mustResetPassword
-                  $rootScope.$broadcast('auth:password-reset-confirm-success', @user)
+                  if @mustResetPassword
+                    $rootScope.$broadcast('auth:password-reset-confirm-success', @user)
 
-                $rootScope.$broadcast('auth:validation-success', @user)
-              )
-              .error((data) =>
-                # broadcast event for first time login failure
-                if @firstTimeLogin
-                  $rootScope.$broadcast('auth:email-confirmation-error', data)
+                  $rootScope.$broadcast('auth:validation-success', @user)
+                )
+                .error((data) =>
+                  # broadcast event for first time login failure
+                  if @firstTimeLogin
+                    $rootScope.$broadcast('auth:email-confirmation-error', data)
 
-                if @mustResetPassword
-                  $rootScope.$broadcast('auth:password-reset-confirm-error', data)
+                  if @mustResetPassword
+                    $rootScope.$broadcast('auth:password-reset-confirm-error', data)
 
-                $rootScope.$broadcast('auth:validation-error', data)
+                  $rootScope.$broadcast('auth:validation-error', data)
 
-                @rejectDfd({
-                  reason: 'unauthorized'
-                  errors: ['Invalid/expired credentials']
-                })
-              )
+                  @rejectDfd({
+                    reason: 'unauthorized'
+                    errors: ['Invalid/expired credentials']
+                  })
+                )
+            else
+              @rejectDfd({
+                reason: 'unauthorized'
+                errors: ['Expired credentials']
+              })
+
+
+          # don't bother checking known expired headers
+          tokenHasExpired: ->
+            expiry    = null
+            now       = new Date().getTime()
+
+            if @header and @header.match(/expiry/)
+              expiry = @header.match(/expiry=([^ ]+) /)
+              if expiry
+                expiry = expiry[1]
+                expiry = parseInt(expiry, 10) * 1000 # convert from ruby time
+
+              return (expiry and expiry < now)
+            else
+              return null
 
 
           # this service attempts to cache auth tokens, but sometimes we
