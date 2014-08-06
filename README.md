@@ -68,6 +68,17 @@ angular.module('myApp', ['ng-token-auth'])
         github:   '/auth/github',
         facebook: '/auth/facebook',
         google:   '/auth/google'
+      },
+      tokenFormat: {
+        access_token: "{{ token }}",
+        token_type:   "Bearer",
+        client:       "{{ clientId }}",
+        expiry:       "{{ expiry }}",
+        uid:          "{{ uid }}"
+      },
+      parseExpiry: function(headers) {
+        // convert from 'ruby time'
+        return (parseInt(headers['expiry']) * 1000) || null;
       }
     });
   });
@@ -86,6 +97,13 @@ angular.module('myApp', ['ng-token-auth'])
 * **passwordResetSuccessUrl**: the URL to which the API should redirect after users visit the links contained in password-reset emails. [Read more](#password-reset-flow).
 * **proxyIf**: older browsers have trouble with CORS ([read more](#ie8-and-ie9)). pass a method here to determine whether or not a proxy should be used. example: `function() { return !Modernizr.cors }`
 * **proxyUrl**: proxy url if proxy is to be used
+* **tokenFormat**: a template for authentication tokens. the template will be provided a context with the following params:
+  * token
+  * clientId
+  * uid
+  * expiry  
+  [Read more](#alternate-header-formats).
+* **parseExpiry**: a function that will return the token's expiry from the current headers. Returns null if no headers or expiry are found. [Read more](#alternate-header-formats).
 
 
 # Usage
@@ -394,6 +412,45 @@ The following events are broadcast by the `$rootScope`:
     alert("Registration failed: " + reason.errors[0]);
   });
   ~~~
+  
+### Using alternate header formats
+
+By default, this module (and the [devise token auth](https://github.com/lynndylanhurley/devise_token_auth) gem) use the [RFC 6750 Bearer Token](http://tools.ietf.org/html/rfc6750) format. You can customize this using the `tokenFormat` and `parseExpiry` config params.
+
+The following example will provide support for this header format:
+~~~
+Authorization: token={{ token }} expiry={{ expiry }} uid={{ uid }}
+~~~
+
+**Example with alternate token format**:
+~~~javascript
+angular.module('myApp', ['ng-token-auth'])
+  .config(function($authProvider) {
+    $authProvider.configure({
+      apiUrl: 'http://api.example.com'
+      
+      // provide the header template
+      tokenFormat: {
+        "Authorization": "token={{ token }} expiry={{ expiry }} uid={{ uid }}"
+      },
+      
+      // parse the expiry from the 'Authorization' param
+      parseExpiry: function(headers) {
+        return (parseInt(headers['Authorization'].match(/expiry=([^ ]+) /)[1], 10)) || null
+
+      }
+    });
+  });
+~~~
+
+The `tokenFormat` param accepts an object as an argument. Each param of the object will be added as an auth header to requests made to the API url provided. Each value of the object will be interpolated using the following context:
+
+* **token**: the user's valid access token
+* **uid**: the user's id 
+* **expiry**: the expiration date of the token
+* **clientId**: the id of the current device
+
+The `parseExpiry` param accepts a method that will be used to parse the expiration date from the auth headers. The current valid headers will be provided as an argument.
 
 # Conceptual
 
@@ -461,9 +518,6 @@ The client's tokens are stored in cookies using the ngCookie module. This is don
 
 ![validation flow](https://github.com/lynndylanhurley/ng-token-auth/raw/master/test/app/images/flow/validation-flow.jpg)
 
-Rails example [here](https://github.com/lynndylanhurley/ng-token-auth-api-rails/blob/master/app/controllers/users/auth_controller.rb#L5)
-
-
 ## Email registration flow
 
 This module also provides support for email registration. The following diagram illustrates this process.
@@ -488,7 +542,7 @@ Tokens should be invalidated after each request to the API. The following diagra
 
 ![password reset flow](https://github.com/lynndylanhurley/ng-token-auth/raw/master/test/app/images/flow/token-update-detail.jpg)
 
-During each request, a new token is generated. The `Authorization` header that should be used in the next request is returned in the `Authorization` header of the response to the previous request. The last request in the diagram fails because it tries to use a token that was invalidated by the previous request.
+During each request, a new token is generated. The `access_token` header that should be used in the next request is returned in the `access_token` header of the response to the previous request. The last request in the diagram fails because it tries to use a token that was invalidated by the previous request.
 
 The only case where an expired token is allowed is during [batch requests](#about-batch-requests).
 
@@ -514,7 +568,7 @@ $scope.getResourceData = function() {
 };
 ~~~
 
-In this case, it's impossible to update the `Authorization` header for the second request with the `Authorization` header of the first response because the second request will begin before the first one is complete. The server must allow these batches of concurrent requests to share the same auth token. This diagram illustrates how batch requests are identified by the server:
+In this case, it's impossible to update the `access_token` header for the second request with the `access_token` header of the first response because the second request will begin before the first one is complete. The server must allow these batches of concurrent requests to share the same auth token. This diagram illustrates how batch requests are identified by the server:
 
 ![batch request overview](https://github.com/lynndylanhurley/ng-token-auth/raw/master/test/app/images/flow/batch-request-overview.jpg)
 
@@ -530,17 +584,21 @@ The [devise token auth](https://github.com/lynndylanhurley/devise_token_auth) ge
 
 # Identifying users on the server.
 
-The user's authentication information is included by the client in the `Authorization` header of each request. If you're using the [devise token auth](https://github.com/lynndylanhurley/devise_token_auth) gem, the header must follow this format:
+The user's authentication information is included by the client in the `access_token` header of each request. If you're using the [devise token auth](https://github.com/lynndylanhurley/devise_token_auth) gem, the header must follow the [RFC 6750 Bearer Token](http://tools.ietf.org/html/rfc6750) format:
 
 ~~~
-token=wwwww client=xxxxx expiry=yyyyy uid=zzzzz
+"access_token": "wwwww",
+"token_type":   "Bearer",
+"client":       "xxxxx",
+"expiry":       "yyyyy",
+"uid":          "zzzzz"
 ~~~
 
 Replace `xxxxx` with the user's `auth_token` and `zzzzz` with the user's `uid`. The `client` field exists to allow for multiple simultaneous sessions per user. The `client` field defaults to `default` if omitted. `expiry` is used by the client to invalidate expired tokens without making an API request. A more in depth explanation of these values is [here](https://github.com/lynndylanhurley/devise_token_auth#identifying-users-in-controllers).
 
 This will all happen automatically when using this module.
 
-**Note**: If you require a different authorization header format, post an issue. I will make it a configuration option if there is a demand.
+**Note**: You can customize the auth headers however you like. [Read more](#using-alternate-header-formats).
 
 # IE8 and IE9
 

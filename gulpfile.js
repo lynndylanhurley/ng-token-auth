@@ -331,6 +331,7 @@ gulp.task('s3', function() {
 gulp.task('push', $.shell.task([
   'git checkout -b '+tag,
   'cp -R '+distDir+' '+DIST_DIR,
+  'cp test/config/'+env+'.yml test/config/default.yml',
   'git add -u .',
   'git add .',
   'git commit -am "commit for '+tag+' push"',

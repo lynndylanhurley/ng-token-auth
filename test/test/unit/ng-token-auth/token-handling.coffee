@@ -1,5 +1,11 @@
-suite 'cookie store', ->
-  newAuthHeader = "token=(^_^) client=#{validClient} expiry=#{validExpiry} uid=#{validUid}"
+suite 'token handling', ->
+  newAuthHeader = {
+    "access-token": "(^_^)"
+    "token-type":   'Bearer'
+    client:         validClient
+    expiry:         validExpiry.toString()
+    uid:            validUid.toString()
+  }
   dfd = null
 
   successResp =
@@ -14,24 +20,26 @@ suite 'cookie store', ->
     setup ->
       $httpBackend
         .expectGET('/api/auth/validate_token')
-        .respond(201, successResp, {'Authorization': newAuthHeader})
+        .respond(201, successResp, newAuthHeader)
 
-      $cookieStore.put('auth_header', validAuthHeader)
+      $cookieStore.put('auth_headers', validAuthHeader)
 
       dfd = $auth.validateUser()
 
       $httpBackend.flush()
 
     test 'headers should be updated', ->
-      assert.equal(newAuthHeader, $auth.header)
+      console.log 'expected', newAuthHeader
+      console.log 'actual', $auth.headers
+      assert.deepEqual(newAuthHeader, $auth.headers)
 
     test 'header is included with the next request to the api', ->
       $httpBackend
         .expectGET('/api/test', (headers) ->
-          assert.equal(newAuthHeader, headers.Authorization)
+          assert.equal(newAuthHeader['access-token'], headers['access-token'])
           headers
         )
-        .respond(201, successResp, {'Authorization', 'whatever'})
+        .respond(201, successResp, {'access-token', 'whatever'})
 
       $http.get('/api/test')
 
@@ -40,10 +48,10 @@ suite 'cookie store', ->
     test 'header is not included in requests to alternate apis', ->
       $httpBackend
         .expectGET('/alternate-api/test', (headers) ->
-          assert.equal(null, headers.Authorization)
+          assert.equal(null, headers['access-token'])
           headers
         )
-        .respond(201, successResp, {'Authorization', 'whatever'})
+        .respond(201, successResp, {'access-token', 'whatever'})
 
       $http.get('/alternate-api/test')
 
@@ -57,7 +65,7 @@ suite 'cookie store', ->
       )
       $timeout.flush()
 
-    test 'subsequent calls do not require api requests', (done) ->
+    test 'subsequent calls to validateUser do not require api requests', (done) ->
       $auth.validateUser().then(->
         assert true
         done()
@@ -73,7 +81,7 @@ suite 'cookie store', ->
         .expectGET('/api/auth/validate_token')
         .respond(401, errorResp)
 
-      $cookieStore.put('auth_header', '(-_-)')
+      $cookieStore.put('auth_headers', {'access-token': '(-_-)'})
 
       dfd = $auth.validateUser()
 
@@ -92,7 +100,13 @@ suite 'cookie store', ->
 
   suite 'expired headers', ->
     expiredExpiry  = (new Date().getTime() / 1000) - 500 | 0
-    expiredHeaders = "token=(x_x) client=#{validClient} expiry=#{expiredExpiry} uid=#{validUid}"
+    expiredHeaders = {
+      "access-token": "(x_x)"
+      "token-type":   'Bearer'
+      client:         validClient
+      expiry:         expiredExpiry
+      uid:            validUid
+    }
 
     setup ->
       $cookieStore.put('auth_header', expiredHeaders)

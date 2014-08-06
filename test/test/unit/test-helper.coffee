@@ -16,7 +16,13 @@ validToken      = '123xyz'
 validClient     = 'abc123'
 validUid        = 123
 validExpiry     = (new Date().getTime() / 1000) + 500 | 0
-validAuthHeader = "token=#{validToken} client=#{validClient} expiry=#{validExpiry} uid=#{validUid}"
+validAuthHeader = {
+  'access-token': validToken
+  'token-type':   'Bearer'
+  client:         validClient
+  expiry:         validExpiry
+  uid:            validUid
+}
 
 validEmail        = 'test@test.com'
 existingUserEmail = 'testExisting@test.com'
