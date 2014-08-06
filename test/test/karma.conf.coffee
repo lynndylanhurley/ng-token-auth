@@ -2,7 +2,7 @@ module.exports = (config) ->
   config.set
     basePath : '../../'
 
-    preprocessors: 
+    preprocessors:
       'src/*.coffee': ['coverage']
       'test/test/**/*.coffee': ['coffee']
 

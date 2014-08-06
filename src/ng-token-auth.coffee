@@ -14,6 +14,17 @@ angular.module('ng-token-auth', ['ngCookies'])
       proxyUrl:                '/proxy'
       validateOnPageLoad:      true
       forceHardRedirect:       false
+
+      tokenFormat:
+        "Authorization": "token={{ token }} client={{ clientId }} expiry={{ expiry }} uid={{ uid }}"
+
+      parseExpiry: (headers) ->
+        expiry = headers['Authorization'].match(/expiry=([^ ]+) /)
+        if expiry
+          parseInt(expiry[1], 10) * 1000 # convert from ruby time
+        else
+          null
+
       authProviderPaths:
         github:    '/auth/github'
         facebook:  '/auth/facebook'
@@ -34,7 +45,8 @@ angular.module('ng-token-auth', ['ngCookies'])
         '$window'
         '$timeout'
         '$rootScope'
-        ($http, $q, $location, $cookies, $cookieStore, $window, $timeout, $rootScope) =>
+        '$interpolate'
+        ($http, $q, $location, $cookies, $cookieStore, $window, $timeout, $rootScope, $interpolate) =>
           header:            null
           dfd:               null
           config:            config
@@ -101,7 +113,7 @@ angular.module('ng-token-auth', ['ngCookies'])
             $rootScope.updatePassword       = (params) => @updatePassword(params)
 
             # check to see if user is returning user
-            if @config.validateOnPageLoad
+            if config.validateOnPageLoad
               @validateUser()
 
 
@@ -229,7 +241,7 @@ angular.module('ng-token-auth', ['ngCookies'])
             unless @dfd?
               @initDfd()
 
-              unless @header and @user.id
+              unless @headers and @user.id
                 # token querystring is present. user most likely just came from
                 # registration email link.
                 if $location.search().token != undefined
@@ -244,7 +256,11 @@ angular.module('ng-token-auth', ['ngCookies'])
                   @firstTimeLogin = $location.search().account_confirmation_success
 
                   # persist these values
-                  @setAuthHeader(@buildAuthToken(token, clientId, uid))
+                  @setAuthHeaders(@buildAuthHeaders({
+                    token:    token
+                    clientId: clientId
+                    uid:      uid
+                  }))
 
                   # strip qs from url to prevent re-use of these params
                   # on page refresh
@@ -252,10 +268,10 @@ angular.module('ng-token-auth', ['ngCookies'])
 
                 # token cookie is present. user is returning to the site, or
                 # has refreshed the page.
-                else if $cookieStore.get('auth_header')
-                  @header = $cookieStore.get('auth_header')
+                else if $cookieStore.get('auth_headers')
+                  @headers = $cookieStore.get('auth_headers')
 
-                if @header
+                if @headers
                   @validateToken()
 
                 # new user session. will redirect to login
@@ -301,7 +317,7 @@ angular.module('ng-token-auth', ['ngCookies'])
 
                   @rejectDfd({
                     reason: 'unauthorized'
-                    errors: ['Invalid/expired credentials']
+                    errors: data.errors
                   })
                 )
             else
@@ -313,18 +329,19 @@ angular.module('ng-token-auth', ['ngCookies'])
 
           # don't bother checking known expired headers
           tokenHasExpired: ->
-            expiry    = null
-            now       = new Date().getTime()
+            expiry = @getExpiry()
 
-            if @header and @header.match(/expiry/)
-              expiry = @header.match(/expiry=([^ ]+) /)
-              if expiry
-                expiry = expiry[1]
-                expiry = parseInt(expiry, 10) * 1000 # convert from ruby time
+            now = new Date().getTime()
 
+            if @headers and expiry
               return (expiry and expiry < now)
             else
               return null
+
+
+          # get expiry by method provided in config
+          getExpiry: ->
+            config.parseExpiry(@headers)
 
 
           # this service attempts to cache auth tokens, but sometimes we
@@ -339,10 +356,10 @@ angular.module('ng-token-auth', ['ngCookies'])
 
             # setting this value to null will force the validateToken method
             # to re-validate credentials with api server when validate is called
-            @header = null
+            @headers = null
 
             # kill cookies, otherwise session will resume on page reload
-            delete $cookies['auth_header']
+            delete $cookies['auth_headers']
 
 
           # destroy auth token on server, destroy user auth credentials
@@ -367,21 +384,31 @@ angular.module('ng-token-auth', ['ngCookies'])
 
             # postMessage will not contain header. must save headers manually.
             if setHeader
-              @setAuthHeader(@buildAuthToken(@user.auth_token, @user.client_id, @user.uid))
+              @setAuthHeaders(@buildAuthHeaders({
+                token:    @user.auth_token
+                clientId: @user.client_id
+                uid:      @user.uid
+              }))
 
             # fulfill promise
             @resolveDfd()
 
 
           # auth token format. consider making this configurable
-          buildAuthToken: (token, clientId, uid) ->
-            "token=#{token} client=#{clientId} uid=#{uid}"
+          buildAuthHeaders: (ctx) ->
+            headers = {}
+
+            for key, val of config.tokenFormat
+              headers[key] = $interpolate(val)(ctx)
+
+            return headers
 
 
           # persist authentication token, client id, uid
-          setAuthHeader: (header) ->
-            @header = header
-            $cookieStore.put('auth_header', header)
+          setAuthHeaders: (headers) ->
+            @headers = angular.extend((@headers || {}), headers)
+            $cookieStore.put('auth_headers', @headers)
+
 
 
           # ie8 + ie9 cannot use xdomain postMessage
@@ -428,14 +455,22 @@ angular.module('ng-token-auth', ['ngCookies'])
       request: (req) ->
         $injector.invoke ($http, $auth) ->
           if req.url.match($auth.config.apiUrl)
-            req.headers['Authorization'] = $auth.header
+            for key, val of $auth.headers
+              req.headers[key] = val
+
         return req
 
-      response: (response) ->
+      response: (resp) ->
         $injector.invoke ($http, $auth) ->
-          if response.headers('Authorization')
-            $auth.setAuthHeader(response.headers('Authorization'))
-        return response
+          newHeaders = {}
+
+          for key, val of $auth.config.tokenFormat
+            if resp.headers(key)
+              newHeaders[key] = resp.headers(key)
+
+          $auth.setAuthHeaders(newHeaders)
+
+        return resp
 
     # define http methods that may need to carry auth headers
     httpMethods = ['get', 'post', 'put', 'patch', 'delete']
@@ -445,7 +480,6 @@ angular.module('ng-token-auth', ['ngCookies'])
       $httpProvider.defaults.headers[method] ?= method
       $httpProvider.defaults.headers[method]['If-Modified-Since'] = '0'
     )
-
   )
 
   .run(($auth, $window, $rootScope) -> $auth.initialize())

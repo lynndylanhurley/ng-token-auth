@@ -1,5 +1,7 @@
-suite 'cookie store', ->
-  newAuthHeader = "token=(^_^) client=#{validClient} expiry=#{validExpiry} uid=#{validUid}"
+suite 'token handling', ->
+  newAuthHeader = {
+    'Authorization': "token=(^_^) client=#{validClient} expiry=#{validExpiry} uid=#{validUid}"
+  }
   dfd = null
 
   successResp =
@@ -14,21 +16,21 @@ suite 'cookie store', ->
     setup ->
       $httpBackend
         .expectGET('/api/auth/validate_token')
-        .respond(201, successResp, {'Authorization': newAuthHeader})
+        .respond(201, successResp, newAuthHeader)
 
-      $cookieStore.put('auth_header', validAuthHeader)
+      $cookieStore.put('auth_headers', validAuthHeader)
 
       dfd = $auth.validateUser()
 
       $httpBackend.flush()
 
     test 'headers should be updated', ->
-      assert.equal(newAuthHeader, $auth.header)
+      assert.deepEqual(newAuthHeader, $auth.headers)
 
     test 'header is included with the next request to the api', ->
       $httpBackend
         .expectGET('/api/test', (headers) ->
-          assert.equal(newAuthHeader, headers.Authorization)
+          assert.equal(newAuthHeader.Authorization, headers.Authorization)
           headers
         )
         .respond(201, successResp, {'Authorization', 'whatever'})
@@ -57,7 +59,7 @@ suite 'cookie store', ->
       )
       $timeout.flush()
 
-    test 'subsequent calls do not require api requests', (done) ->
+    test 'subsequent calls to validateUser do not require api requests', (done) ->
       $auth.validateUser().then(->
         assert true
         done()
@@ -73,7 +75,7 @@ suite 'cookie store', ->
         .expectGET('/api/auth/validate_token')
         .respond(401, errorResp)
 
-      $cookieStore.put('auth_header', '(-_-)')
+      $cookieStore.put('auth_headers', {'Authorization': '(-_-)'})
 
       dfd = $auth.validateUser()
 
@@ -92,7 +94,7 @@ suite 'cookie store', ->
 
   suite 'expired headers', ->
     expiredExpiry  = (new Date().getTime() / 1000) - 500 | 0
-    expiredHeaders = "token=(x_x) client=#{validClient} expiry=#{expiredExpiry} uid=#{validUid}"
+    expiredHeaders = {'Authorization': "token=(x_x) client=#{validClient} expiry=#{expiredExpiry} uid=#{validUid}"}
 
     setup ->
       $cookieStore.put('auth_header', expiredHeaders)
