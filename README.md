@@ -68,6 +68,12 @@ angular.module('myApp', ['ng-token-auth'])
         github:   '/auth/github',
         facebook: '/auth/facebook',
         google:   '/auth/google'
+      },
+      tokenFormat: {
+        'Authorization': 'token={{ token }} client={{ clientId }} expiry={{ expiry }} uid={{ uid }}'
+      },
+      parseExpiry: function(headers) {
+        return headers['Authorization'].match(/expiry=([^ ]+) /)[1];
       }
     });
   });
@@ -86,6 +92,13 @@ angular.module('myApp', ['ng-token-auth'])
 * **passwordResetSuccessUrl**: the URL to which the API should redirect after users visit the links contained in password-reset emails. [Read more](#password-reset-flow).
 * **proxyIf**: older browsers have trouble with CORS ([read more](#ie8-and-ie9)). pass a method here to determine whether or not a proxy should be used. example: `function() { return !Modernizr.cors }`
 * **proxyUrl**: proxy url if proxy is to be used
+* **tokenFormat**: a template for authentication tokens. the template will be provided a context with the following params:
+  * token
+  * clientId
+  * uid
+  * expiry  
+  [Read more](#alternate-token-formats).
+* **parseExpiry**: a function that will return the token's expiry from the current headers. Returns null if no headers or expiry are found. [Read more](#alternate-token-formats).
 
 
 # Usage
@@ -394,6 +407,42 @@ The following events are broadcast by the `$rootScope`:
     alert("Registration failed: " + reason.errors[0]);
   });
   ~~~
+  
+### Using alternate header formats
+
+This module can be configured to work with alternate header formats. For example, to configure the module for use with [Grails Spring Security](http://alvarosanchez.github.io/grails-spring-security-rest/docs/guide/tokenRendering.html), use the following configuration settings:
+
+**Example with alternate token format**:
+~~~javascript
+angular.module('myApp', ['ng-token-auth'])
+  .config(function($authProvider) {
+    $authProvider.configure({
+      apiUrl: 'http://api.example.com'
+      
+      // provide the header template
+      tokenFormat: {
+        "access_token": "{{ token }}",
+        "token_type":   "Bearer",
+        "username":     "{{ uid }}",
+        "expiry":       "{{ expiry }}"
+      },
+      
+      // provide a method to determine the token's expiry
+      parseExpiry: function(headers) {
+        return headers['expiry'];
+      }
+    });
+  });
+~~~
+
+The `tokenFormat` param accepts an object as an argument. Each param of the object will be added as an auth header to requests made to the API url provided. Each value of the object will be interpolated using the following context:
+
+* **token**: the user's valid access token
+* **uid**: the user's id 
+* **expiry**: the expiration date of the token
+* **clientId**: the id of the current device
+
+The `parseExpiry` param accepts a method that will be used to parse the expiration date from the auth headers. The current valid headers will be provided as an argument.
 
 # Conceptual
 
