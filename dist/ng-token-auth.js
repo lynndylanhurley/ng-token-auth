@@ -17,8 +17,8 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
     validateOnPageLoad: true,
     forceHardRedirect: false,
     tokenFormat: {
-      access_token: "{{ token }}",
-      token_type: "Bearer",
+      "access-token": "{{ token }}",
+      "token-type": "Bearer",
       client: "{{ clientId }}",
       expiry: "{{ expiry }}",
       uid: "{{ uid }}"
@@ -245,6 +245,7 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
                   } else if ($cookieStore.get('auth_headers')) {
                     this.headers = $cookieStore.get('auth_headers');
                   }
+                  console.log('@-->headers', this.headers);
                   if (this.headers) {
                     this.validateToken();
                   } else {
@@ -306,7 +307,6 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
               }
             },
             getExpiry: function() {
-              console.log('parsing for expiry');
               return config.parseExpiry(this.headers);
             },
             invalidateTokens: function() {
@@ -397,16 +397,15 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
     return {
       request: function(req) {
         $injector.invoke(function($http, $auth) {
-          var key, val, _ref, _results;
+          var key, val, _ref;
           if (req.url.match($auth.config.apiUrl)) {
             _ref = $auth.headers;
-            _results = [];
             for (key in _ref) {
               val = _ref[key];
-              _results.push(req.headers[key] = val);
+              req.headers[key] = val;
             }
-            return _results;
           }
+          return console.log('req headers', req.headers);
         });
         return req;
       },

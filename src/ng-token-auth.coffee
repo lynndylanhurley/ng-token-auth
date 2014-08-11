@@ -16,13 +16,14 @@ angular.module('ng-token-auth', ['ngCookies'])
       forceHardRedirect:       false
 
       tokenFormat:
-        access_token: "{{ token }}"
-        token_type:   "Bearer"
+        "access-token": "{{ token }}"
+        "token-type":   "Bearer"
         client:       "{{ clientId }}"
         expiry:       "{{ expiry }}"
         uid:          "{{ uid }}"
 
       parseExpiry: (headers) ->
+        # convert from ruby time (seconds) to js time (millis)
         (parseInt(headers['expiry'], 10) * 1000) || null
 
       authProviderPaths:
@@ -271,6 +272,8 @@ angular.module('ng-token-auth', ['ngCookies'])
                 else if $cookieStore.get('auth_headers')
                   @headers = $cookieStore.get('auth_headers')
 
+                console.log '@-->headers', @headers
+
                 if @headers
                   @validateToken()
 
@@ -341,7 +344,6 @@ angular.module('ng-token-auth', ['ngCookies'])
 
           # get expiry by method provided in config
           getExpiry: ->
-            console.log 'parsing for expiry'
             config.parseExpiry(@headers)
 
 
@@ -458,6 +460,8 @@ angular.module('ng-token-auth', ['ngCookies'])
           if req.url.match($auth.config.apiUrl)
             for key, val of $auth.headers
               req.headers[key] = val
+
+          console.log 'req headers', req.headers
 
         return req
 
