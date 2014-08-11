@@ -26,34 +26,29 @@ suite 'configuration', ->
 
   suite 'alternate token format', ->
     expectedHeaders =
-      "access_token": "#{validToken}"
-      "token_type":   "Bearer"
-      "username":     "#{validUid}"
-      "expiry":       "#{validExpiry}"
+      "Authorization": "token=#{validToken} expiry=#{validExpiry} uid=#{validUid}"
 
     setup ->
       $authProvider.configure({
         tokenFormat:
-          "access_token": "{{ token }}"
-          "token_type":   "Bearer"
-          "username":     "{{ uid }}"
-          "expiry":       "{{ expiry }}"
+          "Authorization": "token={{token}} expiry={{expiry}} uid={{uid}}"
 
         parseExpiry: (headers) ->
-          headers['expiry']
+          console.log 'headers', headers
+          (parseInt(headers['Authorization'].match(/expiry=([^ ]+) /)[1], 10)) || null
       })
 
     teardown ->
       $authProvider.configure({
         tokenFormat:
-          "Authorization": "token={{ token }} client={{ clientId }} expiry={{ expiry }} uid={{ uid }}"
+          access_token: "{{ token }}"
+          token_type:   "Bearer"
+          client:       "{{ clientId }}"
+          expiry:       "{{ expiry }}"
+          uid:          "{{ uid }}"
 
         parseExpiry: (headers) ->
-          expiry = headers.match(/expiry=([^ ]+) /)
-          if expiry
-            expiry = parseInt(expiry[1], 10) * 1000 # convert from ruby time
-          else
-            null
+          (parseInt(headers['expiry'], 10) * 1000) || null
       })
 
     test 'auth headers are built according to config.tokenFormat', ->
@@ -63,6 +58,7 @@ suite 'configuration', ->
         uid:      validUid
         expiry:   validExpiry
       })
+
       assert.deepEqual(headers, expectedHeaders)
 
     test 'expiry should be derived from cached headers', ->

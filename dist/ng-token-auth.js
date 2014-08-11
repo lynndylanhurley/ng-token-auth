@@ -17,16 +17,14 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
     validateOnPageLoad: true,
     forceHardRedirect: false,
     tokenFormat: {
-      "Authorization": "token={{ token }} client={{ clientId }} expiry={{ expiry }} uid={{ uid }}"
+      access_token: "{{ token }}",
+      token_type: "Bearer",
+      client: "{{ clientId }}",
+      expiry: "{{ expiry }}",
+      uid: "{{ uid }}"
     },
     parseExpiry: function(headers) {
-      var expiry;
-      expiry = headers['Authorization'].match(/expiry=([^ ]+) /);
-      if (expiry) {
-        return parseInt(expiry[1], 10) * 1000;
-      } else {
-        return null;
-      }
+      return (parseInt(headers['expiry'], 10) * 1000) || null;
     },
     authProviderPaths: {
       github: '/auth/github',
@@ -308,6 +306,7 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
               }
             },
             getExpiry: function() {
+              console.log('parsing for expiry');
               return config.parseExpiry(this.headers);
             },
             invalidateTokens: function() {

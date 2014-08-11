@@ -16,14 +16,14 @@ angular.module('ng-token-auth', ['ngCookies'])
       forceHardRedirect:       false
 
       tokenFormat:
-        "Authorization": "token={{ token }} client={{ clientId }} expiry={{ expiry }} uid={{ uid }}"
+        access_token: "{{ token }}"
+        token_type:   "Bearer"
+        client:       "{{ clientId }}"
+        expiry:       "{{ expiry }}"
+        uid:          "{{ uid }}"
 
       parseExpiry: (headers) ->
-        expiry = headers['Authorization'].match(/expiry=([^ ]+) /)
-        if expiry
-          parseInt(expiry[1], 10) * 1000 # convert from ruby time
-        else
-          null
+        (parseInt(headers['expiry'], 10) * 1000) || null
 
       authProviderPaths:
         github:    '/auth/github'
@@ -341,6 +341,7 @@ angular.module('ng-token-auth', ['ngCookies'])
 
           # get expiry by method provided in config
           getExpiry: ->
+            console.log 'parsing for expiry'
             config.parseExpiry(@headers)
 
 
