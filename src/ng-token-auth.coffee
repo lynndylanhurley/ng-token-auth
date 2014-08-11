@@ -472,9 +472,6 @@ angular.module('ng-token-auth', ['ngCookies'])
 
           $auth.setAuthHeaders(newHeaders)
 
-          console.log 'returned headers', newHeaders
-          console.log 'set headers', $auth.headers
-
         return resp
 
     # define http methods that may need to carry auth headers
