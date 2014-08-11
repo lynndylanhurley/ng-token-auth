@@ -41,11 +41,11 @@ suite 'configuration', ->
     teardown ->
       $authProvider.configure({
         tokenFormat:
-          access_token: "{{ token }}"
-          token_type:   "Bearer"
-          client:       "{{ clientId }}"
-          expiry:       "{{ expiry }}"
-          uid:          "{{ uid }}"
+          "access-token": "{{ token }}"
+          "token-type":   "Bearer"
+          client:         "{{ clientId }}"
+          expiry:         "{{ expiry }}"
+          uid:            "{{ uid }}"
 
         parseExpiry: (headers) ->
           (parseInt(headers['expiry'], 10) * 1000) || null

@@ -272,8 +272,6 @@ angular.module('ng-token-auth', ['ngCookies'])
                 else if $cookieStore.get('auth_headers')
                   @headers = $cookieStore.get('auth_headers')
 
-                console.log '@-->headers', @headers
-
                 if @headers
                   @validateToken()
 
@@ -461,8 +459,6 @@ angular.module('ng-token-auth', ['ngCookies'])
             for key, val of $auth.headers
               req.headers[key] = val
 
-          console.log 'req headers', req.headers
-
         return req
 
       response: (resp) ->
@@ -473,7 +469,11 @@ angular.module('ng-token-auth', ['ngCookies'])
             if resp.headers(key)
               newHeaders[key] = resp.headers(key)
 
+
           $auth.setAuthHeaders(newHeaders)
+
+          console.log 'returned headers', newHeaders
+          console.log 'set headers', $auth.headers
 
         return resp
 

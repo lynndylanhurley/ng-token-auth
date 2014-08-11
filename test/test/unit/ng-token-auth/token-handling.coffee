@@ -1,10 +1,10 @@
 suite 'token handling', ->
   newAuthHeader = {
-    access_token: "(^_^)"
-    token_type:   'Bearer'
-    client:       validClient
-    expiry:       validExpiry.toString()
-    uid:          validUid.toString()
+    "access-token": "(^_^)"
+    "token-type":   'Bearer'
+    client:         validClient
+    expiry:         validExpiry.toString()
+    uid:            validUid.toString()
   }
   dfd = null
 
@@ -36,10 +36,10 @@ suite 'token handling', ->
     test 'header is included with the next request to the api', ->
       $httpBackend
         .expectGET('/api/test', (headers) ->
-          assert.equal(newAuthHeader.access_token, headers.access_token)
+          assert.equal(newAuthHeader['access-token'], headers['access-token'])
           headers
         )
-        .respond(201, successResp, {'access_token', 'whatever'})
+        .respond(201, successResp, {'access-token', 'whatever'})
 
       $http.get('/api/test')
 
@@ -48,10 +48,10 @@ suite 'token handling', ->
     test 'header is not included in requests to alternate apis', ->
       $httpBackend
         .expectGET('/alternate-api/test', (headers) ->
-          assert.equal(null, headers.access_token)
+          assert.equal(null, headers['access-token'])
           headers
         )
-        .respond(201, successResp, {'access_token', 'whatever'})
+        .respond(201, successResp, {'access-token', 'whatever'})
 
       $http.get('/alternate-api/test')
 
@@ -81,7 +81,7 @@ suite 'token handling', ->
         .expectGET('/api/auth/validate_token')
         .respond(401, errorResp)
 
-      $cookieStore.put('auth_headers', {'access_token': '(-_-)'})
+      $cookieStore.put('auth_headers', {'access-token': '(-_-)'})
 
       dfd = $auth.validateUser()
 
@@ -101,11 +101,11 @@ suite 'token handling', ->
   suite 'expired headers', ->
     expiredExpiry  = (new Date().getTime() / 1000) - 500 | 0
     expiredHeaders = {
-      access_token: "(x_x)"
-      token_type:   'Bearer'
-      client:       validClient
-      expiry:       expiredExpiry
-      uid:          validUid
+      "access-token": "(x_x)"
+      "token-type":   'Bearer'
+      client:         validClient
+      expiry:         expiredExpiry
+      uid:            validUid
     }
 
     setup ->
