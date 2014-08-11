@@ -77,7 +77,7 @@ angular.module('myApp', ['ng-token-auth'])
         uid:          "{{ uid }}"
       },
       parseExpiry: function(headers) {
-        // convert from 'ruby time'
+        // convert from UTC ruby (seconds) to UTC js (milliseconds)
         return (parseInt(headers['expiry']) * 1000) || null;
       }
     });
@@ -85,25 +85,22 @@ angular.module('myApp', ['ng-token-auth'])
 ~~~
 
 ##### Config options:
-* **apiUrl**: the base route to your api. Each of the following paths will be relative to this URL.
-* **authProviderPaths**: an object containing paths to auth endpoints. keys are names of the providers, values are their auth paths relative to the `apiUrl`. [Read more](#oauth2-authentication-flow).
-* **tokenValidationPath**: relative path to validate authentication tokens. [Read more](#token-validation-flow).
-* **emailRegistrationPath**: path for submitting new email registrations. [Read more](#email-registration-flow).
-* **signOutUrl**: relative path to sign user out. this will destroy the user's token both server-side and client-side.
-* **confirmationSuccessUrl**: the url to which the API should redirect after users visit the link contained in email-registration emails. [Read more](#email-registration-flow).
-* **emailSignInPath**: path for signing in using email credentials. [Read more](#email-sign-in-flow).
-* **passwordResetPath**: path for requesting password reset emails. [Read more](#password-reset-flow).
-* **passwordUpdatePath**: path for submitting new passwords for authenticated users. [Read more](#password-reset-flow).
-* **passwordResetSuccessUrl**: the URL to which the API should redirect after users visit the links contained in password-reset emails. [Read more](#password-reset-flow).
-* **proxyIf**: older browsers have trouble with CORS ([read more](#ie8-and-ie9)). pass a method here to determine whether or not a proxy should be used. example: `function() { return !Modernizr.cors }`
-* **proxyUrl**: proxy url if proxy is to be used
-* **tokenFormat**: a template for authentication tokens. the template will be provided a context with the following params:
-  * token
-  * clientId
-  * uid
-  * expiry  
-  [Read more](#alternate-header-formats).
-* **parseExpiry**: a function that will return the token's expiry from the current headers. Returns null if no headers or expiry are found. [Read more](#alternate-header-formats).
+| param | description |
+|---|---|
+| **apiUrl** | the base route to your api. Each of the following paths will be relative to this URL. |
+| **authProviderPaths** | an object containing paths to auth endpoints. keys are names of the providers, values are their auth paths relative to the `apiUrl`. [Read more](#oauth2-authentication-flow). |
+| **tokenValidationPath** | relative path to validate authentication tokens. [Read more](#token-validation-flow). |
+| **emailRegistrationPath** | path for submitting new email registrations. [Read more](#email-registration-flow). |
+| **signOutUrl** | relative path to sign user out. this will destroy the user's token both server-side and client-side. |
+| **confirmationSuccessUrl** | the url to which the API should redirect after users visit the link contained in email-registration emails. [Read more](#email-registration-flow). |
+| **emailSignInPath** | path for signing in using email credentials. [Read more](#email-sign-in-flow) |
+| **passwordResetPath** | path for requesting password reset emails. [Read more](#password-reset-flow). |
+| **passwordUpdatePath** | path for submitting new passwords for authenticated users. [Read more](#password-reset-flow) |
+| **passwordResetSuccessUrl** | the URL to which the API should redirect after users visit the links contained in password-reset emails. [Read more](#password-reset-flow). |
+| **proxyIf** | older browsers have trouble with CORS ([read more](#ie8-and-ie9)). pass a method here to determine whether or not a proxy should be used. example: `function() { return !Modernizr.cors }` |
+| **proxyUrl** | proxy url if proxy is to be used |
+| **tokenFormat** | a template for authentication tokens. the template will be provided a context with the following params:<br><ul><li>token</li><li>clientId</li><li>uid</li><li>expiry</li></ul>Defaults to the [RFC 6750 Bearer Token](http://tools.ietf.org/html/rfc6750) format. [Read more](#alternate-header-formats). |
+| **parseExpiry** | a function that will return the token's expiry from the current headers. Returns null if no headers or expiry are found. [Read more](#alternate-header-formats). |
 
 
 # Usage
