@@ -445,24 +445,25 @@ angular.module('ng-token-auth', ['ngCookies'])
 
   # each response will contain auth headers that have been updated by
   # the server. copy those headers for use in the next request.
-  .config(($httpProvider) ->
+  .config(['$httpProvider', ($httpProvider) ->
     # this is ugly...
     # we need to configure an interceptor (must be done in the configuration
     # phase), but we need access to the $http service, which is only available
     # during the run phase. the following technique was taken from this
     # stackoverflow post:
     # http://stackoverflow.com/questions/14681654/i-need-two-instances-of-angularjs-http-service-or-what
-    $httpProvider.interceptors.push ($injector) ->
+    $httpProvider.interceptors.push ['$injector', ($injector) ->
       request: (req) ->
-        $injector.invoke ($http, $auth) ->
+        $injector.invoke ['$http', '$auth',  ($http, $auth) ->
           if req.url.match($auth.config.apiUrl)
             for key, val of $auth.headers
               req.headers[key] = val
+        ]
 
         return req
 
       response: (resp) ->
-        $injector.invoke ($http, $auth) ->
+        $injector.invoke ['$http', '$auth', ($http, $auth) ->
           newHeaders = {}
 
           for key, val of $auth.config.tokenFormat
@@ -471,8 +472,10 @@ angular.module('ng-token-auth', ['ngCookies'])
 
 
           $auth.setAuthHeaders(newHeaders)
+        ]
 
         return resp
+    ]
 
     # define http methods that may need to carry auth headers
     httpMethods = ['get', 'post', 'put', 'patch', 'delete']
@@ -482,10 +485,11 @@ angular.module('ng-token-auth', ['ngCookies'])
       $httpProvider.defaults.headers[method] ?= method
       $httpProvider.defaults.headers[method]['If-Modified-Since'] = '0'
     )
-  )
+  ])
 
-  .run(($auth, $window, $rootScope) -> $auth.initialize())
-
+  .run(['$auth', '$window', '$rootScope', ($auth, $window, $rootScope) ->
+    $auth.initialize()
+  ])
 
 # ie8 and ie9 require special handling
 window.isOldIE = ->
