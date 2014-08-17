@@ -12,7 +12,8 @@ var cached   = require('gulp-cached');
 var es       = require('event-stream');
 var seq      = require('run-sequence');
 var lazypipe = require('lazypipe');
-var nib      = require('nib')
+var nib      = require('nib');
+var ngAnnotate = require('gulp-ng-annotate');
 
 var appDir = 'test/app/'
 var distDir = 'test/dist/'
@@ -107,7 +108,8 @@ gulp.task('component-coffee', function() {
       this.emit('end');
     })
     .pipe(gulp.dest(componentDistDir))
-    .pipe(gulp.dest(tmpDir+'scripts/'))
+    .pipe(ngAnnotate())
+    .pipe(gulp.dest(tmpDir + 'scripts/'))
     .pipe($.size());
 });
 

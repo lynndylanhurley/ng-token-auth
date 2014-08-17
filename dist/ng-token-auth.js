@@ -245,7 +245,6 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
                   } else if ($cookieStore.get('auth_headers')) {
                     this.headers = $cookieStore.get('auth_headers');
                   }
-                  console.log('@-->headers', this.headers);
                   if (this.headers) {
                     this.validateToken();
                   } else {
