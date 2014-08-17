@@ -245,7 +245,6 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
                   } else if ($cookieStore.get('auth_headers')) {
                     this.headers = $cookieStore.get('auth_headers');
                   }
-                  console.log('@-->headers', this.headers);
                   if (this.headers) {
                     this.validateToken();
                   } else {
@@ -397,15 +396,16 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
     return {
       request: function(req) {
         $injector.invoke(function($http, $auth) {
-          var key, val, _ref;
+          var key, val, _ref, _results;
           if (req.url.match($auth.config.apiUrl)) {
             _ref = $auth.headers;
+            _results = [];
             for (key in _ref) {
               val = _ref[key];
-              req.headers[key] = val;
+              _results.push(req.headers[key] = val);
             }
+            return _results;
           }
-          return console.log('req headers', req.headers);
         });
         return req;
       },
