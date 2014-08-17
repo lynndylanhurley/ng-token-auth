@@ -390,53 +390,63 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
       })(this)
     ]
   };
-}).config(function($httpProvider) {
-  var httpMethods;
-  $httpProvider.interceptors.push(function($injector) {
-    return {
-      request: function(req) {
-        $injector.invoke(function($http, $auth) {
-          var key, val, _ref, _results;
-          if (req.url.match($auth.config.apiUrl)) {
-            _ref = $auth.headers;
-            _results = [];
-            for (key in _ref) {
-              val = _ref[key];
-              _results.push(req.headers[key] = val);
-            }
-            return _results;
+}).config([
+  '$httpProvider', function($httpProvider) {
+    var httpMethods;
+    $httpProvider.interceptors.push([
+      '$injector', function($injector) {
+        return {
+          request: function(req) {
+            $injector.invoke([
+              '$http', '$auth', function($http, $auth) {
+                var key, val, _ref, _results;
+                if (req.url.match($auth.config.apiUrl)) {
+                  _ref = $auth.headers;
+                  _results = [];
+                  for (key in _ref) {
+                    val = _ref[key];
+                    _results.push(req.headers[key] = val);
+                  }
+                  return _results;
+                }
+              }
+            ]);
+            return req;
+          },
+          response: function(resp) {
+            $injector.invoke([
+              '$http', '$auth', function($http, $auth) {
+                var key, newHeaders, val, _ref;
+                newHeaders = {};
+                _ref = $auth.config.tokenFormat;
+                for (key in _ref) {
+                  val = _ref[key];
+                  if (resp.headers(key)) {
+                    newHeaders[key] = resp.headers(key);
+                  }
+                }
+                return $auth.setAuthHeaders(newHeaders);
+              }
+            ]);
+            return resp;
           }
-        });
-        return req;
-      },
-      response: function(resp) {
-        $injector.invoke(function($http, $auth) {
-          var key, newHeaders, val, _ref;
-          newHeaders = {};
-          _ref = $auth.config.tokenFormat;
-          for (key in _ref) {
-            val = _ref[key];
-            if (resp.headers(key)) {
-              newHeaders[key] = resp.headers(key);
-            }
-          }
-          return $auth.setAuthHeaders(newHeaders);
-        });
-        return resp;
+        };
       }
-    };
-  });
-  httpMethods = ['get', 'post', 'put', 'patch', 'delete'];
-  return angular.forEach(httpMethods, function(method) {
-    var _base;
-    if ((_base = $httpProvider.defaults.headers)[method] == null) {
-      _base[method] = method;
-    }
-    return $httpProvider.defaults.headers[method]['If-Modified-Since'] = '0';
-  });
-}).run(function($auth, $window, $rootScope) {
-  return $auth.initialize();
-});
+    ]);
+    httpMethods = ['get', 'post', 'put', 'patch', 'delete'];
+    return angular.forEach(httpMethods, function(method) {
+      var _base;
+      if ((_base = $httpProvider.defaults.headers)[method] == null) {
+        _base[method] = method;
+      }
+      return $httpProvider.defaults.headers[method]['If-Modified-Since'] = '0';
+    });
+  }
+]).run([
+  '$auth', '$window', '$rootScope', function($auth, $window, $rootScope) {
+    return $auth.initialize();
+  }
+]);
 
 window.isOldIE = function() {
   var nav, out, version;
