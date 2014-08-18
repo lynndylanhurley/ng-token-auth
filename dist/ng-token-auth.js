@@ -44,8 +44,8 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
       return angular.extend(config, params);
     },
     $get: [
-      '$http', '$q', '$location', '$cookies', '$cookieStore', '$window', '$timeout', '$rootScope', '$interpolate', (function(_this) {
-        return function($http, $q, $location, $cookies, $cookieStore, $window, $timeout, $rootScope, $interpolate) {
+      '$http', '$q', '$location', '$cookieStore', '$window', '$timeout', '$rootScope', '$interpolate', (function(_this) {
+        return function($http, $q, $location, $cookieStore, $window, $timeout, $rootScope, $interpolate) {
           return {
             header: null,
             dfd: null,
