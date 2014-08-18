@@ -778,7 +778,10 @@ There are more detailed instructions in `test/README.md`.
 
 Just send a pull request. You will be granted commit access if you send quality pull requests.
 
-Guidelines will be posted if the need arises.
+### Contribution guidelines:
+
+* Make sure that you make changes to the CoffeeScript source file (`src/ng-token-auth.coffee`) and not the compiled distribution file (`dist/ng-token-auth.js`). If the [dev server](#running-the-dev-server) is running, the coffescript will be compiled automatically. You can also run `gulp transpile` from the project root to compile the code.
+* Pull requests that include tests will receive prioirity. Read how to run the tests [here](#running-the-tests).
 
 # TODO
 
