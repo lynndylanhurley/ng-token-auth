@@ -12,6 +12,7 @@ This module provides the following features:
 * Email authentication, including:
   * User registration
   * Password reset
+* Seamless integration with the [devise token auth](https://github.com/lynndylanhurley/devise_token_auth) Rails gem
 * Extensive [event notifications](#events)
 * Allows for extensive [configuration](#configuration) to work with any API
 * Session support using cookies or localStorage
