@@ -766,7 +766,7 @@ A dev server will start on [localhost:7777](http://localhost:7777).
 
 Assuming the [dev server](#running-the-dev-server) has already been set up, start karma using the following command:
 
-`karma start test/test/karma-ci.conf.coffee`
+`karma start test/test/karma.conf.coffee`
 
 ### Testing against a live API
 
