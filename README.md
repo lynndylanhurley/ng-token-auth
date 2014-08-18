@@ -459,7 +459,7 @@ The `parseExpiry` param accepts a method that will be used to parse the expirati
 
 ### Using alternate response formats
 
-By default, this module expects user info (`id`, `name`, etc.) to be contained within the `data` param of successful login / token validation responses as in the following example:
+By default, this module expects user info (`id`, `name`, etc.) to be contained within the `data` param of successful login / token-validation responses. The following example shows an example of an expected response:
 
 **Expected API login response example**
 ~~~
