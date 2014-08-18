@@ -26,6 +26,9 @@ angular.module('ng-token-auth', ['ngCookies'])
         # convert from ruby time (seconds) to js time (millis)
         (parseInt(headers['expiry'], 10) * 1000) || null
 
+      handleLoginResponse: (resp) -> resp.data
+      handleTokenValidationResponse: (resp) -> resp.data
+
       authProviderPaths:
         github:    '/auth/github'
         facebook:  '/auth/facebook'
@@ -139,7 +142,8 @@ angular.module('ng-token-auth', ['ngCookies'])
             @initDfd()
             $http.post(@apiUrl() + config.emailSignInPath, params)
               .success((resp) =>
-                @handleValidAuth(resp.data)
+                authData = config.handleLoginResponse(resp)
+                @handleValidAuth(authData)
                 $rootScope.$broadcast('auth:login-success', @user)
               )
               .error((resp) =>
@@ -295,7 +299,8 @@ angular.module('ng-token-auth', ['ngCookies'])
             unless @tokenHasExpired()
               $http.get(@apiUrl() + config.tokenValidationPath)
                 .success((resp) =>
-                  @handleValidAuth(resp.data)
+                  authData = config.handleTokenValidationResponse(resp)
+                  @handleValidAuth(authData)
 
                   # broadcast event for first time login
                   if @firstTimeLogin

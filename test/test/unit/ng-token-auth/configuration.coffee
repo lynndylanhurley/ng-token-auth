@@ -65,3 +65,71 @@ suite 'configuration', ->
       $auth.setAuthHeaders(expectedHeaders)
       expiry = $auth.getExpiry()
       assert.equal(expiry, validExpiry)
+
+  suite 'alternate login response format', ->
+    setup ->
+      # define custom login response handler
+      $authProvider.configure({
+        handleLoginResponse: (resp) -> resp
+      })
+
+      # return non-standard login response format
+      $httpBackend
+        .expectPOST('/api/auth/sign_in')
+        .respond(201, validUser)
+
+      $auth.submitLogin({
+        email: validUser.email
+        password: 'secret123'
+      })
+
+      $httpBackend.flush()
+
+    teardown ->
+      # restore default login response handler
+      $authProvider.configure({
+        handleLoginResponse: (resp) -> resp.data
+      })
+
+    test 'new user is defined in the root scope', ->
+      assert.equal(validUser.uid, $rootScope.user.uid)
+
+    test 'success event should return user info', ->
+      assert $rootScope.$broadcast.calledWithMatch('auth:login-success', validUser)
+
+
+  suite 'alternate token validation response format', ->
+    successResp = validUser
+    newAuthHeader = {
+      "access-token": "(✿◠‿◠)"
+      "token-type":   'Bearer'
+      client:         validClient
+      expiry:         validExpiry.toString()
+      uid:            validUid.toString()
+    }
+    dfd = null
+
+    setup ->
+      # define custom token validation response handler
+      $authProvider.configure({
+        handleTokenValidationResponse: (resp) -> resp
+      })
+
+      $httpBackend
+        .expectGET('/api/auth/validate_token')
+        .respond(201, successResp, newAuthHeader)
+
+      $cookieStore.put('auth_headers', validAuthHeader)
+
+      $auth.validateUser()
+
+      $httpBackend.flush()
+
+    teardown ->
+      # restore default token validation response handler
+      $authProvider.configure({
+        handleTokenValidationResponse: (resp) -> resp.data
+      })
+
+    test 'new user is defined in the root scope', ->
+      assert.equal(validUser.uid, $rootScope.user.uid)

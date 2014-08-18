@@ -26,6 +26,12 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
     parseExpiry: function(headers) {
       return (parseInt(headers['expiry'], 10) * 1000) || null;
     },
+    handleLoginResponse: function(resp) {
+      return resp.data;
+    },
+    handleTokenValidationResponse: function(resp) {
+      return resp.data;
+    },
     authProviderPaths: {
       github: '/auth/github',
       facebook: '/auth/facebook',
@@ -141,7 +147,9 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
               this.initDfd();
               $http.post(this.apiUrl() + config.emailSignInPath, params).success((function(_this) {
                 return function(resp) {
-                  _this.handleValidAuth(resp.data);
+                  var authData;
+                  authData = config.handleLoginResponse(resp);
+                  _this.handleValidAuth(authData);
                   return $rootScope.$broadcast('auth:login-success', _this.user);
                 };
               })(this)).error((function(_this) {
@@ -264,7 +272,9 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
               if (!this.tokenHasExpired()) {
                 return $http.get(this.apiUrl() + config.tokenValidationPath).success((function(_this) {
                   return function(resp) {
-                    _this.handleValidAuth(resp.data);
+                    var authData;
+                    authData = config.handleTokenValidationResponse(resp);
+                    _this.handleValidAuth(authData);
                     if (_this.firstTimeLogin) {
                       $rootScope.$broadcast('auth:email-confirmation-success', _this.user);
                     }
