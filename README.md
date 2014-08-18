@@ -785,9 +785,7 @@ Just send a pull request. You will be granted commit access if you send quality 
 
 # TODO
 
-* Only verify tokens that have not expired.
 * Add interceptor to catch 401 responses, hold http requests until user has been authenticated.
-* Only add the auth header if request url matches api url.
 
 # License
 
