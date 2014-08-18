@@ -14,6 +14,7 @@ angular.module('ng-token-auth', ['ngCookies'])
       proxyUrl:                '/proxy'
       validateOnPageLoad:      true
       forceHardRedirect:       false
+      storage:                 'cookies'
 
       tokenFormat:
         "access-token": "{{ token }}"
@@ -273,8 +274,8 @@ angular.module('ng-token-auth', ['ngCookies'])
 
                 # token cookie is present. user is returning to the site, or
                 # has refreshed the page.
-                else if $cookieStore.get('auth_headers')
-                  @headers = $cookieStore.get('auth_headers')
+                else if @retrieveData('auth_headers')
+                  @headers = @retrieveData('auth_headers')
 
                 if @headers
                   @validateToken()
@@ -410,10 +411,26 @@ angular.module('ng-token-auth', ['ngCookies'])
             return headers
 
 
+          # abstract persistent data store
+          persistData: (key, val) ->
+            switch config.storage
+              when 'localStorage'
+                $window.localStorage.setItem(key, JSON.stringify(val))
+              else $cookieStore.put(key, val)
+
+
+          # abstract persistent data retrieval
+          retrieveData: (key) ->
+            switch config.storage
+              when 'localStorage'
+                JSON.parse($window.localStorage.getItem(key))
+              else $cookieStore.get(key)
+
+
           # persist authentication token, client id, uid
           setAuthHeaders: (headers) ->
             @headers = angular.extend((@headers || {}), headers)
-            $cookieStore.put('auth_headers', @headers)
+            @persistData('auth_headers', @headers)
 
 
 

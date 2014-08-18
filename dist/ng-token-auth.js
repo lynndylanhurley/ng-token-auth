@@ -16,6 +16,7 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
     proxyUrl: '/proxy',
     validateOnPageLoad: true,
     forceHardRedirect: false,
+    storage: 'cookies',
     tokenFormat: {
       "access-token": "{{ token }}",
       "token-type": "Bearer",
@@ -250,8 +251,8 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
                       uid: uid
                     }));
                     $location.url($location.path() || '/');
-                  } else if ($cookieStore.get('auth_headers')) {
-                    this.headers = $cookieStore.get('auth_headers');
+                  } else if (this.retrieveData('auth_headers')) {
+                    this.headers = this.retrieveData('auth_headers');
                   }
                   if (this.headers) {
                     this.validateToken();
@@ -367,9 +368,25 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
               }
               return headers;
             },
+            persistData: function(key, val) {
+              switch (config.storage) {
+                case 'localStorage':
+                  return $window.localStorage.setItem(key, JSON.stringify(val));
+                default:
+                  return $cookieStore.put(key, val);
+              }
+            },
+            retrieveData: function(key) {
+              switch (config.storage) {
+                case 'localStorage':
+                  return JSON.parse($window.localStorage.getItem(key));
+                default:
+                  return $cookieStore.get(key);
+              }
+            },
             setAuthHeaders: function(headers) {
               this.headers = angular.extend(this.headers || {}, headers);
-              return $cookieStore.put('auth_headers', this.headers);
+              return this.persistData('auth_headers', this.headers);
             },
             useExternalWindow: function() {
               return !(config.forceHardRedirect || $window.isOldIE());
