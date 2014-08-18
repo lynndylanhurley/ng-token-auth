@@ -327,7 +327,7 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
                 delete this.user[key];
               }
               this.headers = null;
-              return delete $cookies['auth_headers'];
+              return this.removeData('auth_headers');
             },
             signOut: function() {
               return $http["delete"](this.apiUrl() + config.signOutUrl).success((function(_this) {
@@ -384,6 +384,16 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
                   return $cookieStore.get(key);
               }
             },
+            removeData: function(key){
+              switch (config.storage) {
+                case 'localStorage':
+                  return $window.localStorage.removeItem(key);
+                default:
+                  return delete $cookieStore.remove('auth_headers');
+              }
+
+            },
+
             setAuthHeaders: function(headers) {
               this.headers = angular.extend(this.headers || {}, headers);
               return this.persistData('auth_headers', this.headers);
