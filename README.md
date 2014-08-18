@@ -1,4 +1,6 @@
-# Angular Token Auth
+ ![Serious Trust](https://raw.githubusercontent.com/lynndylanhurley/ng-token-auth/master/test/app/images/serious-trust.jpg "Serious Trust")
+
+# Angular Token Auth 
 
 [![Bower version](https://badge.fury.io/bo/ng-token-auth.svg)](http://badge.fury.io/bo/ng-token-auth)
 [![Build Status](https://travis-ci.org/lynndylanhurley/ng-token-auth.svg?branch=master)](https://travis-ci.org/lynndylanhurley/ng-token-auth)
@@ -9,6 +11,7 @@ This module provides a simple method of client authentication that can be config
 This module was designed to work out of the box with the outstanding [devise token auth](https://github.com/lynndylanhurley/devise_token_auth) gem, but I've been able to use it in other environments as well ([go](http://golang.org/), [gorm](https://github.com/jinzhu/gorm) and [gomniauth](https://github.com/stretchr/gomniauth) for example).
 
 Token based authentication requires coordination between the client and the server. [Diagrams](#conceptual) are included to illustrate this relationship.
+
 
 **About security**: [read here](http://stackoverflow.com/questions/18605294/is-devises-token-authenticatable-secure) for more information on securing your token auth system. The [devise token auth](https://github.com/lynndylanhurley/devise_token_auth#security) gem has adequate security measures in place, and the gem works seamlessly with this module.
 
