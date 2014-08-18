@@ -29,8 +29,6 @@ suite 'token handling', ->
       $httpBackend.flush()
 
     test 'headers should be updated', ->
-      console.log 'expected', newAuthHeader
-      console.log 'actual', $auth.headers
       assert.deepEqual(newAuthHeader, $auth.headers)
 
     test 'header is included with the next request to the api', ->
