@@ -4,9 +4,20 @@
 [![Build Status](https://travis-ci.org/lynndylanhurley/ng-token-auth.svg?branch=master)](https://travis-ci.org/lynndylanhurley/ng-token-auth)
 [![Test Coverage](https://codeclimate.com/github/lynndylanhurley/ng-token-auth/coverage.png)](https://codeclimate.com/github/lynndylanhurley/ng-token-auth)
 
-This module provides a simple method of client authentication that can be configured to work with any api.
+# Simple, secure authentication for AngularJS.
 
-This module was designed to work out of the box with the outstanding [devise token auth](https://github.com/lynndylanhurley/devise_token_auth) gem, but I've been able to use it in other environments as well ([go](http://golang.org/), [gorm](https://github.com/jinzhu/gorm) and [gomniauth](https://github.com/stretchr/gomniauth) for example).
+This module provides the following features:
+
+* Oauth2 authentication
+* Email authentication, including:
+  * User registration
+  * Password reset
+* Extensive [event notifications](#events)
+* Allows for extensive [configuration](#configuration) to work with any API
+* Session support using cookies or localStorage
+* Tested with Chrome, Safari, Firefox and [IE8+](#ie8-and-ie9)
+
+This module was designed to work out of the box with the outstanding [devise token auth](https://github.com/lynndylanhurley/devise_token_auth) gem, but it's seen use in other environments as well ([go](http://golang.org/), [gorm](https://github.com/jinzhu/gorm) and [gomniauth](https://github.com/stretchr/gomniauth) for example).
 
 Token based authentication requires coordination between the client and the server. [Diagrams](#conceptual) are included to illustrate this relationship.
 
