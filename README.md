@@ -17,7 +17,7 @@ This module provides the following features:
 * Session support using cookies or localStorage
 * Tested with Chrome, Safari, Firefox and [IE8+](#ie8-and-ie9)
 
-# [:godmode: Live Demo :godmode:](http://ng-token-auth-demo.herokuapp.com/)
+# [Live Demo](http://ng-token-auth-demo.herokuapp.com/)
 
 This project comes bundled with a test app. You can run the demo locally by following [these instructions](#development), or you can use it [here in production](http://ng-token-auth-demo.herokuapp.com/).
 
