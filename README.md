@@ -62,6 +62,7 @@ angular.module('myApp', ['ng-token-auth'])
       passwordUpdatePath:      '/auth/password'
       passwordResetSuccessUrl: window.location.href
       emailSignInPath:         '/auth/sign_in',
+      storage:                 'cookies',
       proxyIf:                 function() { return false; },
       proxyUrl:                '/proxy',
       authProviderPaths: {
@@ -103,6 +104,7 @@ angular.module('myApp', ['ng-token-auth'])
 | **passwordResetPath** | path for requesting password reset emails. [Read more](#password-reset-flow). |
 | **passwordUpdatePath** | path for submitting new passwords for authenticated users. [Read more](#password-reset-flow) |
 | **passwordResetSuccessUrl** | the URL to which the API should redirect after users visit the links contained in password-reset emails. [Read more](#password-reset-flow). |
+| **storage** | the method used to persist tokens between sessions. cookies are used by default, but `window.localStorage` can be used as well. allowed values are `cookies` and `localStorage`. |
 | **proxyIf** | older browsers have trouble with CORS ([read more](#ie8-and-ie9)). pass a method here to determine whether or not a proxy should be used. example: `function() { return !Modernizr.cors }` |
 | **proxyUrl** | proxy url if proxy is to be used |
 | **tokenFormat** | a template for authentication tokens. the template will be provided a context with the following params:<br><ul><li>token</li><li>clientId</li><li>uid</li><li>expiry</li></ul>Defaults to the [RFC 6750 Bearer Token](http://tools.ietf.org/html/rfc6750) format. [Read more](#alternate-header-formats). |
