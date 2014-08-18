@@ -79,6 +79,12 @@ angular.module('myApp', ['ng-token-auth'])
       parseExpiry: function(headers) {
         // convert from UTC ruby (seconds) to UTC js (milliseconds)
         return (parseInt(headers['expiry']) * 1000) || null;
+      },
+      handleLoginResponse: function(response) { 
+        return response.data;
+      },
+      handleTokenValidationResponse: function(response) {
+        return response.data;
       }
     });
   });
@@ -101,6 +107,8 @@ angular.module('myApp', ['ng-token-auth'])
 | **proxyUrl** | proxy url if proxy is to be used |
 | **tokenFormat** | a template for authentication tokens. the template will be provided a context with the following params:<br><ul><li>token</li><li>clientId</li><li>uid</li><li>expiry</li></ul>Defaults to the [RFC 6750 Bearer Token](http://tools.ietf.org/html/rfc6750) format. [Read more](#alternate-header-formats). |
 | **parseExpiry** | a function that will return the token's expiry from the current headers. Returns null if no headers or expiry are found. [Read more](#alternate-header-formats). |
+| **handleLoginResponse** | a function that will identify and return the current user's info (id, username, etc.) in the response of a successful login request. [Read more](#using-alternate-response-formats). |
+| **handleTokenValidationResponse** | a function that will identify and return the current user's info (id, username, etc.) in the response of a successful token validation request. [Read more](#using-alternate-response-formats). |
 
 
 # Usage
@@ -448,6 +456,59 @@ The `tokenFormat` param accepts an object as an argument. Each param of the obje
 * **clientId**: the id of the current device
 
 The `parseExpiry` param accepts a method that will be used to parse the expiration date from the auth headers. The current valid headers will be provided as an argument.
+
+### Using alternate response formats
+
+By default, this module expects user info (`id`, `name`, etc.) to be contained within the `data` param of successful login / token validation responses as in the following example:
+
+**Expected API login response example**
+~~~
+HTTP/1.1 200 OK
+Content-Type: application/json;charset=UTF-8
+{
+  "data": {
+    "id":"123",
+    "name": "Slemp Diggler",
+    "etc": "..."
+  }
+}
+~~~
+
+The above example follows the format used by the [devise token gem](https://github.com/lynndylanhurley/devise_token_auth). This format requires no additional configuration.
+
+But not all APIs use this format. Some APIs simply return the serialized user model with no container params:
+
+**Alternate API login response example**
+~~~
+HTTP/1.1 200 OK
+Content-Type: application/json;charset=UTF-8
+{
+  "id":"123",
+  "name": "Slemp Diggler",
+  "etc": "..."
+}
+~~~
+
+Functions can be provided to identify and return the relevant user data from successful authentication responses. The above example response can be handled with the following configuration:
+
+**Example alternate login response handler format**:
+
+~~~javascript
+angular.module('myApp', ['ng-token-auth'])
+  .config(function($authProvider) {
+    $authProvider.configure({
+      apiUrl: 'http://api.example.com'
+
+      handleLoginResponse: function(response) {
+        return response;
+      },
+      
+      handleTokenValidationResponse: function(response) {
+        return response;
+      }
+    })
+  });
+~~~
 
 # Conceptual
 
