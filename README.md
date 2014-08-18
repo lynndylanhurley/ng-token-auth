@@ -750,6 +750,8 @@ These steps are taken automatically when using this module with IE8 and IE9. I a
 
 # Development
 
+### Running the dev server
+
 There is a test project in the `test` directory of this app. To start a dev server, perform the following steps.
 
 1. `cd` to the root of this project.
@@ -759,6 +761,14 @@ There is a test project in the `test` directory of this app. To start a dev serv
 1. `gulp dev`
 
 A dev server will start on [localhost:7777](http://localhost:7777).
+
+### Running the tests
+
+Assuming the [dev server](#running-the-dev-server) has already been set up, start karma using the following command:
+
+`karma start test/test/karma-ci.conf.coffee`
+
+### Testing against a live API
 
 This module was built against [this API](https://github.com/lynndylanhurley/devise_token_auth_demo). You can use this, or feel free to use your own.
 
