@@ -62,5 +62,5 @@ suite 'alternate storage', ->
     test '$rootScope should broadcast logout success event', ->
       assert $rootScope.$broadcast.calledWith('auth:logout-success')
 
-    test.only 'localStorage item should no longer be present', ->
+    test 'localStorage item should no longer be present', ->
       assert($cookieStore.get('auth_headers') == undefined)
