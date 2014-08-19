@@ -44,8 +44,8 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
       return angular.extend(config, params);
     },
     $get: [
-      '$http', '$q', '$location', '$cookies', '$cookieStore', '$window', '$timeout', '$rootScope', '$interpolate', (function(_this) {
-        return function($http, $q, $location, $cookies, $cookieStore, $window, $timeout, $rootScope, $interpolate) {
+      '$http', '$q', '$location', '$cookieStore', '$window', '$timeout', '$rootScope', '$interpolate', (function(_this) {
+        return function($http, $q, $location, $cookieStore, $window, $timeout, $rootScope, $interpolate) {
           return {
             header: null,
             dfd: null,
@@ -327,7 +327,7 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
                 delete this.user[key];
               }
               this.headers = null;
-              return delete $cookies['auth_headers'];
+              return this.deleteData('auth_headers');
             },
             signOut: function() {
               return $http["delete"](this.apiUrl() + config.signOutUrl).success((function(_this) {
@@ -337,6 +337,7 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
                 };
               })(this)).error((function(_this) {
                 return function(resp) {
+                  _this.invalidateTokens();
                   return $rootScope.$broadcast('auth:logout-error', resp);
                 };
               })(this));
@@ -382,6 +383,14 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
                   return JSON.parse($window.localStorage.getItem(key));
                 default:
                   return $cookieStore.get(key);
+              }
+            },
+            deleteData: function(key) {
+              switch (config.storage) {
+                case 'localStorage':
+                  return $window.localStorage.removeItem(key);
+                default:
+                  return $cookieStore.remove(key);
               }
             },
             setAuthHeaders: function(headers) {
