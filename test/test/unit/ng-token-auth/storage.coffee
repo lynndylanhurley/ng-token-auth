@@ -12,20 +12,11 @@ suite 'alternate storage', ->
     data: validUser
 
   suite 'localStorage', ->
+    # configure for local storage
     setup ->
       $authProvider.configure({
         storage: 'localStorage'
       })
-
-      $httpBackend
-        .expectGET('/api/auth/validate_token')
-        .respond(201, successResp, newAuthHeader)
-
-      $window.localStorage.setItem('auth_headers', JSON.stringify(validAuthHeader))
-
-      $auth.validateUser()
-
-      $httpBackend.flush()
 
     # restore config defaults
     teardown ->
@@ -33,34 +24,48 @@ suite 'alternate storage', ->
         storage: 'cookies'
       })
 
-    test 'headers should be updated', ->
-      assert.deepEqual(newAuthHeader, $auth.headers)
+    suite 'token validation', ->
+      setup ->
+        $httpBackend
+          .expectGET('/api/auth/validate_token')
+          .respond(201, successResp, newAuthHeader)
 
-    test 'header is included with the next request to the api', ->
-      $httpBackend
-        .expectGET('/api/test', (headers) ->
-          assert.equal(newAuthHeader['access-token'], headers['access-token'])
-          headers
-        )
-        .respond(201, successResp, {'access-token', 'whatever'})
+        $window.localStorage.setItem('auth_headers', JSON.stringify(validAuthHeader))
 
-      $http.get('/api/test')
+        $auth.validateUser()
 
-      $httpBackend.flush()
+        $httpBackend.flush()
 
-    setup ->
-      $httpBackend
-        .expectDELETE('/api/auth/sign_out')
-        .respond(201, successResp)
 
-      $window.localStorage.setItem('auth_headers', JSON.stringify(validAuthHeader))
+      test 'headers should be updated', ->
+        assert.deepEqual(newAuthHeader, $auth.headers)
 
-      $auth.signOut()
+      test 'header is included with the next request to the api', ->
+        $httpBackend
+          .expectGET('/api/test', (headers) ->
+            assert.equal(newAuthHeader['access-token'], headers['access-token'])
+            headers
+          )
+          .respond(201, successResp, {'access-token', 'whatever'})
 
-      $httpBackend.flush()
+        $http.get('/api/test')
 
-    test '$rootScope should broadcast logout success event', ->
-      assert $rootScope.$broadcast.calledWith('auth:logout-success')
+        $httpBackend.flush()
 
-    test 'localStorage item should no longer be present', ->
-      assert($cookieStore.get('auth_headers') == undefined)
+    suite 'sign out', ->
+      setup ->
+        $httpBackend
+          .expectDELETE('/api/auth/sign_out')
+          .respond(201, successResp)
+
+        $window.localStorage.setItem('auth_headers', JSON.stringify(validAuthHeader))
+
+        $auth.signOut()
+
+        $httpBackend.flush()
+
+      test '$rootScope should broadcast logout success event', ->
+        assert $rootScope.$broadcast.calledWith('auth:logout-success')
+
+      test 'localStorage item should no longer be present', ->
+        assert($cookieStore.get('auth_headers') == undefined)
