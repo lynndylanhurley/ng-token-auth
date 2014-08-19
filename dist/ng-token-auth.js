@@ -254,7 +254,7 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
                   } else if (this.retrieveData('auth_headers')) {
                     this.headers = this.retrieveData('auth_headers');
                   }
-                  if (this.headers) {
+                  if (!isEmpty(this.headers)) {
                     this.validateToken();
                   } else {
                     this.rejectDfd({
@@ -495,4 +495,24 @@ window.isOldIE = function() {
     }
   }
   return out;
+};
+
+window.isEmpty = function(obj) {
+  var key, val;
+  if (!obj) {
+    return true;
+  }
+  if (obj.length > 0) {
+    return false;
+  }
+  if (obj.length === 0) {
+    return true;
+  }
+  for (key in obj) {
+    val = obj[key];
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
+      return false;
+    }
+  }
+  return true;
 };

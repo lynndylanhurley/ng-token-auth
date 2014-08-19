@@ -73,6 +73,17 @@ suite 'token handling', ->
       return false
 
 
+  suite 'undefined headers', ->
+    test 'validateUser should not make requests if no token is present', ->
+      $auth.validateUser().catch(-> assert true)
+      $timeout.flush()
+
+    test 'validation request should not be made if headers are empty', ->
+      $cookieStore.put('auth_headers', {})
+      $auth.validateUser().catch(-> assert true)
+      $timeout.flush()
+
+
   suite 'invalid headers', ->
     setup ->
       $httpBackend

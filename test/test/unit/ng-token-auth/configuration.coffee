@@ -34,7 +34,6 @@ suite 'configuration', ->
           "Authorization": "token={{token}} expiry={{expiry}} uid={{uid}}"
 
         parseExpiry: (headers) ->
-          console.log 'headers', headers
           (parseInt(headers['Authorization'].match(/expiry=([^ ]+) /)[1], 10)) || null
       })
 
