@@ -45,13 +45,12 @@ angular.module('ng-token-auth', ['ngCookies'])
         '$http'
         '$q'
         '$location'
-        '$cookies'
         '$cookieStore'
         '$window'
         '$timeout'
         '$rootScope'
         '$interpolate'
-        ($http, $q, $location, $cookies, $cookieStore, $window, $timeout, $rootScope, $interpolate) =>
+        ($http, $q, $location, $cookieStore, $window, $timeout, $rootScope, $interpolate) =>
           header:            null
           dfd:               null
           config:            config
@@ -366,7 +365,7 @@ angular.module('ng-token-auth', ['ngCookies'])
             @headers = null
 
             # kill cookies, otherwise session will resume on page reload
-            delete $cookies['auth_headers']
+            @deleteData('auth_headers')
 
 
           # destroy auth token on server, destroy user auth credentials
@@ -377,6 +376,7 @@ angular.module('ng-token-auth', ['ngCookies'])
                 $rootScope.$broadcast('auth:logout-success')
               )
               .error((resp) =>
+                @invalidateTokens()
                 $rootScope.$broadcast('auth:logout-error', resp)
               )
 
@@ -425,6 +425,14 @@ angular.module('ng-token-auth', ['ngCookies'])
               when 'localStorage'
                 JSON.parse($window.localStorage.getItem(key))
               else $cookieStore.get(key)
+
+
+          # abstract persistent data removal
+          deleteData: (key) ->
+            switch config.storage
+              when 'localStorage'
+                $window.localStorage.removeItem(key)
+              else $cookieStore.remove(key)
 
 
           # persist authentication token, client id, uid
