@@ -240,7 +240,7 @@ Authenticate a user that registered via email. [Read more](#email-sign-in-flow).
 
 This method is also available in the `$rootScope` for use in templates.
 
-#### Example use in a template:
+##### Example use in a template:
 ~~~html
 <form ng-submit="submitLogin(loginForm)" role="form" ng-init="loginForm = {}">
   <div class="form-group">
@@ -271,7 +271,7 @@ Send password reset instructions to a user. This only applies to users that have
 
 This method is also available in the `$rootScope` for use in templates.
 
-#### Example use in a template:
+##### Example use in a template:
 ~~~html
 <form ng-submit="requestPasswordReset(passwordResetForm)" role="form" ng-init="passwordResetForm = {}">
   <div class="form-group">
@@ -290,7 +290,7 @@ Change an authenticated user's password. This only applies to users that have re
 
 The two params must match. This method is also available in the `$rootScope` for use in templates.
 
-#### Example use in a template
+##### Example use in a template
 ~~~html
 <form ng-submit="updatePassword(changePasswordForm)" role="form" ng-init="changePasswordForm = {}">
   <div class="form-group">
@@ -314,7 +314,7 @@ The following events are broadcast by the `$rootScope`:
 ###auth:login-success
 Broadcast after successful user authentication. Event message contains the user object.
 
-####Example:
+##### Example:
 ~~~javascript
 $rootScope.$on('auth:login-success', function(ev, user) {
     alert('Welcome ', user.email);
@@ -324,7 +324,7 @@ $rootScope.$on('auth:login-success', function(ev, user) {
 ###auth:login-error
 Broadcast after user fails authentication.
 
-####Example:
+##### Example:
 ~~~javascript
 $rootScope.$on('auth:login-error', function(ev, reason) {
     alert('auth failed because', reason.errors[0]);
@@ -334,7 +334,7 @@ $rootScope.$on('auth:login-error', function(ev, reason) {
 ###auth:logout-success
 Broadcast after user is successfully logged out using the `$auth.signOut` method. This event does not contain a message.
 
-####Example:
+##### Example:
 ~~~javascript
 $rootScope.$on('auth:logout-success', function(ev) {
     alert('goodbye');
@@ -344,7 +344,7 @@ $rootScope.$on('auth:logout-success', function(ev) {
 ###auth:logout-error
 Broadcast after failed logout attempts using the `$auth.signOut` method. Message contains the failed logout response.
 
-####Example:
+##### Example:
 ~~~javascript
 $rootScope.$on('auth:logout-error', function(ev, reason) {
     alert('logout failed because ' + reason.errors[0]);
@@ -354,7 +354,7 @@ $rootScope.$on('auth:logout-error', function(ev, reason) {
 ###auth:registration-email-success
 Broadcast after email registration requests complete successfully using the `$auth.submitRegistration` method. Message contains the params that were sent to the server.
 
-####Example:
+##### Example:
 ~~~javascript
 $scope.$on('auth:registration-email-success', function(ev, message) {
     alert("A registration email was sent to " + message.email);
@@ -364,7 +364,7 @@ $scope.$on('auth:registration-email-success', function(ev, message) {
 ###auth:registration-email-error
 Broadcast after failed email registration requests using the `$auth.submitRegistration` method. Message contains the error response.
 
-####Example:
+##### Example:
 ~~~javascript
 $scope.$on('auth:registration-email-error', function(ev, reason) {
     alert("Registration failed: " + reason.errors[0]);
@@ -374,7 +374,7 @@ $scope.$on('auth:registration-email-error', function(ev, reason) {
 ###auth:email-confirmation-success
 Broadcast when users arrive from links contained in password-reset emails. This can be used to trigger "welcome" notifications to new users.
 
-####Example:
+##### Example:
 ~~~javascript
 $scope.$on('auth:email-confirmation-success', function(ev, user) {
     alert("Welcome, "+user.email+". Your account has been verified.");
@@ -384,7 +384,7 @@ $scope.$on('auth:email-confirmation-success', function(ev, user) {
 ###auth:email-confirmation-error
 Broadcast when a user arrives from a link contained in a password-reset email, but the confirmation token fails to validate.
 
-####Example:
+##### Example:
 ~~~javascript
 $scope.$on('auth:email-confirmation-error', function(ev, reason) {
     alert("There was an error with your registration.");
@@ -394,7 +394,7 @@ $scope.$on('auth:email-confirmation-error', function(ev, reason) {
 ###auth:password-reset-request-success
 Broadcast when users successfully submit the password reset form using the `$auth.requestPasswordReset` method.
 
-####Password reset request example:
+##### Password reset request example:
 ~~~javascript
 $scope.$on('auth:password-reset-request-success', function(ev, data) {
     alert("Password reset instructions were sent to " + data.email);
@@ -404,7 +404,7 @@ $scope.$on('auth:password-reset-request-success', function(ev, data) {
 ###auth:password-reset-request-error
 Broadcast after failed requests using the `$auth.requestPasswordReset` method. Message contains the error response.
 
-####Example:
+##### Example:
 ~~~javascript
 $scope.$on('auth:password-reset-request-error', function(ev, resp) {
     alert("Password reset request failed: " + resp.errors[0]);
@@ -416,7 +416,7 @@ Broadcast when users arrive from links contained in password reset emails. This 
 
 The following example demonstrates one way to handle an `auth:password-reset-confirm-success` event. This example assumes that [angular ui-router](https://github.com/angular-ui/ui-router) is used for routing, and that there is a state called `account.password-reset` that contains instructions for changing the user's password.
 
-####Password reset prompt example:
+##### Password reset prompt example:
 ~~~javascript
 angular.module('myApp')
   .run(function($rootScope, $state) {
@@ -431,7 +431,7 @@ You could also choose to display a modal, or you can ignore the event completely
 ###auth:password-reset-confirm-error
 Broadcast when users arrive from links contained in password reset emails, but the server fails to validate their password reset token.
 
-####Example:
+##### Example:
 ~~~javascript
 $scope.$on('auth:password-reset-confirm-error', function(ev, reason) {
     alert("Unable to verify your account. Please try again.");
@@ -441,7 +441,7 @@ $scope.$on('auth:password-reset-confirm-error', function(ev, reason) {
 ###auth:password-change-success
 Broadcast when users successfully update their password using the `$auth.updatePassword` method. [Read more](#password-reset-flow).
 
-####Example:
+##### Example:
 ~~~javascript
 $scope.$on('auth:password-change-success', function(ev) {
   alert("Your password has been successfully updated!");
@@ -451,7 +451,7 @@ $scope.$on('auth:password-change-success', function(ev) {
 ###auth:password-change-error
 Broadcast when requests resulting from the `$auth.updatePassword` method fail. [Read more](#password-reset-flow).
 
-####Example:
+##### Example:
 ~~~javascript
 $scope.$on('auth:registration-change-error', function(ev, reason) {
   alert("Registration failed: " + reason.errors[0]);
@@ -467,7 +467,7 @@ The following example will provide support for this header format:
 Authorization: token={{ token }} expiry={{ expiry }} uid={{ uid }}
 ~~~
 
-#### Example with alternate token format**:
+##### Example with alternate token format**:
 ~~~javascript
 angular.module('myApp', ['ng-token-auth'])
   .config(function($authProvider) {
@@ -501,7 +501,7 @@ The `parseExpiry` param accepts a method that will be used to parse the expirati
 
 By default, this module expects user info (`id`, `name`, etc.) to be contained within the `data` param of successful login / token-validation responses. The following example shows an example of an expected response:
 
-#### Expected API login response example
+##### Expected API login response example
 ~~~
 HTTP/1.1 200 OK
 Content-Type: application/json;charset=UTF-8
@@ -518,7 +518,7 @@ The above example follows the format used by the [devise token gem](https://gith
 
 But not all APIs use this format. Some APIs simply return the serialized user model with no container params:
 
-#### Alternate API login response example
+##### Alternate API login response example
 ~~~
 HTTP/1.1 200 OK
 Content-Type: application/json;charset=UTF-8
@@ -531,7 +531,7 @@ Content-Type: application/json;charset=UTF-8
 
 Functions can be provided to identify and return the relevant user data from successful authentication responses. The above example response can be handled with the following configuration:
 
-#### Example alternate login response handler format:
+##### Example alternate login response handler format:
 
 ~~~javascript
 angular.module('myApp', ['ng-token-auth'])
@@ -650,7 +650,7 @@ Token management is handled by default when using this module with the [devise t
 
 By default, the API should update the auth token for each request ([read more](#about-token-management)). But sometimes it's neccessary to make several concurrent requests to the API, for example:
 
-#####Batch request example
+##### Batch request example
 ~~~javascript
 $scope.getResourceData = function() {
 
