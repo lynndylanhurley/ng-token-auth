@@ -97,7 +97,7 @@ angular.module('myApp', ['ng-token-auth'])
         // convert from UTC ruby (seconds) to UTC js (milliseconds)
         return (parseInt(headers['expiry']) * 1000) || null;
       },
-      handleLoginResponse: function(response) { 
+      handleLoginResponse: function(response) {
         return response.data;
       },
       handleTokenValidationResponse: function(response) {
@@ -136,9 +136,9 @@ angular.module('myApp', ['ng-token-auth'])
 The `$auth` module is available for dependency injection during your app's run phase (for controllers, directives, filters, etc.). The following methods are available.
 
 ###$auth.authenticate
-Initiate on oauth2 authentication. takes 1 argument, a string that is also the name of the target ovider service. This method is also added to the `$rootScope` for use in templates. [Read more]oauth2-authentication-flow).
+Initiate on oauth2 authentication. takes 1 argument, a string that is also the name of the target provider service. This method is also added to the `$rootScope` for use in templates. [Read more](#oauth2-authentication-flow).
 
-##### Example use in a controller
+#### Example use in a controller
 ~~~javascript
 angular.module('ngTokenAuthTestApp')
   .controller('IndexCtrl', function($auth) {
@@ -149,7 +149,7 @@ angular.module('ngTokenAuthTestApp')
   });
 ~~~
 
-##### Example use in a template
+#### Example use in a template
 ~~~html
 <button ng-click="authenticate('github')">
   Sign in with Github
@@ -157,13 +157,13 @@ angular.module('ngTokenAuthTestApp')
 ~~~
 
 ###$auth.validateUser
-return a promise that will resolve if a user's auth token exists and is valid. This method does not ke any arguments. [Read more](#token-validation-flow)
+return a promise that will resolve if a user's auth token exists and is valid. This method does not take any arguments. [Read more](#token-validation-flow)
 
-This method is called on page load during the app's run phase so that returning users will not need to nually re-authenticate themselves.
+This method is called on page load during the app's run phase so that returning users will not need to manually re-authenticate themselves.
 
-The promise returned by this method can be used to prevent users from viewing certain pages when using ngular ui router](https://github.com/angular-ui/ui-router) [resolvers](http://angular-ui.github.io/ui-uter/site/#/api/ui.router.util.$resolve).
+The promise returned by this method can be used to prevent users from viewing certain pages when using [angular ui router](https://github.com/angular-ui/ui-router) [resolvers](http://angular-ui.github.io/ui-router/site/#/api/ui.router.util.$resolve).
 
-##### Example using angular ui router
+#### Example using angular ui router
 
 ~~~coffeescript
 angular.module('myApp', [
@@ -200,57 +200,57 @@ angular.module('myApp', [
   });
 ~~~
 
-This example shows how to implement access control on the client side, however access to restricted formation should be limited on the server as well (using something like [pundit](https://github.com/abs/pundit) if you're using Rails).
+This example shows how to implement access control on the client side, however access to restricted information should be limited on the server as well (using something like [pundit](https://github.com/elabs/pundit) if you're using Rails).
 
 ###$auth.submitRegistration
-Users can register by email using this method. [Read more](#email-registration-flow). Accepts an object th the following params:
+Users can register by email using this method. [Read more](#email-registration-flow). Accepts an object with the following params:
+ * **email**
+ * **password**
+ * **password_confirmation**
+
+ This method is also available in the `$rootScope` for use in templates.
+
+ ##### Example use in a template:
+
+ ~~~html
+ <form ng-submit="submitRegistration(registrationForm)" role="form" ng-init="registrationForm = {}">
+   <div class="form-group">
+     <label>email</label>
+     <input type="email" name="email" ng-model="registrationForm.email" required="required" class="form-control"/>
+   </div>
+
+   <div class="form-group">
+     <label>password</label>
+     <input type="password" name="password" ng-model="registrationForm.password" required="required" class="form-control"/>
+   </div>
+
+   <div class="form-group">
+     <label>password confirmation</label>
+     <input type="password" name="password_confirmation" ng-model="registrationForm.password_confirmation" required="required" class="form-control"/>
+   </div>
+
+   <button type="submit" class="btn btn-primary btn-lg">Register</button>
+ </form>
+ ~~~
+
+###$auth.submitLogin
+Authenticate a user that registered via email. [Read more](#email-sign-in-flow). Accepts an object with the following params:
 * **email**
 * **password**
-* **password_confirmation**
 
 This method is also available in the `$rootScope` for use in templates.
 
 #### Example use in a template:
-
-~~~html
-<form ng-submit="submitRegistration(registrationForm)" role="form" ng-init="registrationForm = {}">
-  <div class="form-group">
-    <label>email</label>
-    <input type="email" name="email" ng-model="registrationForm.email" required="required" class="form-ntrol"/>
-  </div>
-
-  <div class="form-group">
-    <label>password</label>
-    <input type="password" name="password" ng-model="registrationForm.password" required="required" ass="form-control"/>
-  </div>
-
-  <div class="form-group">
-    <label>password confirmation</label>
-    <input type="password" name="password_confirmation" ng-del="registrationForm.password_confirmation" required="required" class="form-control"/>
-  </div>
-
-  <button type="submit" class="btn btn-primary btn-lg">Register</button>
-</form>
-~~~
-
-###$auth.submitLogin
-Authenticate a user that registered via email. [Read more](#email-sign-in-flow). Accepts an object with e following params:
-* **email**
-* **password**
-
-This method is also available in the `$rootScope` for use in templates.
-
-##### Example use in a template:
 ~~~html
 <form ng-submit="submitLogin(loginForm)" role="form" ng-init="loginForm = {}">
   <div class="form-group">
     <label>email</label>
-    <input type="email" name="email" ng-model="loginForm.email" required="required" class="form-ntrol"/>
+    <input type="email" name="email" ng-model="loginForm.email" required="required" class="form-control"/>
   </div>
 
   <div class="form-group">
     <label>password</label>
-    <input type="password" name="password" ng-model="loginForm.password" required="required" ass="form-control"/>
+    <input type="password" name="password" ng-model="loginForm.password" required="required" class="form-control"/>
   </div>
 
   <button type="submit" class="btn btn-primary btn-lg">Sign in</button>
@@ -258,7 +258,7 @@ This method is also available in the `$rootScope` for use in templates.
 ~~~
 
 ###$auth.signOut
-De-authenticate a user. This method does not take any arguments. This method will change the user's uth_token` server-side, and it will destroy the `uid` and `auth_token` cookies saved client-side. This thod is also available in the `$rootScope` for use in templates.
+De-authenticate a user. This method does not take any arguments. This method will change the user's `auth_token` server-side, and it will destroy the `uid` and `auth_token` cookies saved client-side. This method is also available in the `$rootScope` for use in templates.
 
 ##### Example use in a template:
 ~~~html
@@ -266,7 +266,7 @@ De-authenticate a user. This method does not take any arguments. This method wil
 ~~~
 
 ###$auth.requestPasswordReset
-Send password reset instructions to a user. This only applies to users that have registered using ail. This method accepts an object with the following param:
+Send password reset instructions to a user. This only applies to users that have registered using email. This method accepts an object with the following param:
 * **email**
 
 This method is also available in the `$rootScope` for use in templates.
@@ -276,7 +276,7 @@ This method is also available in the `$rootScope` for use in templates.
 <form ng-submit="requestPasswordReset(passwordResetForm)" role="form" ng-init="passwordResetForm = {}">
   <div class="form-group">
     <label>email</label>
-    <input type="email" name="email" ng-model="passwordResetForm.email" required="required" ass="form-control"/>
+    <input type="email" name="email" ng-model="passwordResetForm.email" required="required" class="form-control"/>
   </div>
 
   <button type="submit" class="btn btn-primary btn-lg">Request password reset</button>
@@ -284,7 +284,7 @@ This method is also available in the `$rootScope` for use in templates.
 ~~~
 
 ###$auth.updatePassword
-Change an authenticated user's password. This only applies to users that have registered using email. is method accepts an object with the following params:
+Change an authenticated user's password. This only applies to users that have registered using email. This method accepts an object with the following params:
 * **password**
 * **password_confirmation**
 
@@ -295,12 +295,12 @@ The two params must match. This method is also available in the `$rootScope` for
 <form ng-submit="updatePassword(changePasswordForm)" role="form" ng-init="changePasswordForm = {}">
   <div class="form-group">
     <label>password</label>
-    <input type="password" name="password" ng-model="changePasswordForm.password" required="required" ass="form-control"/>
+    <input type="password" name="password" ng-model="changePasswordForm.password" required="required" class="form-control"/>
   </div>
 
   <div class="form-group">
     <label>password confirmation</label>
-    <input type="password" name="password_confirmation" ng-del="changePasswordForm.password_confirmation" required="required" class="form-control"/>
+    <input type="password" name="password_confirmation" ng-model="changePasswordForm.password_confirmation" required="required" class="form-control"/>
   </div>
 
   <button type="submit" class="btn btn-primary btn-lg">Change your password</button>
@@ -312,9 +312,9 @@ The two params must match. This method is also available in the `$rootScope` for
 The following events are broadcast by the `$rootScope`:
 
 ###auth:login-success
-Broadcast after successful user authentication. event message contains the user object.
+Broadcast after successful user authentication. Event message contains the user object.
 
-**Example**:
+####Example:
 ~~~javascript
 $rootScope.$on('auth:login-success', function(ev, user) {
     alert('Welcome ', user.email);
@@ -324,7 +324,7 @@ $rootScope.$on('auth:login-success', function(ev, user) {
 ###auth:login-error
 Broadcast after user fails authentication.
 
-**Example**:
+####Example:
 ~~~javascript
 $rootScope.$on('auth:login-error', function(ev, reason) {
     alert('auth failed because', reason.errors[0]);
@@ -332,9 +332,9 @@ $rootScope.$on('auth:login-error', function(ev, reason) {
 ~~~
 
 ###auth:logout-success
-Broadcast after user is successfully logged out using the `$auth.signOut` thod. This event does not contain a message.
+Broadcast after user is successfully logged out using the `$auth.signOut` method. This event does not contain a message.
 
-**Example**:
+####Example:
 ~~~javascript
 $rootScope.$on('auth:logout-success', function(ev) {
     alert('goodbye');
@@ -344,7 +344,7 @@ $rootScope.$on('auth:logout-success', function(ev) {
 ###auth:logout-error
 Broadcast after failed logout attempts using the `$auth.signOut` method. Message contains the failed logout response.
 
-**Example**:
+####Example:
 ~~~javascript
 $rootScope.$on('auth:logout-error', function(ev, reason) {
     alert('logout failed because ' + reason.errors[0]);
@@ -352,9 +352,9 @@ $rootScope.$on('auth:logout-error', function(ev, reason) {
 ~~~
 
 ###auth:registration-email-success
-Broadcast after email registration requests complete successfully ing the `$auth.submitRegistration` method. Message contains the params that were sent to the server.
+Broadcast after email registration requests complete successfully using the `$auth.submitRegistration` method. Message contains the params that were sent to the server.
 
-**Example**:
+####Example:
 ~~~javascript
 $scope.$on('auth:registration-email-success', function(ev, message) {
     alert("A registration email was sent to " + message.email);
@@ -364,7 +364,7 @@ $scope.$on('auth:registration-email-success', function(ev, message) {
 ###auth:registration-email-error
 Broadcast after failed email registration requests using the `$auth.submitRegistration` method. Message contains the error response.
 
-**Example**:
+####Example:
 ~~~javascript
 $scope.$on('auth:registration-email-error', function(ev, reason) {
     alert("Registration failed: " + reason.errors[0]);
@@ -372,9 +372,9 @@ $scope.$on('auth:registration-email-error', function(ev, reason) {
 ~~~
 
 ###auth:email-confirmation-success
-Broadcast when users arrive from links contained in password set emails. You can use this to trigger "welcome" notifications to new users if you like.
+Broadcast when users arrive from links contained in password-reset emails. This can be used to trigger "welcome" notifications to new users.
 
-**Example**:
+####Example:
 ~~~javascript
 $scope.$on('auth:email-confirmation-success', function(ev, user) {
     alert("Welcome, "+user.email+". Your account has been verified.");
@@ -382,9 +382,9 @@ $scope.$on('auth:email-confirmation-success', function(ev, user) {
 ~~~
 
 ###auth:email-confirmation-error
-Broadcast when users arrive from links contained in password reset emails and their confirmation tokens fail to validate.
+Broadcast when a user arrives from a link contained in a password-reset email, but the confirmation token fails to validate.
 
-**Example**:
+####Example:
 ~~~javascript
 $scope.$on('auth:email-confirmation-error', function(ev, reason) {
     alert("There was an error with your registration.");
@@ -392,9 +392,9 @@ $scope.$on('auth:email-confirmation-error', function(ev, reason) {
 ~~~
 
 ###auth:password-reset-request-success
-Broadcast when users successfully submit the password reset rm using the `$auth.requestPasswordReset` method.
+Broadcast when users successfully submit the password reset form using the `$auth.requestPasswordReset` method.
 
-**Password reset request example**:
+####Password reset request example:
 ~~~javascript
 $scope.$on('auth:password-reset-request-success', function(ev, data) {
     alert("Password reset instructions were sent to " + data.email);
@@ -402,9 +402,9 @@ $scope.$on('auth:password-reset-request-success', function(ev, data) {
 ~~~
 
 ###auth:password-reset-request-error
-Broadcast after failed requests using the `uth.requestPasswordReset` method. Message contains the error response.
+Broadcast after failed requests using the `$auth.requestPasswordReset` method. Message contains the error response.
 
-**Example**:
+####Example:
 ~~~javascript
 $scope.$on('auth:password-reset-request-error', function(ev, resp) {
     alert("Password reset request failed: " + resp.errors[0]);
@@ -416,7 +416,7 @@ Broadcast when users arrive from links contained in password reset emails. This 
 
 The following example demonstrates one way to handle an `auth:password-reset-confirm-success` event. This example assumes that [angular ui-router](https://github.com/angular-ui/ui-router) is used for routing, and that there is a state called `account.password-reset` that contains instructions for changing the user's password.
 
-**Password reset prompt example**:
+####Password reset prompt example:
 ~~~javascript
 angular.module('myApp')
   .run(function($rootScope, $state) {
@@ -428,11 +428,10 @@ angular.module('myApp')
 
 You could also choose to display a modal, or you can ignore the event completely. What you do with the `auth:password-reset-confirm-success` event is entirely your choice.
 
-
 ###auth:password-reset-confirm-error
-Broadcast when users arrive from links contained in password set emails, but the server fails to validate their password reset token.
+Broadcast when users arrive from links contained in password reset emails, but the server fails to validate their password reset token.
 
-**Example**:
+####Example:
 ~~~javascript
 $scope.$on('auth:password-reset-confirm-error', function(ev, reason) {
     alert("Unable to verify your account. Please try again.");
@@ -442,7 +441,7 @@ $scope.$on('auth:password-reset-confirm-error', function(ev, reason) {
 ###auth:password-change-success
 Broadcast when users successfully update their password using the `$auth.updatePassword` method. [Read more](#password-reset-flow).
 
-**Example**:
+####Example:
 ~~~javascript
 $scope.$on('auth:password-change-success', function(ev) {
   alert("Your password has been successfully updated!");
@@ -452,13 +451,13 @@ $scope.$on('auth:password-change-success', function(ev) {
 ###auth:password-change-error
 Broadcast when requests resulting from the `$auth.updatePassword` method fail. [Read more](#password-reset-flow).
 
-**Example**:
+####Example:
 ~~~javascript
 $scope.$on('auth:registration-change-error', function(ev, reason) {
   alert("Registration failed: " + reason.errors[0]);
 });
 ~~~
-  
+
 ## Using alternate header formats
 
 By default, this module (and the [devise token auth](https://github.com/lynndylanhurley/devise_token_auth) gem) use the [RFC 6750 Bearer Token](http://tools.ietf.org/html/rfc6750) format. You can customize this using the `tokenFormat` and `parseExpiry` config params.
@@ -468,18 +467,18 @@ The following example will provide support for this header format:
 Authorization: token={{ token }} expiry={{ expiry }} uid={{ uid }}
 ~~~
 
-**Example with alternate token format**:
+#### Example with alternate token format**:
 ~~~javascript
 angular.module('myApp', ['ng-token-auth'])
   .config(function($authProvider) {
     $authProvider.configure({
       apiUrl: 'http://api.example.com'
-      
+
       // provide the header template
       tokenFormat: {
         "Authorization": "token={{ token }} expiry={{ expiry }} uid={{ uid }}"
       },
-      
+
       // parse the expiry from the 'Authorization' param
       parseExpiry: function(headers) {
         return (parseInt(headers['Authorization'].match(/expiry=([^ ]+) /)[1], 10)) || null
@@ -492,17 +491,17 @@ angular.module('myApp', ['ng-token-auth'])
 The `tokenFormat` param accepts an object as an argument. Each param of the object will be added as an auth header to requests made to the API url provided. Each value of the object will be interpolated using the following context:
 
 * **token**: the user's valid access token
-* **uid**: the user's id 
+* **uid**: the user's id
 * **expiry**: the expiration date of the token
 * **clientId**: the id of the current device
 
 The `parseExpiry` param accepts a method that will be used to parse the expiration date from the auth headers. The current valid headers will be provided as an argument.
 
-## Using alternate response formats
+### Using alternate response formats
 
 By default, this module expects user info (`id`, `name`, etc.) to be contained within the `data` param of successful login / token-validation responses. The following example shows an example of an expected response:
 
-**Expected API login response example**
+#### Expected API login response example
 ~~~
 HTTP/1.1 200 OK
 Content-Type: application/json;charset=UTF-8
@@ -519,7 +518,7 @@ The above example follows the format used by the [devise token gem](https://gith
 
 But not all APIs use this format. Some APIs simply return the serialized user model with no container params:
 
-**Alternate API login response example**
+#### Alternate API login response example
 ~~~
 HTTP/1.1 200 OK
 Content-Type: application/json;charset=UTF-8
@@ -532,7 +531,7 @@ Content-Type: application/json;charset=UTF-8
 
 Functions can be provided to identify and return the relevant user data from successful authentication responses. The above example response can be handled with the following configuration:
 
-**Example alternate login response handler format**:
+#### Example alternate login response handler format:
 
 ~~~javascript
 angular.module('myApp', ['ng-token-auth'])
@@ -543,7 +542,7 @@ angular.module('myApp', ['ng-token-auth'])
       handleLoginResponse: function(response) {
         return response;
       },
-      
+
       handleTokenValidationResponse: function(response) {
         return response;
       }
@@ -802,26 +801,22 @@ There are more detailed instructions in `test/README.md`.
 
 Just send a pull request. You will be granted commit access if you send quality pull requests.
 
-#### Contribution guidelines:
+### Contribution guidelines:
 
 * Make sure that you make changes to the CoffeeScript source file (`src/ng-token-auth.coffee`) and not the compiled distribution file (`dist/ng-token-auth.js`). If the [dev server](#running-the-dev-server) is running, the coffescript will be compiled automatically. You can also run `gulp transpile` from the project root to compile the code.
 * Pull requests that include tests will receive prioirity. Read how to run the tests [here](#running-the-tests).
 
 # Alternatives
 
-### [Satellizer](https://github.com/sahat/satellizer) 
-Satellizer occupies the same problem space as ng-token-auth. 
-
-Advantages of ng-token-auth (at the time of this writing) include:
-
-* Support for [IE8 and IE9](#ie8-and-ie9)
-* [Events](#events) are broadcast after each action. This can allow for more flexibility while reducing de spaghetti. For example, any template can initiate an authentication, and any controller can bscribe to the `auth:login-success` event to provide success notifications, redirects, etc.
-* Seamless, out-of-the-box integration with the [devise token auth](https://github.com/lynndylanhurley/vise_token_auth) gem. This gem provides a high level of security with minimal configuration.
-* [Auth header customization](#using-alternate-header-formats)
-* [Auth response customization](#using-alternate-response-formats)
-* Supports both cookies and localStorage for session persistence
-* Allows for multiple concurrent sessions. For example, you can be logged in on your phone and on your ptop at the same time.
-* Supports [password reset](#authrequestpasswordreset) and [password update](#authupdatepassword) for users that registered by email.
+* [Satellizer](https://github.com/sahat/satellizer) occupies the same problem space as ng-token-auth. Advantages of ng-token-auth (at the time of this writing) include:
+  * Support for [IE8 and IE9](#ie8-and-ie9)
+  * [Events](#events) are broadcast after each action. This can allow for more flexibility while reducing code spaghetti. For example, any template can initiate an authentication, and any controller can subscribe to the `auth:login-success` event to provide success notifications, redirects, etc.
+  * Seamless, out-of-the-box integration with the [devise token auth](https://github.com/lynndylanhurley/devise_token_auth) gem. This gem provides a high level of security with minimal configuration.
+  * [Auth header customization](#using-alternate-header-formats)
+  * [Auth response customization](#using-alternate-response-formats)
+  * Supports both cookies and localStorage for session persistence
+  * Allows for multiple concurrent sessions. For example, you can be logged in on your phone and on your laptop at the same time.
+  * Supports [password reset]
 
 # License
 
