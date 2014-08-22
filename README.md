@@ -784,9 +784,16 @@ Just send a pull request. You will be granted commit access if you send quality 
 * Make sure that you make changes to the CoffeeScript source file (`src/ng-token-auth.coffee`) and not the compiled distribution file (`dist/ng-token-auth.js`). If the [dev server](#running-the-dev-server) is running, the coffescript will be compiled automatically. You can also run `gulp transpile` from the project root to compile the code.
 * Pull requests that include tests will receive prioirity. Read how to run the tests [here](#running-the-tests).
 
-# TODO
+# Alternatives
 
-* Add interceptor to catch 401 responses, hold http requests until user has been authenticated.
+* [satellizer](https://github.com/sahat/satellizer) occupies the same problem space as ng-token-auth. Advantages of ng-token-auth (at the time of this writing) include:
+  * ng-token-auth supports [IE8 and IE9](#ie8-and-ie9).
+  * ng-token-auth broadcasts [events](#events) after each action. This can allow for more flexibility while reducing code spaghetti. For example, any template can initiate an authentication, and any controller can subscribe to the `auth:login-success` event to provide success notifications, redirects, etc.
+  * ng-token-auth provides seamless out-of-the-box integration with the [devise token auth](https://github.com/lynndylanhurley/devise_token_auth) gem. This gem provides a high level of security with minimal configuration.
+  * ng-token-auth allows for [custom auth headers](#using-alternate-header-formats).
+  * ng-token-auth allows for [custom auth responses](#using-alternate-response-formats).
+  * ng-token-auth provides support for both cookies and localStorage for session persistence.
+  * ng-token-auth allows for multiple concurrent sessions. For example, you can be logged in on your phone and on your laptop at the same time.
 
 # License
 
