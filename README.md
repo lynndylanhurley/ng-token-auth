@@ -809,14 +809,14 @@ Just send a pull request. You will be granted commit access if you send quality 
 # Alternatives
 
 * [Satellizer](https://github.com/sahat/satellizer) occupies the same problem-space as ng-token-auth. Advantages of ng-token-auth (at the time of this writing) include:
-  * Support for [IE8 and IE9](#ie8-and-ie9)
+  * Support for [IE8 and IE9](#ie8-and-ie9).
   * [Events](#events) are broadcast after each action. This can allow for more flexibility while reducing code spaghetti. For example, any template can initiate an authentication, and any controller can subscribe to the `auth:login-success` event to provide success notifications, redirects, etc.
   * Seamless, out-of-the-box integration with the [devise token auth](https://github.com/lynndylanhurley/devise_token_auth) gem. This gem provides a high level of security with minimal configuration.
-  * [Auth header customization](#using-alternate-header-formats)
-  * [Auth response customization](#using-alternate-response-formats)
-  * Supports both cookies and localStorage for session persistence
+  * [Auth header customization](#using-alternate-header-formats).
+  * [Auth response customization](#using-alternate-response-formats).
+  * Supports both cookies and localStorage for session persistence.
   * Allows for multiple concurrent sessions. For example, you can be logged in on your phone and on your laptop at the same time.
-  * Supports [password reset]
+  * Supports [password reset](#authrequestpasswordreset) and [password update](#authupdatepassword) for users that registered by email.
 
 # License
 
