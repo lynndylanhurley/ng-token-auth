@@ -821,7 +821,7 @@ Advantages of ng-token-auth (at the time of this writing) include:
 * [Auth response customization](#using-alternate-response-formats)
 * Supports both cookies and localStorage for session persistence
 * Allows for multiple concurrent sessions. For example, you can be logged in on your phone and on your ptop at the same time.
-* Supports password reset and password update for users that registered by email.
+* Supports [password reset](#authrequestpasswordreset) and [password update](#authupdatepassword) for users that registered by email.
 
 # License
 
