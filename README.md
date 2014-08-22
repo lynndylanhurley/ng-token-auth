@@ -136,7 +136,7 @@ angular.module('myApp', ['ng-token-auth'])
 The `$auth` module is available for dependency injection during your app's run phase (for controllers, directives, filters, etc.). The following methods are available.
 
 ###$auth.authenticate
-Initiate on oauth2 authentication. takes 1 argument, a string that is also the name of the target provider service. This method is also added to the `$rootScope` for use in templates. [Read more](#oauth2-authentication-flow).
+Initiate an OAuth2 authentication. This method takes 1 argument, a string that is also the name of the target provider service. This method is also added to the `$rootScope` for use in templates. [Read more](#oauth2-authentication-flow).
 
 #### Example use in a controller
 ~~~javascript
@@ -157,9 +157,9 @@ angular.module('ngTokenAuthTestApp')
 ~~~
 
 ###$auth.validateUser
-return a promise that will resolve if a user's auth token exists and is valid. This method does not take any arguments. [Read more](#token-validation-flow)
+This method returns a promise that will resolve if a user's auth token exists and is valid. This method does not accept any arguments. [Read more](#token-validation-flow)
 
-This method is called on page load during the app's run phase so that returning users will not need to manually re-authenticate themselves.
+This method automatically is called on page load during the app's run phase so that returning users will not need to manually re-authenticate themselves.
 
 The promise returned by this method can be used to prevent users from viewing certain pages when using [angular ui router](https://github.com/angular-ui/ui-router) [resolvers](http://angular-ui.github.io/ui-router/site/#/api/ui.router.util.$resolve).
 
