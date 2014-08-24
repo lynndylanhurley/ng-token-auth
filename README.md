@@ -820,6 +820,7 @@ Satellizer occupies the same problem domain as ng-token-auth. Advantages of ng-t
   * Supports both cookies and localStorage for session persistence.
   * Allows for multiple concurrent sessions. For example, you can be authenticated on your phone and on your laptop at the same time.
   * Supports [password reset](#authrequestpasswordreset) and [password update](#authupdatepassword) for users that registered by email.
+  * Supports [changing tokens with each request](#about-token-management).
 
 # License
 
