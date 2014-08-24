@@ -79,3 +79,4 @@ setValidEmailConfirmQS = ->
 setValidPasswordConfirmQS = ->
   setValidAuthQS()
   $location.search('reset_password', true)
+
