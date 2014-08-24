@@ -643,6 +643,8 @@ Tokens should be invalidated after each request to the API. The following diagra
 
 During each request, a new token is generated. The `access-token` header that should be used in the next request is returned in the `access-token` header of the response to the previous request. The last request in the diagram fails because it tries to use a token that was invalidated by the previous request.
 
+The benefit of this measure is that if a user's token is compromised, the user will immediately be forced to re-authenticate. This will invalidate the token that is now in use by the attacker.
+
 The only case where an expired token is allowed is during [batch requests](#about-batch-requests).
 
 Token management is handled by default when using this module with the [devise token auth](https://github.com/lynndylanhurley/devise_token_auth) gem.
