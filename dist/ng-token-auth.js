@@ -222,9 +222,7 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
               }
             },
             resolveDfd: function() {
-              this.dfd.resolve({
-                id: this.user.id
-              });
+              this.dfd.resolve(this.user);
               return $timeout(((function(_this) {
                 return function() {
                   _this.dfd = null;
