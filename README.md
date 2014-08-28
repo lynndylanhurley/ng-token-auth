@@ -184,6 +184,7 @@ angular.module('myApp', [
       .state('admin', {
         url: '/admin',
         abstract: true,
+        template: '<ui-view/>',
         resolve: {
           auth: function($auth) {
             return $auth.validateUser();
