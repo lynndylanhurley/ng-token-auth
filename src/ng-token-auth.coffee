@@ -233,7 +233,7 @@ angular.module('ng-token-auth', ['ngCookies'])
           # this needs to happen after a reflow so that the promise
           # can be rejected properly before it is destroyed.
           resolveDfd: ->
-            @dfd.resolve({id: @user.id})
+            @dfd.resolve(@user)
             $timeout((=>
               @dfd = null
               $rootScope.$digest() unless $rootScope.$$phase
