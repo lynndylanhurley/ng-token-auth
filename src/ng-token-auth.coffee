@@ -30,7 +30,7 @@ angular.module('ng-token-auth', ['ngCookies'])
         (parseInt(headers['expiry'], 10) * 1000) || null
 
       handleLoginResponse: (resp) -> resp.data
-      handleUpdateResponse: (resp) -> resp.data
+      handleAccountUpdateResponse: (resp) -> resp.data
       handleTokenValidationResponse: (resp) -> resp.data
 
       authProviderPaths:
@@ -194,7 +194,7 @@ angular.module('ng-token-auth', ['ngCookies'])
           updateAccount: (params) ->
             $http.put(@apiUrl() + config.accountUpdatePath, params)
               .success((resp) =>
-                angular.extend @user, config.handleUpdateResponse(resp)
+                angular.extend @user, config.handleAccountUpdateResponse(resp)
                 $rootScope.$broadcast('auth:account-update-success', resp)
 
                 console.log 'rootScope.user', $rootScope.user

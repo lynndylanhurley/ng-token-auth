@@ -100,6 +100,9 @@ angular.module('myApp', ['ng-token-auth'])
       handleLoginResponse: function(response) {
         return response.data;
       },
+      handleAccountResponse: function(response) {
+        return response.data;
+      },
       handleTokenValidationResponse: function(response) {
         return response.data;
       }
@@ -126,6 +129,7 @@ angular.module('myApp', ['ng-token-auth'])
 | **tokenFormat** | a template for authentication tokens. the template will be provided a context with the following params:<br><ul><li>token</li><li>clientId</li><li>uid</li><li>expiry</li></ul>Defaults to the [RFC 6750 Bearer Token](http://tools.ietf.org/html/rfc6750) format. [Read more](#alternate-header-formats). |
 | **parseExpiry** | a function that will return the token's expiry from the current headers. Returns null if no headers or expiry are found. [Read more](#alternate-header-formats). |
 | **handleLoginResponse** | a function that will identify and return the current user's info (id, username, etc.) in the response of a successful login request. [Read more](#using-alternate-response-formats). |
+| **handleAccountUpdateResponse** | a function that will identify and return the current user's info (id, username, etc.) in the response of a successful account update request. [Read more](#using-alternate-response-formats). |
 | **handleTokenValidationResponse** | a function that will identify and return the current user's info (id, username, etc.) in the response of a successful token validation request. [Read more](#using-alternate-response-formats). |
 
 
@@ -304,11 +308,38 @@ The two params must match. This method is also available in the `$rootScope` for
 
   <div class="form-group">
     <label>password confirmation</label>
-    <input type="password" name="password_confirmation" ng-model="changePasswordForm.password_confirmation" required="required" class="form-control"/>
+    <input type="password" name="password_confirmation" ng-model="changePasswordForm.password_confirmation" required="required"/>
   </div>
 
-  <button type="submit" class="btn btn-primary btn-lg">Change your password</button>
+  <button type="submit">Change your password</button>
 </form>
+~~~
+
+###$auth.updateAccount
+Change an authenticated user's account info. This method accepts an object that contains valid params for your API's user model. The following shows how to update a user's `zodiac_sign` param:
+
+##### Example use in a template:
+~~~html
+<form ng-submit="updateAccount(updateAccountForm)" role="form" ng-init="updateAccountForm = {zodiac_sign: null}">
+  <fieldset ng-disabled="!user.signedIn">
+    <div>
+      <label>zodiac sign</label>
+      <input type="text" name="text" ng-model="updateAccountForm.zodiac_sign">
+    </div>
+
+    <button type="submit">Update your zodiac sign</button>
+  </fieldset>
+</form>
+~~~
+
+###$auth.destroyAccount
+Destroy a logged in user's account. This method does not accept any params.
+
+##### Example use in a template:
+~~~html
+<button ng-click="destroyAccount()" ng-class="{disabled: !user.signedIn}">
+  Close my account
+</button>
 ~~~
 
 ## Events
@@ -462,6 +493,46 @@ $scope.$on('auth:registration-change-error', function(ev, reason) {
 });
 ~~~
 
+###auth:account-update-success
+Broadcast when users successfully update their account info using the `$auth.updateAccount` method.
+
+##### Example:
+~~~javascript
+$scope.$on('auth:account-update-success', function(ev) {
+  alert("Your account has been successfully updated!");
+});
+~~~
+
+###auth:account-update-error
+Broadcast when requests resulting from the `$auth.updateAccount` method fail.
+
+##### Example:
+~~~javascript
+$scope.$on('auth:account-update-error', function(ev, reason) {
+  alert("Registration failed: " + reason.errors[0]);
+});
+~~~
+
+###auth:account-destroy-success
+Broadcast when users successfully delete their account info using the `$auth.destroyAccount` method.
+
+##### Example:
+~~~javascript
+$scope.$on('auth:account-destroy-success', function(ev) {
+  alert("Your account has been successfully destroyed!");
+});
+~~~
+
+###auth:account-destroy-error
+Broadcast when requests resulting from the `$auth.destroyAccount` method fail.
+
+##### Example:
+~~~javascript
+$scope.$on('auth:account-destroy-error', function(ev, reason) {
+  alert("Account deletion failed: " + reason.errors[0]);
+});
+~~~
+
 ## Using alternate header formats
 
 By default, this module (and the [devise token auth](https://github.com/lynndylanhurley/devise_token_auth) gem) use the [RFC 6750 Bearer Token](http://tools.ietf.org/html/rfc6750) format. You can customize this using the `tokenFormat` and `parseExpiry` config params.
@@ -544,6 +615,10 @@ angular.module('myApp', ['ng-token-auth'])
       apiUrl: 'http://api.example.com'
 
       handleLoginResponse: function(response) {
+        return response;
+      },
+      
+      handleAccountUpdateResponse: function(response) {
         return response;
       },
 
