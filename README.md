@@ -139,7 +139,19 @@ angular.module('myApp', ['ng-token-auth'])
 
 ## API
 
-The `$auth` module is available for dependency injection during your app's run phase (for controllers, directives, filters, etc.). Each API method returns a [$q deferred promise](https://docs.angularjs.org/api/ng/service/$q). The following methods are available:
+The `$auth` module is available for dependency injection during your app's run phase (for controllers, directives, filters, etc.). Each API method returns a [$q deferred promise](https://docs.angularjs.org/api/ng/service/$q) that will be resolved on success, 
+
+## API Table of Contents
+
+* [`$auth.authenticate`](#authauthenticate)
+* [`$auth.validateUser`](#authvalidateuser)
+* [`$auth.submitRegistration`](#authsubmitregistration)
+* [`$auth.submitLogin`](#authsubmitlogin)
+* [`$auth.signOut`](#authsignout)
+* [`$auth.requestPasswordReset`](#authrequestpasswordreset)
+* [`$auth.updatePassword`](#authupdatepassword)
+* [`$auth.updateAccount`](#authupdateaccount)
+* [`$auth.destroyAccount`](#authdestroyaccount)
 
 ###$auth.authenticate
 Initiate an OAuth2 authentication. This method takes 1 argument, a string that is also the name of the target provider service. This method is also added to the `$rootScope` for use in templates. [Read more](#oauth2-authentication-flow).
