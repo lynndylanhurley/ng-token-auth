@@ -128,8 +128,8 @@ angular.module('myApp', ['ng-token-auth'])
 | **storage** | the method used to persist tokens between sessions. cookies are used by default, but `window.localStorage` can be used as well. allowed values are `cookies` and `localStorage`. |
 | **proxyIf** | older browsers have trouble with CORS ([read more](#ie8-and-ie9)). pass a method here to determine whether or not a proxy should be used. example: `function() { return !Modernizr.cors }` |
 | **proxyUrl** | proxy url if proxy is to be used |
-| **tokenFormat** | a template for authentication tokens. the template will be provided a context with the following params:<br><ul><li>token</li><li>clientId</li><li>uid</li><li>expiry</li></ul>Defaults to the [RFC 6750 Bearer Token](http://tools.ietf.org/html/rfc6750) format. [Read more](#alternate-header-formats). |
-| **parseExpiry** | a function that will return the token's expiry from the current headers. Returns null if no headers or expiry are found. [Read more](#alternate-header-formats). |
+| **tokenFormat** | a template for authentication tokens. the template will be provided a context with the following params:<br><ul><li>token</li><li>clientId</li><li>uid</li><li>expiry</li></ul>Defaults to the [RFC 6750 Bearer Token](http://tools.ietf.org/html/rfc6750) format. [Read more](#using-alternate-header-formats). |
+| **parseExpiry** | a function that will return the token's expiry from the current headers. Returns null if no headers or expiry are found. [Read more](#using-alternate-header-formats). |
 | **handleLoginResponse** | a function that will identify and return the current user's info (id, username, etc.) in the response of a successful login request. [Read more](#using-alternate-response-formats). |
 | **handleAccountUpdateResponse** | a function that will identify and return the current user's info (id, username, etc.) in the response of a successful account update request. [Read more](#using-alternate-response-formats). |
 | **handleTokenValidationResponse** | a function that will identify and return the current user's info (id, username, etc.) in the response of a successful token validation request. [Read more](#using-alternate-response-formats). |
@@ -541,6 +541,12 @@ $rootScope.$on('auth:login-error', function(ev, reason) {
     alert('auth failed because', reason.errors[0]);
 });
 ~~~
+
+###auth:validation-success
+Broadcast when a user's token is successfully verified using the [`$auth.validateToken`](#authvalidatetoken) method.
+
+###auth:validation-error
+Broadcast when a user's token fails validation using the [`$auth.validateToken`](#authvalidatetoken) method.
 
 ###auth:logout-success
 Broadcast after user is successfully logged out using the [`$auth.signOut`](#authsignout) method. This event does not contain a message.
