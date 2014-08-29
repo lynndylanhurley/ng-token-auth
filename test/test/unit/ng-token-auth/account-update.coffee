@@ -1,4 +1,5 @@
 suite 'account update', ->
+  dfd = null
   suite 'successful update', ->
     updatedUser = angular.copy(validUser, {operating_thetan: 123})
     successResp =
@@ -10,7 +11,7 @@ suite 'account update', ->
         .expectPUT('/api/auth')
         .respond(201, successResp)
 
-      $auth.updateAccount({
+      dfd = $auth.updateAccount({
         operating_thetan: 123
       })
 
@@ -22,6 +23,10 @@ suite 'account update', ->
     test 'user object is updated', ->
       assert.deepEqual($rootScope.user, updatedUser)
 
+    test 'promise is resolved', ->
+      dfd.then(-> assert(true))
+      $timeout.flush()
+
   suite 'failed update', ->
     failedResp =
       success: false
@@ -32,7 +37,7 @@ suite 'account update', ->
         .expectPUT('/api/auth')
         .respond(403, failedResp)
 
-      $auth.updateAccount({
+      dfd = $auth.updateAccount({
         operating_thetan: 123
       })
 
@@ -40,3 +45,7 @@ suite 'account update', ->
 
     test 'user update event is broadcast by $rootScope', ->
       assert $rootScope.$broadcast.calledWithMatch('auth:account-update-error', failedResp)
+
+    test 'promise is rejected', ->
+      dfd.catch(-> assert(true))
+      $timeout.flush()

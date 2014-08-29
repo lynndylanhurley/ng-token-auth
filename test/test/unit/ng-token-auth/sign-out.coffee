@@ -1,4 +1,6 @@
 suite 'sign out', ->
+  dfd = null
+
   successResp =
     success: true
 
@@ -14,7 +16,7 @@ suite 'sign out', ->
 
       $cookieStore.put('auth_headers', validAuthHeader)
 
-      $auth.signOut()
+      dfd = $auth.signOut()
 
       $httpBackend.flush()
 
@@ -24,6 +26,9 @@ suite 'sign out', ->
     test 'cookie should no longer be present', ->
       assert($cookieStore.get('auth_headers') == undefined)
 
+    test 'promise is resolved', ->
+      dfd.then(-> assert(true))
+      $timeout.flush()
 
 
   suite 'directive access', ->
@@ -50,7 +55,7 @@ suite 'sign out', ->
 
       $cookieStore.put('auth_headers', validAuthHeader)
 
-      $auth.signOut()
+      dfd = $auth.signOut()
 
       $httpBackend.flush()
 
@@ -59,3 +64,7 @@ suite 'sign out', ->
 
     test 'cookie should no longer be present', ->
       assert($cookieStore.get('auth_headers') == undefined)
+
+    test 'promise is rejected', ->
+      dfd.catch(-> assert(true))
+      $timeout.flush()

@@ -1,4 +1,5 @@
 suite 'password change confirmation', ->
+  dfd = null
   suite 'successful authentication', ->
     successResp =
       sucess: true
@@ -12,7 +13,7 @@ suite 'password change confirmation', ->
       # mock the querystring for the password reset confirmation link
       setValidPasswordConfirmQS()
 
-      $auth.validateUser()
+      dfd = $auth.validateUser()
       $httpBackend.flush()
 
     test 'that new user is defined in the root scope', ->
@@ -23,6 +24,10 @@ suite 'password change confirmation', ->
 
     test 'that $rootScope broadcast email confirmation success event', ->
       assert $rootScope.$broadcast.calledWithMatch('auth:validation-success', validUser)
+
+    test 'promise is resolved', ->
+      dfd.then(-> assert(true))
+      $timeout.flush()
 
 
   suite 'failed authentication', ->
@@ -38,7 +43,7 @@ suite 'password change confirmation', ->
       # mock the querystring for the email confirmation link
       setValidPasswordConfirmQS()
 
-      $auth.validateUser()
+      dfd = $auth.validateUser()
       $httpBackend.flush()
 
     test 'that new user is not defined in the root scope', ->
@@ -49,3 +54,7 @@ suite 'password change confirmation', ->
 
     test 'that $rootScope broadcast validation error event', ->
       assert $rootScope.$broadcast.calledWithMatch('auth:validation-error', errorResp)
+
+    test 'promise is rejected', ->
+      dfd.catch(-> assert(true))
+      $timeout.flush()

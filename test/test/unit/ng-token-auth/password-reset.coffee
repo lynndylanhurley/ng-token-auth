@@ -1,4 +1,5 @@
 suite 'password update', ->
+  dfd = null
   suite 'successful password update', ->
     successResp =
       success: true
@@ -8,7 +9,7 @@ suite 'password update', ->
         .expectPUT('/api/auth/password')
         .respond(201, {success: true})
 
-      $auth.updatePassword({
+      dfd = $auth.updatePassword({
         password: 'secret123'
         password_confirmation: 'secret123'
       })
@@ -17,6 +18,11 @@ suite 'password update', ->
 
     test 'success event should return user info', ->
       assert $rootScope.$broadcast.calledWithMatch('auth:password-change-success', successResp)
+
+    test 'promise is resolved', ->
+      dfd.then(-> assert(true))
+      $timeout.flush()
+
 
   suite 'directive access', ->
     args =
@@ -46,15 +52,20 @@ suite 'password update', ->
         .expectPUT('/api/auth/password')
         .respond(401, errorResp)
 
-      $auth.updatePassword({
+      dfd = $auth.updatePassword({
         password: 'secret123'
         password_confirmation: 'secret123'
       })
 
       $httpBackend.flush()
 
-    test 'new user is defined in the root scope', ->
+    test 'new user is NOT defined in the root scope', ->
       assert.equal(undefined, $rootScope.user.uid)
 
-    test 'success event should return user info', ->
+    test 'error should be broadcast by rootscope', ->
       assert $rootScope.$broadcast.calledWithMatch('auth:password-change-error', errorResp)
+
+    test 'promise is rejected', ->
+      dfd.catch(-> assert(true))
+      $timeout.flush()
+

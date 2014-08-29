@@ -1,4 +1,6 @@
 suite 'email registration submission', ->
+  dfd = null
+
   suite 'successful submission', ->
     setup ->
       $httpBackend
@@ -7,7 +9,7 @@ suite 'email registration submission', ->
 
     suite 'service module', ->
       setup ->
-        $auth.submitRegistration({
+        dfd = $auth.submitRegistration({
           email: validEmail
           password: 'secret123'
           password_confirmation: 'secret123'
@@ -17,6 +19,10 @@ suite 'email registration submission', ->
 
       test '$rootScope should broadcast success event', ->
         assert $rootScope.$broadcast.calledWithMatch('auth:registration-email-success')
+
+      test 'promise is resolved', ->
+        dfd.then(-> assert(true))
+        $timeout.flush()
 
     suite 'directive access', ->
       args =
@@ -49,7 +55,7 @@ suite 'email registration submission', ->
           .expectPOST('/api/auth')
           .respond(422, errorResp)
 
-        $auth.submitRegistration({
+        dfd = $auth.submitRegistration({
           email: validEmail
           password: 'secret123'
           password_confirmation: 'bogus'
@@ -59,6 +65,11 @@ suite 'email registration submission', ->
 
       test '$rootScope should broadcast failure event', ->
         assert $rootScope.$broadcast.calledWithMatch('auth:registration-email-error', errorResp)
+
+      test 'promise is rejected', ->
+        dfd.catch(-> assert(true))
+        $timeout.flush()
+
 
     suite 'existing user', ->
       errorResp =
@@ -73,7 +84,7 @@ suite 'email registration submission', ->
           .expectPOST('/api/auth')
           .respond(422, errorResp)
 
-        $auth.submitRegistration({
+        dfd = $auth.submitRegistration({
           email: validEmail
           password: 'secret123'
           password_confirmation: 'bogus'
@@ -82,3 +93,7 @@ suite 'email registration submission', ->
 
       test '$rootScope should broadcast failure event', ->
         assert $rootScope.$broadcast.calledWithMatch('auth:registration-email-error', errorResp)
+
+      test 'promise is rejected', ->
+        dfd.catch(-> assert(true))
+        $timeout.flush()

@@ -1,4 +1,5 @@
 suite 'email registration confirmation', ->
+  dfd = null
   suite 'successful registration', ->
     setup ->
       $httpBackend
@@ -11,7 +12,7 @@ suite 'email registration confirmation', ->
       # mock the querystring for the email confirmation link
       setValidEmailConfirmQS()
 
-      $auth.validateUser()
+      dfd = $auth.validateUser()
       $httpBackend.flush()
 
     test 'new user is defined in the root scope', ->
@@ -22,6 +23,10 @@ suite 'email registration confirmation', ->
 
     test '$rootScope broadcast email confirmation success event', ->
       assert $rootScope.$broadcast.calledWith('auth:email-confirmation-success')
+
+    test 'promise is resolved', ->
+      dfd.then(-> assert(true))
+      $timeout.flush()
 
 
   suite 'failed registration', ->
@@ -36,7 +41,7 @@ suite 'email registration confirmation', ->
       # mock the querystring for the email confirmation link
       setValidEmailConfirmQS()
 
-      $auth.validateUser()
+      dfd = $auth.validateUser()
       $httpBackend.flush()
 
     test 'new user is not defined in the root scope', ->
@@ -47,3 +52,7 @@ suite 'email registration confirmation', ->
 
     test '$rootScope broadcast email confirmation error event', ->
       assert $rootScope.$broadcast.calledWith('auth:email-confirmation-error')
+
+    test 'promise is rejected', ->
+      dfd.catch(-> assert(true))
+      $timeout.flush()

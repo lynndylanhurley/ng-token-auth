@@ -53,6 +53,10 @@ suite 'oauth2 login', ->
           done()
         ))
 
+      test 'promise is resolved', ->
+        dfd.then(-> assert(true))
+        $timeout.flush()
+
     suite 'directive access', ->
       args = 'github'
 
@@ -93,6 +97,10 @@ suite 'oauth2 login', ->
           done()
         ), 0)
 
+      test 'promise is rejected', ->
+        dfd.catch(-> assert(true))
+        $timeout.flush()
+
 
     suite 'postMessage window closed before message is sent', ->
       setup ->
@@ -115,6 +123,10 @@ suite 'oauth2 login', ->
         assert.equal(true, called)
         assert.equal(null, $auth.t)
         done()
+
+      test 'promise is rejected', ->
+        dfd.catch(-> assert(true))
+        $timeout.flush()
 
 
     suite 'cancel method', ->

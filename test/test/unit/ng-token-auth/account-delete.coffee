@@ -1,4 +1,5 @@
 suite 'account delete', ->
+  dfd = null
   setup ->
     angular.extend($rootScope.user, validUser)
     $cookieStore.put('auth_headers', validAuthHeader)
@@ -12,7 +13,7 @@ suite 'account delete', ->
         .expectDELETE('/api/auth')
         .respond(201, successResp)
 
-      $auth.destroyAccount()
+      dfd = $auth.destroyAccount()
 
       $httpBackend.flush()
 
@@ -25,6 +26,10 @@ suite 'account delete', ->
     test 'local auth headers are destroyed', ->
       assert.isUndefined $auth.retrieveData('auth_headers')
 
+    test 'promise is resolved', ->
+      dfd.then(-> assert(true))
+      $timeout.flush()
+
   suite 'failed update', ->
     failedResp =
       success: false
@@ -35,7 +40,7 @@ suite 'account delete', ->
         .expectDELETE('/api/auth')
         .respond(403, failedResp)
 
-      $auth.destroyAccount()
+      dfd = $auth.destroyAccount()
 
       $httpBackend.flush()
 
@@ -47,3 +52,7 @@ suite 'account delete', ->
 
     test 'auth headers persist', ->
       assert.deepEqual($auth.retrieveData('auth_headers'), validAuthHeader)
+
+    test 'promise is rejected', ->
+      dfd.catch(-> assert(true))
+      $timeout.flush()

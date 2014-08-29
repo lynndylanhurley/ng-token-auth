@@ -130,16 +130,22 @@ angular.module('ng-token-auth', ['ngCookies'])
           # containing a link to activate the account. the link will
           # redirect to this site.
           submitRegistration: (params) ->
+            regDfd = $q.defer()
+
             angular.extend(params, {
               confirm_success_url: config.confirmationSuccessUrl
             })
             $http.post(@apiUrl() + config.emailRegistrationPath, params)
-              .success(->
+              .success((resp)->
                 $rootScope.$broadcast('auth:registration-email-success', params)
+                regDfd.resolve(resp)
               )
               .error((resp) ->
                 $rootScope.$broadcast('auth:registration-email-error', resp)
+                regDfd.reject(resp)
               )
+
+            regDfd.promise
 
 
           # capture input from user, authenticate serverside
@@ -169,50 +175,72 @@ angular.module('ng-token-auth', ['ngCookies'])
           # request password reset from API
           requestPasswordReset: (params) ->
             params.redirect_url = config.passwordResetSuccessUrl
+            pwdDfd = $q.defer()
 
             $http.post(@apiUrl() + config.passwordResetPath, params)
-              .success(->
+              .success((resp) ->
                 $rootScope.$broadcast('auth:password-reset-request-success', params)
+                pwdDfd.resolve(resp)
               )
               .error((resp) ->
                 $rootScope.$broadcast('auth:password-reset-request-error', resp)
+                pwdDfd.reject(resp)
               )
+
+            pwdDfd.promise
 
 
           # update user password
           updatePassword: (params) ->
+            pwdDfd = $q.defer()
+
             $http.put(@apiUrl() + config.passwordUpdatePath, params)
               .success((resp) =>
                 $rootScope.$broadcast('auth:password-change-success', resp)
                 @mustResetPassword = false
+                pwdDfd.resolve(resp)
               )
               .error((resp) ->
                 $rootScope.$broadcast('auth:password-change-error', resp)
+                pwdDfd.reject(resp)
               )
+
+            pwdDfd.promise
 
           # update user account info
           updateAccount: (params) ->
+            acctDfd = $q.defer()
+
             $http.put(@apiUrl() + config.accountUpdatePath, params)
               .success((resp) =>
                 angular.extend @user, config.handleAccountUpdateResponse(resp)
                 $rootScope.$broadcast('auth:account-update-success', resp)
-
-                console.log 'rootScope.user', $rootScope.user
+                acctDfd.resolve(resp)
               )
               .error((resp) ->
                 $rootScope.$broadcast('auth:account-update-error', resp)
+                acctDfd.reject(resp)
               )
 
+            acctDfd.promise
 
+
+          # permanently destroy a user's account.
           destroyAccount: (params) ->
+            destroyDfd = $q.defer()
+
             $http.delete(@apiUrl() + config.accountUpdatePath, params)
               .success((resp) =>
                 @invalidateTokens()
                 $rootScope.$broadcast('auth:account-destroy-success', resp)
+                destroyDfd.resolve(resp)
               )
               .error((resp) ->
                 $rootScope.$broadcast('auth:account-destroy-error', resp)
+                destroyDfd.reject(resp)
               )
+
+            destroyDfd.promise
 
           # open external auth provider in separate window, send requests for
           # credentials until api auth callback page responds.
@@ -403,15 +431,21 @@ angular.module('ng-token-auth', ['ngCookies'])
 
           # destroy auth token on server, destroy user auth credentials
           signOut: ->
+            signOutDfd = $q.defer()
+
             $http.delete(@apiUrl() + config.signOutUrl)
               .success((resp) =>
                 @invalidateTokens()
                 $rootScope.$broadcast('auth:logout-success')
+                signOutDfd.resolve(resp)
               )
               .error((resp) =>
                 @invalidateTokens()
                 $rootScope.$broadcast('auth:logout-error', resp)
+                signOutDfd.reject(resp)
               )
+
+            signOutDfd.promise
 
 
           # handle successful authentication

@@ -137,21 +137,29 @@ angular.module('myApp', ['ng-token-auth'])
 
 ## API
 
-The `$auth` module is available for dependency injection during your app's run phase (for controllers, directives, filters, etc.). The following methods are available:
+The `$auth` module is available for dependency injection during your app's run phase (for controllers, directives, filters, etc.). Each API method returns a [$q deferred promise](https://docs.angularjs.org/api/ng/service/$q). The following methods are available:
 
 ###$auth.authenticate
 Initiate an OAuth2 authentication. This method takes 1 argument, a string that is also the name of the target provider service. This method is also added to the `$rootScope` for use in templates. [Read more](#oauth2-authentication-flow).
 
-This method returns a deferred promise.
+This method emits the following events:
+
+* [`auth:login-success`](#authlogin-success)
+* [`auth:login-error`](#authlogin-error)
 
 #### Example use in a controller
 ~~~javascript
 angular.module('ngTokenAuthTestApp')
   .controller('IndexCtrl', function($auth) {
     $scope.handleBtnClick = function() {
-      $auth.authenticate('github').
+      $auth.authenticate('github')
+        .then(function(resp) { 
+          // handle success
+        })
+        .catch(function(resp) { 
+          // handle errors
+        });
     };
-
   });
 ~~~
 
@@ -166,6 +174,18 @@ angular.module('ngTokenAuthTestApp')
 This method returns a promise that will resolve if a user's auth token exists and is valid. This method does not accept any arguments. [Read more](#token-validation-flow)
 
 This method automatically is called on page load during the app's run phase so that returning users will not need to manually re-authenticate themselves.
+
+This method will broadcast the following events:
+
+* On page load:
+  * [`auth:validation-success`](#authvalidation-success)
+  * [`auth:validation-error`](#authvalidation-error)
+* When visiting email confirmation links:
+  * [`auth:email-confirmation-success`](#authemail-confirmation-success)
+  * [`auth:email-confirmation-error`](#authemail-confirmation-error)
+* When visiting password reset confirmation links:
+  * [`auth:password-reset-confirm-success`](#authpassword-reset-confirm-success)
+  * [`auth:password-reset-confirm-error`](#authpassword-reset-confirm-error)
 
 The promise returned by this method can be used to prevent users from viewing certain pages when using [angular ui router](https://github.com/angular-ui/ui-router) [resolvers](http://angular-ui.github.io/ui-router/site/#/api/ui.router.util.$resolve).
 
@@ -212,41 +232,80 @@ This example shows how to implement access control on the client side, however a
 ###$auth.submitRegistration
 Users can register by email using this method. [Read more](#email-registration-flow). Accepts an object with the following params:
 
- * **email**
- * **password**
- * **password_confirmation**
+* **email**
+* **password**
+* **password_confirmation**
 
- This method is also available in the `$rootScope` for use in templates.
+This method broadcasts the following events:
 
- ##### Example use in a template:
+* [`auth:registration-email-success`](#authregistration-email-success)
+* [`auth:registration-email-error`](#authregistration-email-error)
 
- ~~~html
- <form ng-submit="submitRegistration(registrationForm)" role="form" ng-init="registrationForm = {}">
-   <div class="form-group">
-     <label>email</label>
-     <input type="email" name="email" ng-model="registrationForm.email" required="required" class="form-control"/>
-   </div>
+##### Example use in a controller:
+~~~javascript
+angular.module('ngTokenAuthTestApp')
+  .controller('IndexCtrl', function($auth) {
+    $scope.handleRegBtnClick = function() {
+      $auth.submitRegistration($scope.registrationForm)
+        .then(function(resp) { 
+          // handle success response
+        })
+        .catch(function(resp) { 
+          // handle error response
+        });
+    };
+  });
+~~~
 
-   <div class="form-group">
-     <label>password</label>
-     <input type="password" name="password" ng-model="registrationForm.password" required="required" class="form-control"/>
-   </div>
+##### Example use in a template:
 
-   <div class="form-group">
-     <label>password confirmation</label>
-     <input type="password" name="password_confirmation" ng-model="registrationForm.password_confirmation" required="required" class="form-control"/>
-   </div>
+~~~html
+<form ng-submit="submitRegistration(registrationForm)" role="form" ng-init="registrationForm = {}">
+  <div class="form-group">
+    <label>email</label>
+    <input type="email" name="email" ng-model="registrationForm.email" required="required" class="form-control"/>
+  </div>
 
-   <button type="submit" class="btn btn-primary btn-lg">Register</button>
- </form>
- ~~~
+  <div class="form-group">
+    <label>password</label>
+    <input type="password" name="password" ng-model="registrationForm.password" required="required" class="form-control"/>
+  </div>
+
+  <div class="form-group">
+    <label>password confirmation</label>
+    <input type="password" name="password_confirmation" ng-model="registrationForm.password_confirmation" required="required" class="form-control"/>
+  </div>
+
+  <button type="submit" class="btn btn-primary btn-lg">Register</button>
+</form>
+~~~
 
 ###$auth.submitLogin
 Authenticate a user that registered via email. [Read more](#email-sign-in-flow). Accepts an object with the following params:
+
 * **email**
 * **password**
 
-This method is also available in the `$rootScope` for use in templates.
+This method broadcasts the following events:
+
+* [`auth:login-success`](#authlogin-success)
+* [`auth:login-error`](#authlogin-error)
+
+##### Example use in a controller:
+~~~javascript
+angular.module('ngTokenAuthTestApp')
+  .controller('IndexCtrl', function($auth) {
+    $scope.handleLoginBtnClick = function() {
+      $auth.submitLogin($scope.loginForm)
+        .then(function(resp) { 
+          // handle success response
+        })
+        .catch(function(resp) { 
+          // handle error response
+        });
+    };
+  });
+~~~
 
 ##### Example use in a template:
 ~~~html
@@ -266,7 +325,28 @@ This method is also available in the `$rootScope` for use in templates.
 ~~~
 
 ###$auth.signOut
-De-authenticate a user. This method does not take any arguments. This method will change the user's `auth_token` server-side, and it will destroy the `uid` and `auth_token` cookies saved client-side. This method is also available in the `$rootScope` for use in templates.
+De-authenticate a user. This method does not take any arguments. This method will change the user's `auth_token` server-side, and it will destroy the `uid` and `auth_token` cookies saved client-side.
+
+This method broadcasts the following events:
+
+* [`auth:logout-success`](#authlogout-success)
+* [`auth:logout-error`](#authlogout-error)
+
+##### Example use in a controller:
+~~~javascript
+angular.module('ngTokenAuthTestApp')
+  .controller('IndexCtrl', function($auth) {
+    $scope.handleSignOutBtnClick = function() {
+      $auth.signOut()
+        .then(function(resp) { 
+          // handle success response
+        })
+        .catch(function(resp) { 
+          // handle error response
+        });
+    };
+  });
+~~~
 
 ##### Example use in a template:
 ~~~html
@@ -275,9 +355,29 @@ De-authenticate a user. This method does not take any arguments. This method wil
 
 ###$auth.requestPasswordReset
 Send password reset instructions to a user. This only applies to users that have registered using email. This method accepts an object with the following param:
+
 * **email**
 
-This method is also available in the `$rootScope` for use in templates.
+This method broadcasts the following events:
+
+* [`auth:password-reset-request-success`](#authpassword-reset-request-success)
+* [`auth:password-reset-request-error`](#authpassword-reset-request-error)
+
+##### Example use in a controller:
+~~~javascript
+angular.module('ngTokenAuthTestApp')
+  .controller('IndexCtrl', function($auth) {
+    $scope.handlePwdResetBtnClick = function() {
+      $auth.resetPasswordReset($scope.pwdResetForm)
+        .then(function(resp) { 
+          // handle success response
+        })
+        .catch(function(resp) { 
+          // handle error response
+        });
+    };
+  });
+~~~
 
 ##### Example use in a template:
 ~~~html
@@ -293,10 +393,32 @@ This method is also available in the `$rootScope` for use in templates.
 
 ###$auth.updatePassword
 Change an authenticated user's password. This only applies to users that have registered using email. This method accepts an object with the following params:
+
 * **password**
 * **password_confirmation**
 
-The two params must match. This method is also available in the `$rootScope` for use in templates.
+The two params must match.
+
+This method broadcasts the following events:
+
+* [`auth:password-change-success`](#authpassword-change-success)
+* [`auth:password-change-error`](#authpassword-change-error)
+
+##### Example use in a controller:
+~~~javascript
+angular.module('ngTokenAuthTestApp')
+  .controller('IndexCtrl', function($auth) {
+    $scope.handleUpdatePasswordBtnClick = function() {
+      $auth.updatePassword($scope.updatePasswordForm)
+        .then(function(resp) { 
+          // handle success response
+        })
+        .catch(function(resp) { 
+          // handle error response
+        });
+    };
+  });
+~~~
 
 ##### Example use in a template
 ~~~html
@@ -332,8 +454,52 @@ Change an authenticated user's account info. This method accepts an object that 
 </form>
 ~~~
 
+This method broadcasts the following events:
+
+* [`auth:update-account-success`](#authupdate-account-success)
+* [`auth:update-account-error`](#authupdate-account-error)
+
+##### Example use in a controller:
+~~~javascript
+angular.module('ngTokenAuthTestApp')
+  .controller('IndexCtrl', function($auth) {
+    $scope.handleUpdateAccountBtnClick = function() {
+      $auth.updateAccount($scope.updateAccountForm)
+        .then(function(resp) { 
+          // handle success response
+        })
+        .catch(function(resp) { 
+          // handle error response
+        });
+    };
+  });
+~~~
+
+
+
 ###$auth.destroyAccount
 Destroy a logged in user's account. This method does not accept any params.
+
+This method broadcasts the following events:
+
+* [`auth:destroy-account-success`](#authdestroy-account-success)
+* [`auth:destroy-account-error`](#authdestroy-account-error)
+
+##### Example use in a controller:
+~~~javascript
+angular.module('ngTokenAuthTestApp')
+  .controller('IndexCtrl', function($auth) {
+    $scope.handleDestroyAccountBtnClick = function() {
+      $auth.destroyAccount()
+        .then(function(resp) { 
+          // handle success response
+        })
+        .catch(function(resp) { 
+          // handle error response
+        });
+    };
+  });
+~~~
 
 ##### Example use in a template:
 ~~~html
@@ -344,10 +510,15 @@ Destroy a logged in user's account. This method does not accept any params.
 
 ## Events
 
-Events are broadcast after each action. This can allow for more flexibility while reducing code spaghetti. For example, any template can initiate an authentication, and any controller can subscribe to the auth:login-success event to provide success notifications, redirects, etc.
+This module broadcasts events after the success or failure of each API method. Using these events to build your app can result in more flexibility while reducing code spaghetti. 
+
+For example, any template can initiate an authentication, and any controller can subscribe to the `auth:login-success` event to provide success notifications, redirects, etc.
 
 ###auth:login-success
-Broadcast after successful user authentication. Event message contains the user object.
+Broadcast after successful user authentication. Event message contains the user object. This event is broadcast by the following methods:
+
+* [`$auth.submitLogin`](#authsubmitlogin)
+* [`$auth.authenticate`](#authauthenticate)
 
 ##### Example:
 ~~~javascript
@@ -357,7 +528,10 @@ $rootScope.$on('auth:login-success', function(ev, user) {
 ~~~
 
 ###auth:login-error
-Broadcast after user fails authentication.
+Broadcast after user fails authentication. This event is broadcast by the following methods:
+
+* [`$auth.submitLogin`](#authsubmitlogin)
+* [`$auth.authenticate`](#authauthenticate)
 
 ##### Example:
 ~~~javascript
@@ -367,7 +541,7 @@ $rootScope.$on('auth:login-error', function(ev, reason) {
 ~~~
 
 ###auth:logout-success
-Broadcast after user is successfully logged out using the `$auth.signOut` method. This event does not contain a message.
+Broadcast after user is successfully logged out using the [`$auth.signOut`](#authsignout) method. This event does not contain a message.
 
 ##### Example:
 ~~~javascript
@@ -377,7 +551,7 @@ $rootScope.$on('auth:logout-success', function(ev) {
 ~~~
 
 ###auth:logout-error
-Broadcast after failed logout attempts using the `$auth.signOut` method. Message contains the failed logout response.
+Broadcast after failed logout attempts using the [`$auth.signOut`](#authsignout) method. Message contains the failed logout response.
 
 ##### Example:
 ~~~javascript
@@ -387,7 +561,7 @@ $rootScope.$on('auth:logout-error', function(ev, reason) {
 ~~~
 
 ###auth:registration-email-success
-Broadcast after email registration requests complete successfully using the `$auth.submitRegistration` method. Message contains the params that were sent to the server.
+Broadcast after email registration requests complete successfully using the [`$auth.submitRegistration`](#authsubmitregistration) method. Message contains the params that were sent to the server.
 
 ##### Example:
 ~~~javascript
@@ -399,6 +573,8 @@ $scope.$on('auth:registration-email-success', function(ev, message) {
 ###auth:registration-email-error
 Broadcast after failed email registration requests using the `$auth.submitRegistration` method. Message contains the error response.
 
+This event is broadcast by the [`$auth.submitRegistration`](#authsubmitregistration) method.
+
 ##### Example:
 ~~~javascript
 $scope.$on('auth:registration-email-error', function(ev, reason) {
@@ -408,6 +584,8 @@ $scope.$on('auth:registration-email-error', function(ev, reason) {
 
 ###auth:email-confirmation-success
 Broadcast when users arrive from links contained in password-reset emails. This can be used to trigger "welcome" notifications to new users.
+
+This event is broadcast by the [`$auth.validateUser`](#authvalidateuser) method.
 
 ##### Example:
 ~~~javascript
@@ -419,6 +597,8 @@ $scope.$on('auth:email-confirmation-success', function(ev, user) {
 ###auth:email-confirmation-error
 Broadcast when a user arrives from a link contained in a password-reset email, but the confirmation token fails to validate.
 
+This event is broadcast by the [`$auth.validateUser`](#authvalidateuser) method.
+
 ##### Example:
 ~~~javascript
 $scope.$on('auth:email-confirmation-error', function(ev, reason) {
@@ -427,7 +607,7 @@ $scope.$on('auth:email-confirmation-error', function(ev, reason) {
 ~~~
 
 ###auth:password-reset-request-success
-Broadcast when users successfully submit the password reset form using the `$auth.requestPasswordReset` method.
+Broadcast when users successfully submit the password reset form using the [`$auth.requestPasswordReset`](#authrequestpasswordreset) method.
 
 ##### Password reset request example:
 ~~~javascript
@@ -437,7 +617,7 @@ $scope.$on('auth:password-reset-request-success', function(ev, data) {
 ~~~
 
 ###auth:password-reset-request-error
-Broadcast after failed requests using the `$auth.requestPasswordReset` method. Message contains the error response.
+Broadcast after failed requests using the [`$auth.requestPasswordReset`](#authrequestpasswordreset) method. Message contains the error response.
 
 ##### Example:
 ~~~javascript
@@ -448,6 +628,8 @@ $scope.$on('auth:password-reset-request-error', function(ev, resp) {
 
 ###auth:password-reset-confirm-success
 Broadcast when users arrive from links contained in password reset emails. This will be the signal for your app to prompt the user to reset their password. [Read more](#password-reset-flow).
+
+This event is broadcast by the [`$auth.validateUser`](#authvalidateuser) method.
 
 The following example demonstrates one way to handle an `auth:password-reset-confirm-success` event. This example assumes that [angular ui-router](https://github.com/angular-ui/ui-router) is used for routing, and that there is a state called `account.password-reset` that contains instructions for changing the user's password.
 
@@ -466,6 +648,8 @@ You could also choose to display a modal, or you can ignore the event completely
 ###auth:password-reset-confirm-error
 Broadcast when users arrive from links contained in password reset emails, but the server fails to validate their password reset token.
 
+This event is broadcast by the [`$auth.validateUser`](#authvalidateuser) method.
+
 ##### Example:
 ~~~javascript
 $scope.$on('auth:password-reset-confirm-error', function(ev, reason) {
@@ -474,7 +658,7 @@ $scope.$on('auth:password-reset-confirm-error', function(ev, reason) {
 ~~~
 
 ###auth:password-change-success
-Broadcast when users successfully update their password using the `$auth.updatePassword` method. [Read more](#password-reset-flow).
+Broadcast when users successfully update their password using the [`$auth.updatePassword`](authupdatepassword) method. [Read more](#password-reset-flow).
 
 ##### Example:
 ~~~javascript
@@ -484,7 +668,7 @@ $scope.$on('auth:password-change-success', function(ev) {
 ~~~
 
 ###auth:password-change-error
-Broadcast when requests resulting from the `$auth.updatePassword` method fail. [Read more](#password-reset-flow).
+Broadcast when requests resulting from the [`$auth.updatePassword`](authupdatepassword) method fail. [Read more](#password-reset-flow).
 
 ##### Example:
 ~~~javascript
@@ -494,7 +678,7 @@ $scope.$on('auth:registration-change-error', function(ev, reason) {
 ~~~
 
 ###auth:account-update-success
-Broadcast when users successfully update their account info using the `$auth.updateAccount` method.
+Broadcast when users successfully update their account info using the [`$auth.updateAccount`](#authupdateaccount) method.
 
 ##### Example:
 ~~~javascript
@@ -504,7 +688,7 @@ $scope.$on('auth:account-update-success', function(ev) {
 ~~~
 
 ###auth:account-update-error
-Broadcast when requests resulting from the `$auth.updateAccount` method fail.
+Broadcast when requests resulting from the [`$auth.updateAccount`](#authupdateaccount) method fail.
 
 ##### Example:
 ~~~javascript
@@ -514,7 +698,7 @@ $scope.$on('auth:account-update-error', function(ev, reason) {
 ~~~
 
 ###auth:account-destroy-success
-Broadcast when users successfully delete their account info using the `$auth.destroyAccount` method.
+Broadcast when users successfully delete their account info using the [`$auth.destroyAccount`](#authdestroyaccount) method.
 
 ##### Example:
 ~~~javascript
@@ -524,7 +708,7 @@ $scope.$on('auth:account-destroy-success', function(ev) {
 ~~~
 
 ###auth:account-destroy-error
-Broadcast when requests resulting from the `$auth.destroyAccount` method fail.
+Broadcast when requests resulting from the [`$auth.destroyAccount`](#authdestroyaccount) method fail.
 
 ##### Example:
 ~~~javascript

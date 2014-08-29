@@ -1,4 +1,5 @@
 suite 'email user sign in', ->
+  dfd = null
   suite 'successful sign in', ->
     setup ->
       $httpBackend
@@ -8,7 +9,7 @@ suite 'email user sign in', ->
           data: validUser
         })
 
-      $auth.submitLogin({
+      dfd = $auth.submitLogin({
         email: validUser.email
         password: 'secret123'
       })
@@ -20,6 +21,10 @@ suite 'email user sign in', ->
 
     test 'success event should return user info', ->
       assert $rootScope.$broadcast.calledWithMatch('auth:login-success', validUser)
+
+    test 'promise is resolved', ->
+      dfd.then(-> assert(true))
+      $timeout.flush()
 
   suite 'directive access', ->
     args =
@@ -55,7 +60,7 @@ suite 'email user sign in', ->
         .expectPOST('/api/auth/sign_in')
         .respond(401, errorResp)
 
-      $auth.submitLogin({
+      dfd = $auth.submitLogin({
         email: validUser.email
         password: 'secret123'
       })
@@ -67,3 +72,7 @@ suite 'email user sign in', ->
 
     test 'success event should return user info', ->
       assert $rootScope.$broadcast.calledWithMatch('auth:login-error', errorResp)
+
+    test 'promise is rejected', ->
+      dfd.catch(-> assert(true))
+      $timeout.flush
