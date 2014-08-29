@@ -17,7 +17,7 @@ suite 'account delete', ->
       $httpBackend.flush()
 
     test 'account delete event is broadcast by $rootScope', ->
-      assert $rootScope.$broadcast.calledWithMatch('auth:account-delete-success', successResp)
+      assert $rootScope.$broadcast.calledWithMatch('auth:account-destroy-success', successResp)
 
     test 'user object is destroyed', ->
       assert.deepEqual($rootScope.user, {})
@@ -40,7 +40,7 @@ suite 'account delete', ->
       $httpBackend.flush()
 
     test 'failed account delete event is broadcast by $rootScope', ->
-      assert $rootScope.$broadcast.calledWithMatch('auth:account-delete-error', failedResp)
+      assert $rootScope.$broadcast.calledWithMatch('auth:account-destroy-error', failedResp)
 
     test 'user is still defined on root scope', ->
       assert.deepEqual($rootScope.user, validUser)

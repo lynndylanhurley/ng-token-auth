@@ -45,6 +45,7 @@ suite 'oauth2 login', ->
             auth_token: validToken
             expiry:     validExpiry
             client_id:  validClient
+            signedIn:   true
           })
 
           assert(true, called)

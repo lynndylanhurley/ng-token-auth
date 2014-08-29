@@ -115,6 +115,11 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
                   return _this.signOut();
                 };
               })(this);
+              $rootScope.destroyAccount = (function(_this) {
+                return function() {
+                  return _this.destroyAccount();
+                };
+              })(this);
               $rootScope.submitRegistration = (function(_this) {
                 return function(params) {
                   return _this.submitRegistration(params);
@@ -133,6 +138,11 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
               $rootScope.updatePassword = (function(_this) {
                 return function(params) {
                   return _this.updatePassword(params);
+                };
+              })(this);
+              $rootScope.updateAccount = (function(_this) {
+                return function(params) {
+                  return _this.updateAccount(params);
                 };
               })(this);
               if (config.validateOnPageLoad) {
@@ -169,6 +179,9 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
               })(this));
               return this.dfd.promise;
             },
+            userIsAuthenticated: function() {
+              return this.headers && this.user.signedIn;
+            },
             requestPasswordReset: function(params) {
               params.redirect_url = config.passwordResetSuccessUrl;
               return $http.post(this.apiUrl() + config.passwordResetPath, params).success(function() {
@@ -191,7 +204,8 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
               return $http.put(this.apiUrl() + config.accountUpdatePath, params).success((function(_this) {
                 return function(resp) {
                   angular.extend(_this.user, config.handleUpdateResponse(resp));
-                  return $rootScope.$broadcast('auth:account-update-success', resp);
+                  $rootScope.$broadcast('auth:account-update-success', resp);
+                  return console.log('rootScope.user', $rootScope.user);
                 };
               })(this)).error(function(resp) {
                 return $rootScope.$broadcast('auth:account-update-error', resp);
@@ -201,10 +215,10 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
               return $http["delete"](this.apiUrl() + config.accountUpdatePath, params).success((function(_this) {
                 return function(resp) {
                   _this.invalidateTokens();
-                  return $rootScope.$broadcast('auth:account-delete-success', resp);
+                  return $rootScope.$broadcast('auth:account-destroy-success', resp);
                 };
               })(this)).error(function(resp) {
-                return $rootScope.$broadcast('auth:account-delete-error', resp);
+                return $rootScope.$broadcast('auth:account-destroy-error', resp);
               });
             },
             authenticate: function(provider) {
@@ -261,7 +275,7 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
               var clientId, token, uid;
               if (this.dfd == null) {
                 this.initDfd();
-                if (!(this.headers && this.user.id)) {
+                if (!this.userIsAuthenticated()) {
                   if ($location.search().token !== void 0) {
                     token = $location.search().token;
                     clientId = $location.search().client_id;
@@ -373,6 +387,7 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
                 $timeout.cancel(this.t);
               }
               angular.extend(this.user, user);
+              this.user.signedIn = true;
               if (setHeader) {
                 this.setAuthHeaders(this.buildAuthHeaders({
                   token: this.user.auth_token,

@@ -114,10 +114,12 @@ angular.module('ng-token-auth', ['ngCookies'])
 
             # template access to view actions
             $rootScope.signOut              = => @signOut()
+            $rootScope.destroyAccount       = => @destroyAccount()
             $rootScope.submitRegistration   = (params) => @submitRegistration(params)
             $rootScope.submitLogin          = (params) => @submitLogin(params)
             $rootScope.requestPasswordReset = (params) => @requestPasswordReset(params)
             $rootScope.updatePassword       = (params) => @updatePassword(params)
+            $rootScope.updateAccount        = (params) => @updateAccount(params)
 
             # check to see if user is returning user
             if config.validateOnPageLoad
@@ -159,6 +161,11 @@ angular.module('ng-token-auth', ['ngCookies'])
             @dfd.promise
 
 
+          # check if user is authenticated
+          userIsAuthenticated: ->
+            @headers and @user.signedIn
+
+
           # request password reset from API
           requestPasswordReset: (params) ->
             params.redirect_url = config.passwordResetSuccessUrl
@@ -189,6 +196,8 @@ angular.module('ng-token-auth', ['ngCookies'])
               .success((resp) =>
                 angular.extend @user, config.handleUpdateResponse(resp)
                 $rootScope.$broadcast('auth:account-update-success', resp)
+
+                console.log 'rootScope.user', $rootScope.user
               )
               .error((resp) ->
                 $rootScope.$broadcast('auth:account-update-error', resp)
@@ -199,10 +208,10 @@ angular.module('ng-token-auth', ['ngCookies'])
             $http.delete(@apiUrl() + config.accountUpdatePath, params)
               .success((resp) =>
                 @invalidateTokens()
-                $rootScope.$broadcast('auth:account-delete-success', resp)
+                $rootScope.$broadcast('auth:account-destroy-success', resp)
               )
               .error((resp) ->
-                $rootScope.$broadcast('auth:account-delete-error', resp)
+                $rootScope.$broadcast('auth:account-destroy-error', resp)
               )
 
           # open external auth provider in separate window, send requests for
@@ -270,7 +279,7 @@ angular.module('ng-token-auth', ['ngCookies'])
             unless @dfd?
               @initDfd()
 
-              unless @headers and @user.id
+              unless @userIsAuthenticated()
                 # token querystring is present. user most likely just came from
                 # registration email link.
                 if $location.search().token != undefined
@@ -412,6 +421,9 @@ angular.module('ng-token-auth', ['ngCookies'])
 
             # must extend existing object for scoping reasons
             angular.extend @user, user
+
+            # add shortcut to determine user auth status
+            @user.signedIn = true
 
             # postMessage will not contain header. must save headers manually.
             if setHeader

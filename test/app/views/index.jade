@@ -10,17 +10,17 @@ br
 
       .col-sm-8
         label user id
-        p {{ user.uid || "none" }}
+        p {{ user.signedIn || "none" }}
 
         label user email
         p {{ user.email || "none" }}
 
-        label client id
-        p {{ user.client_id || "none" }}
+        label favorite taco bell taco (optional)
+        p {{ user.favorite_taco || "n/a" }}
 
-        button.btn.btn-primary(ng-click='signOut()', ng-disabled='!user.uid') Sign out
+        button.btn.btn-primary(ng-click='signOut()', ng-disabled='!user.signedIn') Sign out
 
-      .col-sm-4(ng-if='user.uid')
+      .col-sm-4(ng-if='user.signedIn')
         img(ng-src='{{ user.image }}', width="100%")
 
 
@@ -28,7 +28,7 @@ br
   .col-sm-12
     h2 Authenticate using an oauth2 provider
 
-    fieldset(ng-disabled='user.uid')
+    fieldset(ng-disabled='user.signedIn')
       button.btn.btn-primary(ng-click="authenticate('github')") Github
       button.btn.btn-primary(ng-click="authenticate('facebook')") Facebook
       button.btn.btn-primary(ng-click="authenticate('google')") Google
@@ -43,7 +43,7 @@ br
       role='form'
       ng-init='registrationForm = {}'
     )
-      fieldset(ng-disabled='user.uid')
+      fieldset(ng-disabled='user.signedIn')
         .form-group
           label email
           input.form-control(
@@ -71,6 +71,14 @@ br
             required
           )
 
+        .form-group
+          label favorite taco bell taco (optional)
+          input.form-control(
+            type='text'
+            name='favorite_taco'
+            ng-model='registrationForm.favorite_taco'
+          )
+
         button#reg-submit.btn.btn-primary.btn-lg(type='submit') Register
 
   .col-sm-6
@@ -81,7 +89,7 @@ br
       role='form'
       ng-init='loginForm = {}'
     )
-      fieldset(ng-disabled='user.uid')
+      fieldset(ng-disabled='user.signedIn')
         .form-group
           label email
           input.form-control(
@@ -126,21 +134,48 @@ br
         button.btn.btn-primary.btn-lg(
           type='button'
           ng-click='showPasswordChangeModal()'
-          ng-disabled='!user.uid'
+          ng-disabled='!user.signedIn'
         ) Change password
+
+  div.col-sm-6
+    h3 Change your favorite taco
+
+    form(
+      ng-submit='updateAccount(updateAccountForm)'
+      role='form'
+      ng-init='updateAccountForm = {favorite_taco: null}'
+    )
+      fieldset(ng-disabled='!user.signedIn')
+        .form-group
+          label favorite taco bell taco
+          input.form-control(
+            type='text'
+            name='text'
+            ng-model='updateAccountForm.favorite_taco'
+          )
+
+        button.btn.btn-primary.btn-lg(type='submit') Update your favorite taco
+
 
 .row
   div.col-sm-6
+    h3 Destroy account
+    button.btn.bn-lg.btn-primary(
+      ng-click='destroyAccount()'
+      ng-class='{disabled: !user.signedIn}'
+    ) Destroy account
+
+  div.col-sm-6
     h3 Restricted routes
-    p(ng-show='user.uid') You are signed in, these will work
-    p(ng-show='!user.uid') You are signed NOT in, these will NOT work
+    p(ng-show='user.signedIn') You are signed in, these will work
+    p(ng-show='!user.signedIn') You are signed NOT in, these will NOT work
 
     button.btn.btn-lg(
       ng-click='accessRestrictedRoute()'
-      ng-class='{"btn-primary": user.uid, "btn-danger": !user.uid}'
+      ng-class='{"btn-primary": user.signedIn, "btn-danger": !user.signedIn}'
     ) Make single <br />privileged request
 
     button.btn.btn-lg(
       ng-click='restrictedRoutesBatch()'
-      ng-class='{"btn-primary": user.uid, "btn-danger": !user.uid}'
+      ng-class='{"btn-primary": user.signedIn, "btn-danger": !user.signedIn}'
     ) Make multiple <br />privileged requests

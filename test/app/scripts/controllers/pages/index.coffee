@@ -28,11 +28,16 @@ angular.module('ngTokenAuthTestApp')
     )
 
     $scope.$on('auth:registration-email-error', (ev, data) ->
+      errors = _(data.errors)
+        .map((v, k) -> "#{k}: #{v}.")
+        .value()
+        .join("<br/>")
+
       $modal({
         title: "Error"
         html: true
         content: "<div id='alert-registration-email-failed'>Unable to send email "+
-          "registration: " + _.map(data.errors).toString() + "</div>"
+          "registration." + errors + "</div>"
       })
     )
 
@@ -162,5 +167,51 @@ angular.module('ngTokenAuthTestApp')
         html: true
         content: "<div id='alert-logout-error'>Unable to complete logout. "+
           "Please try again.</div>"
+      })
+    )
+
+    $scope.$on('auth:account-update-success', ->
+      $modal({
+        title: 'Success'
+        html: true
+        content: "<div id='alert-account-update-success'>Your account has been updated."+
+          "</div>"
+      })
+    )
+
+    $scope.$on('auth:account-update-error', (ev, data) ->
+      errors = _(data.errors)
+        .map((v, k) -> "#{k}: #{v}.")
+        .value()
+        .join("<br/>")
+
+      $modal({
+        title: "Error"
+        html: true
+        content: "<div id='alert-account-update-error'>Unable to update "+
+          "your account. " + errors + "</div>"
+      })
+    )
+
+    $scope.$on('auth:account-destroy-success', ->
+      $modal({
+        title: 'Success'
+        html: true
+        content: "<div id='alert-account-destroy-success'>Your account has been destroyd."+
+          "</div>"
+      })
+    )
+
+    $scope.$on('auth:account-destroy-error', (ev, data) ->
+      errors = _(data.errors)
+        .map((v, k) -> "#{k}: #{v}.")
+        .value()
+        .join("<br/>")
+
+      $modal({
+        title: "Error"
+        html: true
+        content: "<div id='alert-account-destroy-error'>Unable to destroy "+
+          "your account. " + errors + "</div>"
       })
     )
