@@ -458,8 +458,8 @@ Change an authenticated user's account info. This method accepts an object that 
 
 This method broadcasts the following events:
 
-* [`auth:update-account-success`](#authupdate-account-success)
-* [`auth:update-account-error`](#authupdate-account-error)
+* [`auth:account-update-success`](#authaccount-update-success)
+* [`auth:account-update-error`](#authaccount-update-error)
 
 ##### Example use in a controller:
 ~~~javascript
@@ -484,8 +484,8 @@ Destroy a logged in user's account. This method does not accept any params.
 
 This method broadcasts the following events:
 
-* [`auth:destroy-account-success`](#authdestroy-account-success)
-* [`auth:destroy-account-error`](#authdestroy-account-error)
+* [`auth:account-destroy-success`](#authaccount-destroy-success)
+* [`auth:account-destroy-error`](#authaccount-destroy-error)
 
 ##### Example use in a controller:
 ~~~javascript
