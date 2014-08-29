@@ -543,10 +543,10 @@ $rootScope.$on('auth:login-error', function(ev, reason) {
 ~~~
 
 ###auth:validation-success
-Broadcast when a user's token is successfully verified using the [`$auth.validateToken`](#authvalidatetoken) method.
+Broadcast when a user's token is successfully verified using the [`$auth.validateUser`](#authvalidateuser) method.
 
 ###auth:validation-error
-Broadcast when a user's token fails validation using the [`$auth.validateToken`](#authvalidatetoken) method.
+Broadcast when a user's token fails validation using the [`$auth.validateUser`](#authvalidateuser) method.
 
 ###auth:logout-success
 Broadcast after user is successfully logged out using the [`$auth.signOut`](#authsignout) method. This event does not contain a message.
