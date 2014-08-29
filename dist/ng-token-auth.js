@@ -5,6 +5,8 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
     signOutUrl: '/auth/sign_out',
     emailSignInPath: '/auth/sign_in',
     emailRegistrationPath: '/auth',
+    accountUpdatePath: '/auth',
+    accountDeletePath: '/auth',
     confirmationSuccessUrl: window.location.href,
     passwordResetPath: '/auth/password',
     passwordUpdatePath: '/auth/password',
@@ -28,6 +30,9 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
       return (parseInt(headers['expiry'], 10) * 1000) || null;
     },
     handleLoginResponse: function(resp) {
+      return resp.data;
+    },
+    handleUpdateResponse: function(resp) {
       return resp.data;
     },
     handleTokenValidationResponse: function(resp) {
@@ -180,6 +185,26 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
                 };
               })(this)).error(function(resp) {
                 return $rootScope.$broadcast('auth:password-change-error', resp);
+              });
+            },
+            updateAccount: function(params) {
+              return $http.put(this.apiUrl() + config.accountUpdatePath, params).success((function(_this) {
+                return function(resp) {
+                  angular.extend(_this.user, config.handleUpdateResponse(resp));
+                  return $rootScope.$broadcast('auth:account-update-success', resp);
+                };
+              })(this)).error(function(resp) {
+                return $rootScope.$broadcast('auth:account-update-error', resp);
+              });
+            },
+            destroyAccount: function(params) {
+              return $http["delete"](this.apiUrl() + config.accountUpdatePath, params).success((function(_this) {
+                return function(resp) {
+                  _this.invalidateTokens();
+                  return $rootScope.$broadcast('auth:account-delete-success', resp);
+                };
+              })(this)).error(function(resp) {
+                return $rootScope.$broadcast('auth:account-delete-error', resp);
               });
             },
             authenticate: function(provider) {

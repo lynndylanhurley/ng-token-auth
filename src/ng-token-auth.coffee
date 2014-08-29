@@ -5,6 +5,8 @@ angular.module('ng-token-auth', ['ngCookies'])
       signOutUrl:              '/auth/sign_out'
       emailSignInPath:         '/auth/sign_in'
       emailRegistrationPath:   '/auth'
+      accountUpdatePath:       '/auth'
+      accountDeletePath:       '/auth'
       confirmationSuccessUrl:  window.location.href
       passwordResetPath:       '/auth/password'
       passwordUpdatePath:      '/auth/password'
@@ -28,6 +30,7 @@ angular.module('ng-token-auth', ['ngCookies'])
         (parseInt(headers['expiry'], 10) * 1000) || null
 
       handleLoginResponse: (resp) -> resp.data
+      handleUpdateResponse: (resp) -> resp.data
       handleTokenValidationResponse: (resp) -> resp.data
 
       authProviderPaths:
@@ -180,6 +183,27 @@ angular.module('ng-token-auth', ['ngCookies'])
                 $rootScope.$broadcast('auth:password-change-error', resp)
               )
 
+          # update user account info
+          updateAccount: (params) ->
+            $http.put(@apiUrl() + config.accountUpdatePath, params)
+              .success((resp) =>
+                angular.extend @user, config.handleUpdateResponse(resp)
+                $rootScope.$broadcast('auth:account-update-success', resp)
+              )
+              .error((resp) ->
+                $rootScope.$broadcast('auth:account-update-error', resp)
+              )
+
+
+          destroyAccount: (params) ->
+            $http.delete(@apiUrl() + config.accountUpdatePath, params)
+              .success((resp) =>
+                @invalidateTokens()
+                $rootScope.$broadcast('auth:account-delete-success', resp)
+              )
+              .error((resp) ->
+                $rootScope.$broadcast('auth:account-delete-error', resp)
+              )
 
           # open external auth provider in separate window, send requests for
           # credentials until api auth callback page responds.

@@ -133,17 +133,19 @@ angular.module('myApp', ['ng-token-auth'])
 
 ## API
 
-The `$auth` module is available for dependency injection during your app's run phase (for controllers, directives, filters, etc.). The following methods are available.
+The `$auth` module is available for dependency injection during your app's run phase (for controllers, directives, filters, etc.). The following methods are available:
 
 ###$auth.authenticate
 Initiate an OAuth2 authentication. This method takes 1 argument, a string that is also the name of the target provider service. This method is also added to the `$rootScope` for use in templates. [Read more](#oauth2-authentication-flow).
+
+This method returns a deferred promise.
 
 #### Example use in a controller
 ~~~javascript
 angular.module('ngTokenAuthTestApp')
   .controller('IndexCtrl', function($auth) {
     $scope.handleBtnClick = function() {
-      $auth.authenticate('github')
+      $auth.authenticate('github').
     };
 
   });
@@ -310,7 +312,7 @@ The two params must match. This method is also available in the `$rootScope` for
 
 ## Events
 
-The following events are broadcast by the `$rootScope`:
+Events are broadcast after each action. This can allow for more flexibility while reducing code spaghetti. For example, any template can initiate an authentication, and any controller can subscribe to the auth:login-success event to provide success notifications, redirects, etc.
 
 ###auth:login-success
 Broadcast after successful user authentication. Event message contains the user object.
