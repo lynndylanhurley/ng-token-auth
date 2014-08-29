@@ -666,7 +666,7 @@ $scope.$on('auth:password-reset-confirm-error', function(ev, reason) {
 ~~~
 
 ###auth:password-change-success
-Broadcast when users successfully update their password using the [`$auth.updatePassword`](authupdatepassword) method. [Read more](#password-reset-flow).
+Broadcast when users successfully update their password using the [`$auth.updatePassword`](#authupdatepassword) method. [Read more](#password-reset-flow).
 
 ##### Example:
 ~~~javascript
@@ -676,7 +676,7 @@ $scope.$on('auth:password-change-success', function(ev) {
 ~~~
 
 ###auth:password-change-error
-Broadcast when requests resulting from the [`$auth.updatePassword`](authupdatepassword) method fail. [Read more](#password-reset-flow).
+Broadcast when requests resulting from the [`$auth.updatePassword`](#authupdatepassword) method fail. [Read more](#password-reset-flow).
 
 ##### Example:
 ~~~javascript
