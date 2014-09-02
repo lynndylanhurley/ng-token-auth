@@ -75,6 +75,8 @@ angular.module('myApp', ['ng-token-auth'])
       tokenValidationPath:     '/auth/validate_token',
       signOutUrl:              '/auth/sign_out',
       emailRegistrationPath:   '/auth',
+      accountUpdatePath:       '/auth',
+      accountDeletePath:       '/auth',
       confirmationSuccessUrl:  window.location.href,
       passwordResetPath:       '/auth/password'
       passwordUpdatePath:      '/auth/password'
@@ -118,8 +120,10 @@ angular.module('myApp', ['ng-token-auth'])
 | **apiUrl** | the base route to your api. Each of the following paths will be relative to this URL. |
 | **authProviderPaths** | an object containing paths to auth endpoints. keys are names of the providers, values are their auth paths relative to the `apiUrl`. [Read more](#oauth2-authentication-flow). |
 | **tokenValidationPath** | relative path to validate authentication tokens. [Read more](#token-validation-flow). |
-| **emailRegistrationPath** | path for submitting new email registrations. [Read more](#email-registration-flow). |
 | **signOutUrl** | relative path to sign user out. this will destroy the user's token both server-side and client-side. |
+| **emailRegistrationPath** | path for submitting new email registrations. [Read more](#email-registration-flow). |
+| **accountUpdatePath** | path for submitting account update requests. [Read more](#authupdateaccount). |
+| **accountDeletePath** | path for submitting account deletion requests. [Read more](#authdestroyaccount). |
 | **confirmationSuccessUrl** | the url to which the API should redirect after users visit the link contained in email-registration emails. [Read more](#email-registration-flow). |
 | **emailSignInPath** | path for signing in using email credentials. [Read more](#email-sign-in-flow) |
 | **passwordResetPath** | path for requesting password reset emails. [Read more](#password-reset-flow). |
