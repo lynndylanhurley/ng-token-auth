@@ -1,4 +1,4 @@
 #API_URL:     '//devise-token-auth-demo.herokuapp.com'
 #SITE_DOMAIN: 'devise-token-auth-demo.herokuapp.com'
-API_URL:     '//devise-token-auth.dev'
-SITE_DOMAIN: 'devise-token-auth.dev'
+API_URL:     '//devise-token-auth-demo.dev'
+SITE_DOMAIN: 'devise-token-auth-demo.dev'

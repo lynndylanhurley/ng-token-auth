@@ -37,7 +37,7 @@ angular.module('ngTokenAuthTestApp')
         title: "Error"
         html: true
         content: "<div id='alert-registration-email-failed'>Unable to send email "+
-          "registration." + errors + "</div>"
+          "registration. " + errors + "</div>"
       })
     )
 
@@ -197,7 +197,7 @@ angular.module('ngTokenAuthTestApp')
       $modal({
         title: 'Success'
         html: true
-        content: "<div id='alert-account-destroy-success'>Your account has been destroyd."+
+        content: "<div id='alert-account-destroy-success'>Your account has been destroyed."+
           "</div>"
       })
     )
