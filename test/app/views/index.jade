@@ -9,8 +9,8 @@ br
     .row
 
       .col-sm-8
-        label user id
-        p {{ user.signedIn || "none" }}
+        label user signed in?
+        p {{ user.signedIn }}
 
         label user email
         p {{ user.email || "none" }}
