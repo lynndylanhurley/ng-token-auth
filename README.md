@@ -21,7 +21,7 @@ This module provides the following features:
 * Tested with Chrome, Safari, Firefox and [IE8+](#ie8-and-ie9)
 
 # [Live Demo](http://ng-token-auth-demo.herokuapp.com/)
-
+handleBtnClick
 This project comes bundled with a test app. You can run the demo locally by following [these instructions](#development), or you can use it [here in production](http://ng-token-auth-demo.herokuapp.com/).
 
 # About this module
@@ -183,7 +183,7 @@ angular.module('ngTokenAuthTestApp')
 
 #### Example use in a template
 ~~~html
-<button ng-click="authenticate('github')">
+<button ng-click="handleBtnClick()">
   Sign in with Github
 </button>
 ~~~
