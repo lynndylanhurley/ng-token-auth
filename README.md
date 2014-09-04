@@ -1081,7 +1081,7 @@ There is a test project in the `test` directory of this app. To start a dev serv
 
 1. `cd` to the root of this project.
 1. `npm install`
-1. `cd test && bundle install`
+1. `cd test && bower install`
 1. `cd ..`
 1. `gulp dev`
 
