@@ -37,13 +37,26 @@ This module was designed to work out of the box with the outstanding [devise tok
 
 # Installation
 
-* `bower install ng-token-auth --save`
-* include `ng-token-auth` in your app.
 
-##### Example module inclusion:
-~~~javascript
-angular.module('myApp', ['ng-token-auth'])
-~~~
+* Download this module and its dependencies:   
+  ~~~bash
+  # from the terminal at the root of your project
+  bower install ng-token-auth --save
+  ~~~
+  
+* Ensure that [angularjs](https://github.com/angular/angular.js), [ng-cookies](https://docs.angularjs.org/api/ngCookies), and ng-token-auth are included on your page: 
+  ~~~html
+  <!-- in your index.html file -->
+  <script src="/js/angular/angular.js"></script>
+  <script src="/js/angular-cookies/angular-cookies.js"></script>
+  <script src="/js/ng-token-auth/dist/ng-token-auth.js"></script>
+  ~~~
+  
+* Include `ng-token-auth` in your module's dependencies:
+  ~~~javascript
+  // in your js app's module definition
+  angular.module('myApp', ['ng-token-auth'])
+  ~~~
 
 ## Configuration
 
