@@ -1,15 +1,16 @@
 # global injectors
-$authProvider = null
-$cookieStore  = null
-$httpBackend  = null
-$rootScope    = null
-$location     = null
-$provider     = null
-$timeout      = null
-$window       = null
-$http         = null
-$auth         = null
-$q            = null
+$locationProvider = null
+$authProvider     = null
+$cookieStore      = null
+$httpBackend      = null
+$rootScope        = null
+$location         = null
+$provider         = null
+$timeout          = null
+$window           = null
+$http             = null
+$auth             = null
+$q                = null
 
 # global mock vars
 validToken      = '123xyz'
@@ -36,8 +37,9 @@ validUser =
 
 # run before each test
 setup ->
-  module 'ng-token-auth', (_$authProvider_, $provide) ->
-    $authProvider = _$authProvider_
+  module 'ng-token-auth', (_$authProvider_, _$locationProvider_, $provide) ->
+    $authProvider     = _$authProvider_
+    $locationProvider = _$locationProvider_
     $authProvider.configure({
       validateOnPageLoad: false
     })

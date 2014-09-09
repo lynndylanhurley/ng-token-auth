@@ -110,7 +110,7 @@ angular.module('ng-token-auth', ['ngCookies'])
             $rootScope.user = @user
 
             # template access to authentication method
-            $rootScope.authenticate  = (provider) => @authenticate(provider)
+            $rootScope.authenticate  = (provider, opts) => @authenticate(provider, opts)
 
             # template access to view actions
             $rootScope.signOut              = => @signOut()
@@ -244,17 +244,17 @@ angular.module('ng-token-auth', ['ngCookies'])
 
           # open external auth provider in separate window, send requests for
           # credentials until api auth callback page responds.
-          authenticate: (provider) ->
+          authenticate: (provider, opts) ->
             unless @dfd?
               @initDfd()
-              @openAuthWindow(provider)
+              @openAuthWindow(provider, opts)
 
             @dfd.promise
 
 
           # open external window to authentication provider
-          openAuthWindow: (provider) ->
-            authUrl = @buildAuthUrl(provider)
+          openAuthWindow: (provider, opts) ->
+            authUrl = @buildAuthUrl(provider, opts)
 
             if @useExternalWindow()
               @requestCredentials($window.open(authUrl))
@@ -262,12 +262,21 @@ angular.module('ng-token-auth', ['ngCookies'])
               $location.replace(authUrl)
 
 
-          buildAuthUrl: (provider) ->
-            authUrl  = config.apiUrl
-            authUrl += config.authProviderPaths[provider]
-            authUrl += '?auth_origin_url='
-            authUrl += $location.href
+          buildAuthUrl: (provider, opts) ->
+            opts ?= {}
 
+            authUrl  = config.apiUrl
+            authUrl += opts.providerPath || config.authProviderPaths[provider]
+            authUrl += '?auth_origin_url=' + $location.href
+
+            if opts.params?
+              for key, val of opts.params
+                authUrl += '&'
+                authUrl += encodeURIComponent(key)
+                authUrl += '='
+                authUrl += encodeURIComponent(val)
+
+            return authUrl
 
           # ping auth window to see if user has completed registration.
           # recursively call this method until:

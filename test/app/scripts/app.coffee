@@ -6,7 +6,7 @@ angular.module('ngTokenAuthTestApp', [
   'ngTokenAuthTestPartials'
   'ng-token-auth'
 ])
-  .config ($stateProvider, $urlRouterProvider, $locationProvider, $sceProvider, $authProvider) ->
+  .config ($stateProvider, $urlRouterProvider, $locationProvider, $sceProvider, $authProvider, $httpProvider) ->
     # disable sce
     # TODO: FIX
     $sceProvider.enabled(false)

@@ -13,154 +13,191 @@ suite 'oauth2 login', ->
       # verify that popup was initiated
       sinon.spy($window, 'open')
 
-      dfd = $auth.authenticate('github')
+    suite 'using config options', ->
+      altProviderPath = '/altair4/github'
 
-      return false
+      test 'provider path is overridden', ->
+        expectedAuthUrl = $auth.config.apiUrl +
+          altProviderPath +
+          '?auth_origin_url=' +
+          $location.href
 
-    suite 'postMessage success', ->
-      test 'user should be authenticated', (done)->
-        called = false
-        dfd.then(=>
-          called = true
-        )
+        $auth.authenticate('github', {providerPath: altProviderPath})
+        assert $window.open.calledWith(expectedAuthUrl)
 
-        # fake response from api redirect
-        $window.postMessage({
-          message:    "deliverCredentials"
-          id:         validUser.id
-          uid:        validUser.uid
-          email:      validUser.email
-          auth_token: validToken
-          expiry:     validExpiry
-          client_id:  validClient
-        }, '*')
+      test 'optional params are sent', ->
+        expectedAuthUrl = $auth.config.apiUrl +
+          $auth.config.authProviderPaths['github'] +
+          '?auth_origin_url=' +
+          $location.href +
+          '&spirit_animal=scorpion'
 
-        setTimeout((->
-          $timeout.flush()
+        $auth.authenticate('github', {params: {spirit_animal: 'scorpion'}})
+        assert $window.open.calledWith(expectedAuthUrl)
 
-          assert.deepEqual($rootScope.user, {
+      test 'provider path override and custom params combined', ->
+        expectedAuthUrl = $auth.config.apiUrl +
+          altProviderPath +
+          '?auth_origin_url=' +
+          $location.href +
+          '&spirit_animal=scorpion'
+
+        $auth.authenticate('github', {
+          providerPath: altProviderPath,
+          params: {spirit_animal: 'scorpion'}
+        })
+
+        assert $window.open.calledWith(expectedAuthUrl)
+
+    suite 'defaults config', ->
+      setup ->
+        dfd = $auth.authenticate('github')
+
+        return false
+
+
+      suite 'postMessage success', ->
+        test 'user should be authenticated', (done)->
+          called = false
+          dfd.then(=>
+            called = true
+          )
+
+          # fake response from api redirect
+          $window.postMessage({
+            message:    "deliverCredentials"
             id:         validUser.id
             uid:        validUser.uid
             email:      validUser.email
             auth_token: validToken
             expiry:     validExpiry
             client_id:  validClient
-            signedIn:   true
-          })
+          }, '*')
 
-          assert(true, called)
+          setTimeout((->
+            $timeout.flush()
 
-          done()
-        ))
+            assert.deepEqual($rootScope.user, {
+              id:         validUser.id
+              uid:        validUser.uid
+              email:      validUser.email
+              auth_token: validToken
+              expiry:     validExpiry
+              client_id:  validClient
+              signedIn:   true
+            })
 
-      test 'promise is resolved', ->
-        dfd.then(-> assert(true))
-        $timeout.flush()
+            assert(true, called)
 
-    suite 'directive access', ->
-      args = 'github'
+            done()
+          ))
 
-      setup ->
-        sinon.spy($auth, 'authenticate')
-        $rootScope.authenticate('github')
-        $timeout.flush()
-
-      test '$auth.authenticate was called from $rootScope', ->
-        assert $auth.authenticate.calledWithMatch(args)
-
-
-
-
-    suite 'postMessage error', (done) ->
-      errorResponse =
-        message: 'authFailure'
-        errors: ['420']
-
-      setup ->
-        sinon.spy($auth, 'cancel')
-
-      test 'error response cancels authentication', (done) ->
-        called = false
-
-        dfd.finally(->
-          called = true
-        )
-
-        # fake response from api redirect
-        $window.postMessage(errorResponse, '*')
-
-        setTimeout((->
+        test 'promise is resolved', ->
+          dfd.then(-> assert(true))
           $timeout.flush()
-          assert true, called
+
+      suite 'directive access', ->
+        args = 'github'
+
+        setup ->
+          sinon.spy($auth, 'authenticate')
+          $rootScope.authenticate('github')
+          $timeout.flush()
+
+        test '$auth.authenticate was called from $rootScope', ->
+          assert $auth.authenticate.calledWithMatch(args)
+
+
+      suite 'postMessage error', (done) ->
+        errorResponse =
+          message: 'authFailure'
+          errors: ['420']
+
+        setup ->
+          sinon.spy($auth, 'cancel')
+
+        test 'error response cancels authentication', (done) ->
+          called = false
+
+          dfd.finally(->
+            called = true
+          )
+
+          # fake response from api redirect
+          $window.postMessage(errorResponse, '*')
+
+          setTimeout((->
+            $timeout.flush()
+            assert true, called
+            assert $auth.cancel.called
+            assert $rootScope.$broadcast.calledWith('auth:login-error')
+            done()
+          ), 0)
+
+        test 'promise is rejected', ->
+          dfd.catch(-> assert(true))
+          $timeout.flush()
+
+
+      suite 'postMessage window closed before message is sent', ->
+        setup ->
+          sinon.spy($auth, 'cancel')
+
+        teardown ->
+          popupWindow.closed = false
+
+        test 'auth is cancelled', (done) ->
+          called = false
+
+          dfd.catch =>
+            called = true
+
+          popupWindow.closed = true
+
+          $timeout.flush()
+
           assert $auth.cancel.called
-          assert $rootScope.$broadcast.calledWith('auth:login-error')
-          done()
-        ), 0)
-
-      test 'promise is rejected', ->
-        dfd.catch(-> assert(true))
-        $timeout.flush()
-
-
-    suite 'postMessage window closed before message is sent', ->
-      setup ->
-        sinon.spy($auth, 'cancel')
-
-      teardown ->
-        popupWindow.closed = false
-
-      test 'auth is cancelled', (done) ->
-        called = false
-
-        dfd.catch =>
-          called = true
-
-        popupWindow.closed = true
-
-        $timeout.flush()
-
-        assert $auth.cancel.called
-        assert.equal(true, called)
-        assert.equal(null, $auth.t)
-        done()
-
-      test 'promise is rejected', ->
-        dfd.catch(-> assert(true))
-        $timeout.flush()
-
-
-    suite 'cancel method', ->
-      test 'timer is rejected then nullified', (done) ->
-        called = false
-
-        $auth.t.catch =>
-          called = true
-
-        $auth.cancel()
-
-        # wait for reflow
-        setTimeout((->
-          $timeout.flush()
           assert.equal(true, called)
           assert.equal(null, $auth.t)
           done()
-        ), 0)
 
-      test 'promise is rejected then nullified', (done) ->
-        called = false
-
-        $auth.dfd.promise.catch ->
-          called = true
-
-        $auth.cancel()
-
-        # wait for reflow
-        setTimeout((->
+        test 'promise is rejected', ->
+          dfd.catch(-> assert(true))
           $timeout.flush()
-          assert.equal(true, called)
-          assert.equal(null, $auth.dfd)
-          done()
-        ), 0)
+
+
+      suite 'cancel method', ->
+        test 'timer is rejected then nullified', (done) ->
+          called = false
+
+          $auth.t.catch =>
+            called = true
+
+          $auth.cancel()
+
+          # wait for reflow
+          setTimeout((->
+            $timeout.flush()
+            assert.equal(true, called)
+            assert.equal(null, $auth.t)
+            done()
+          ), 0)
+
+        test 'promise is rejected then nullified', (done) ->
+          called = false
+
+          $auth.dfd.promise.catch ->
+            called = true
+
+          $auth.cancel()
+
+          # wait for reflow
+          setTimeout((->
+            $timeout.flush()
+            assert.equal(true, called)
+            assert.equal(null, $auth.dfd)
+            done()
+          ), 0)
 
   suite 'using hard redirect', ->
     successResp =

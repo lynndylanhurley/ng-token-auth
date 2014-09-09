@@ -171,7 +171,27 @@ The `$auth` module is available for dependency injection during your app's run p
 * [`$auth.destroyAccount`](#authdestroyaccount)
 
 ###$auth.authenticate
-Initiate an OAuth2 authentication. This method takes 1 argument, a string that is also the name of the target provider service. This method is also added to the `$rootScope` for use in templates. [Read more](#oauth2-authentication-flow).
+Initiate an OAuth2 authentication. This method accepts 2 arguments:
+
+* **provider**: a string that is also the name of the target provider service. For example, to authenticate using github: 
+  ~~~javascript
+  $auth.authenticate('github')
+  ~~~
+  
+* **options**: _(optional)_ an object containing the following params:
+  *  **providerPath**: overrides the default path for the specified provider. For example, to authenticate admin users at a different route than is specified in the [config](#configuration):
+
+     ~~~javascript
+     $auth.authenticate('github', {providerPath: '/admin_auth/github'})
+     ~~~
+     
+  *  **params**: additional params to be passed to the OAuth provider. For example, to pass the user's favorite color on sign up:
+
+     ~~~javascript
+     $auth.authenticate('github', {params: {favorite_color: 'green'})
+     ~~~
+
+This method is also added to the `$rootScope` for use in templates. [Read more](#oauth2-authentication-flow).
 
 This method emits the following events:
 
