@@ -591,7 +591,7 @@ angular.module('ng-token-auth', ['ngCookies'])
 
     # disable IE ajax request caching for each of the necessary http methods
     angular.forEach(httpMethods, (method) ->
-      $httpProvider.defaults.headers[method] ?= method
+      $httpProvider.defaults.headers[method] ?= {}
       $httpProvider.defaults.headers[method]['If-Modified-Since'] = '0'
     )
   ])
