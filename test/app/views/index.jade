@@ -1,4 +1,4 @@
-h1 Angular.js Token Auth Demo
+h1 Angular Token Auth Demo
 
 br
 
@@ -10,10 +10,10 @@ br
 
       .col-sm-8
         label user signed in?
-        p {{ user.signedIn }}
+        p {{ user.signedIn ? "true" : "false" }}
 
         label user email
-        p {{ user.email || "none" }}
+        p {{ user.email || "n/a" }}
 
         label favorite color (optional)
         p {{ user.favorite_color || "n/a" }}
@@ -28,11 +28,32 @@ br
   .col-sm-12
     h2 Authenticate using an oauth2 provider
 
-    fieldset(ng-disabled='user.signedIn')
-      button.btn.btn-primary(ng-click="authenticate('github')") Github
-      button.btn.btn-primary(ng-click="authenticate('facebook')") Facebook
-      button.btn.btn-primary(ng-click="authenticate('google')") Google
-      button.btn.btn-primary(ng-click="authenticate('developer')") Developer
+    p
+      = 'The "favorite color" field will saved using the optional '
+      a(
+        href='https://github.com/lynndylanhurley/ng-token-auth#authauthenticate'
+        target='_blank') params
+      = ' argument.'
+
+    .row
+      fieldset(ng-disabled='user.signedIn', ng-init='oAuthForm = {}')
+        .col-sm-6
+          .form-group
+            label favorite color (optional)
+            br
+            input.form-control(
+              type='text'
+              name='favorite_color'
+              ng-model='oAuthForm.favorite_color'
+            )
+
+        .col-sm-6
+          label authenticate using:
+          .form-group
+            button.btn.btn-primary(ng-click="authenticate('github', {params: oAuthForm})") Github
+            button.btn.btn-primary(ng-click="authenticate('facebook', {params: oAuthForm})") Facebook
+            button.btn.btn-primary(ng-click="authenticate('google', {params: oAuthForm})") Google
+
 
 
   .col-sm-6
