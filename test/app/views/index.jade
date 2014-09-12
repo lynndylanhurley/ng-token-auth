@@ -18,7 +18,10 @@ br
         label favorite color (optional)
         p {{ user.favorite_color || "n/a" }}
 
-        button.btn.btn-primary(ng-click='signOut()', ng-disabled='!user.signedIn') Sign out
+        button.btn.btn-primary(
+          ng-click='signOut()'
+          ng-disabled='!user.signedIn'
+        ) Sign out
 
       .col-sm-4(ng-if='user.signedIn')
         img(ng-src='{{ user.image }}', width="100%")
@@ -29,14 +32,17 @@ br
     h2 Authenticate using an oauth2 provider
 
     p
-      = 'The "favorite color" field will saved using the optional '
+      = 'The "favorite color" field will be saved using the optional '
       a(
         href='https://github.com/lynndylanhurley/ng-token-auth#authauthenticate'
         target='_blank') params
       = ' argument.'
 
     .row
-      fieldset(ng-disabled='user.signedIn', ng-init='oAuthForm = {}')
+      fieldset(
+        ng-disabled='user.signedIn'
+        ng-init='oAuthForm = {}'
+      )
         .col-sm-6
           .form-group
             label favorite color (optional)
