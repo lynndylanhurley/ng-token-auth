@@ -1,47 +1,75 @@
 angular.module('ng-token-auth', ['ngCookies'])
   .provider('$auth', ->
-    config =
-      apiUrl:                  '/api'
-      signOutUrl:              '/auth/sign_out'
-      emailSignInPath:         '/auth/sign_in'
-      emailRegistrationPath:   '/auth'
-      accountUpdatePath:       '/auth'
-      accountDeletePath:       '/auth'
-      confirmationSuccessUrl:  window.location.href
-      passwordResetPath:       '/auth/password'
-      passwordUpdatePath:      '/auth/password'
-      passwordResetSuccessUrl: window.location.href
-      tokenValidationPath:     '/auth/validate_token'
-      proxyIf:                 -> false
-      proxyUrl:                '/proxy'
-      validateOnPageLoad:      true
-      forceHardRedirect:       false
-      storage:                 'cookies'
+    configs =
+      default:
+        apiUrl:                  '/api'
+        signOutUrl:              '/auth/sign_out'
+        emailSignInPath:         '/auth/sign_in'
+        emailRegistrationPath:   '/auth'
+        accountUpdatePath:       '/auth'
+        accountDeletePath:       '/auth'
+        confirmationSuccessUrl:  window.location.href
+        passwordResetPath:       '/auth/password'
+        passwordUpdatePath:      '/auth/password'
+        passwordResetSuccessUrl: window.location.href
+        tokenValidationPath:     '/auth/validate_token'
+        proxyIf:                 -> false
+        proxyUrl:                '/proxy'
+        validateOnPageLoad:      true
+        forceHardRedirect:       false
+        storage:                 'cookies'
 
-      tokenFormat:
-        "access-token": "{{ token }}"
-        "token-type":   "Bearer"
-        client:       "{{ clientId }}"
-        expiry:       "{{ expiry }}"
-        uid:          "{{ uid }}"
+        tokenFormat:
+          "access-token": "{{ token }}"
+          "token-type":   "Bearer"
+          client:       "{{ clientId }}"
+          expiry:       "{{ expiry }}"
+          uid:          "{{ uid }}"
 
-      parseExpiry: (headers) ->
-        # convert from ruby time (seconds) to js time (millis)
-        (parseInt(headers['expiry'], 10) * 1000) || null
+        parseExpiry: (headers) ->
+          # convert from ruby time (seconds) to js time (millis)
+          (parseInt(headers['expiry'], 10) * 1000) || null
 
-      handleLoginResponse: (resp) -> resp.data
-      handleAccountUpdateResponse: (resp) -> resp.data
-      handleTokenValidationResponse: (resp) -> resp.data
+        handleLoginResponse: (resp) -> resp.data
+        handleAccountUpdateResponse: (resp) -> resp.data
+        handleTokenValidationResponse: (resp) -> resp.data
 
-      authProviderPaths:
-        github:    '/auth/github'
-        facebook:  '/auth/facebook'
-        google:    '/auth/google_oauth2'
+        authProviderPaths:
+          github:    '/auth/github'
+          facebook:  '/auth/facebook'
+          google:    '/auth/google_oauth2'
+
+
+    defaultConfigName = "default"
 
 
     return {
       configure: (params) ->
-        angular.extend(config, params)
+        # user is using multiple concurrent configs (>1 user types).
+        if params instanceof Array and params.length
+          # extend each item in array from default settings
+          for conf in params
+            # use copy to preserve original default settings object
+            defaults = angular.copy(configs["default"])
+            angular.extend(configs, angular.extend(defaults, conf))
+
+          # remove existng default config
+          delete config["default"]
+
+          # set first item in array as default
+          for k in params[0]
+            defaultConfigName = k
+            break
+
+        # user is extending the single default config
+        else if params instanceof Object
+          angular.extend(configs["default"], params)
+
+        # user is doing something wrong
+        else
+          throw "Invalid argument: ng-token-auth config should be an Array or Object."
+
+        return configs
 
 
       $get: [
@@ -56,15 +84,25 @@ angular.module('ng-token-auth', ['ngCookies'])
         ($http, $q, $location, $cookieStore, $window, $timeout, $rootScope, $interpolate) =>
           header:            null
           dfd:               null
-          config:            config
           user:              {}
           mustResetPassword: false
+          currentConfigName: null
           listener:          null
 
 
+          # called once at startup
           initialize: ->
+            @setCurrentConfig()
             @initializeListeners()
             @addScopeMethods()
+
+
+          # check if named configuration was set in a previous session
+          # fall back to "default" if named config is not found
+          setCurrentConfig: ->
+            if typeof $window.localStorage != 'undefined'
+              @currentConfigName ?= $window.localStorage.getItem("currentConfigName")
+            @currentConfigName ?=  $cookieStore.get("currentConfigName") || "default"
 
 
           initializeListeners: ->
@@ -122,7 +160,7 @@ angular.module('ng-token-auth', ['ngCookies'])
             $rootScope.updateAccount        = (params) => @updateAccount(params)
 
             # check to see if user is returning user
-            if config.validateOnPageLoad
+            if @getConfig().validateOnPageLoad
               @validateUser()
 
 
@@ -133,9 +171,9 @@ angular.module('ng-token-auth', ['ngCookies'])
             regDfd = $q.defer()
 
             angular.extend(params, {
-              confirm_success_url: config.confirmationSuccessUrl
+              confirm_success_url: @getConfig().confirmationSuccessUrl
             })
-            $http.post(@apiUrl() + config.emailRegistrationPath, params)
+            $http.post(@apiUrl() + @getConfig().emailRegistrationPath, params)
               .success((resp)->
                 $rootScope.$broadcast('auth:registration-email-success', params)
                 regDfd.resolve(resp)
@@ -151,9 +189,9 @@ angular.module('ng-token-auth', ['ngCookies'])
           # capture input from user, authenticate serverside
           submitLogin: (params) ->
             @initDfd()
-            $http.post(@apiUrl() + config.emailSignInPath, params)
+            $http.post(@apiUrl() + @getConfig().emailSignInPath, params)
               .success((resp) =>
-                authData = config.handleLoginResponse(resp)
+                authData = @getConfig().handleLoginResponse(resp)
                 @handleValidAuth(authData)
                 $rootScope.$broadcast('auth:login-success', @user)
               )
@@ -174,10 +212,10 @@ angular.module('ng-token-auth', ['ngCookies'])
 
           # request password reset from API
           requestPasswordReset: (params) ->
-            params.redirect_url = config.passwordResetSuccessUrl
+            params.redirect_url = @getConfig().passwordResetSuccessUrl
             pwdDfd = $q.defer()
 
-            $http.post(@apiUrl() + config.passwordResetPath, params)
+            $http.post(@apiUrl() + @getConfig().passwordResetPath, params)
               .success((resp) ->
                 $rootScope.$broadcast('auth:password-reset-request-success', params)
                 pwdDfd.resolve(resp)
@@ -194,7 +232,7 @@ angular.module('ng-token-auth', ['ngCookies'])
           updatePassword: (params) ->
             pwdDfd = $q.defer()
 
-            $http.put(@apiUrl() + config.passwordUpdatePath, params)
+            $http.put(@apiUrl() + @getConfig().passwordUpdatePath, params)
               .success((resp) =>
                 $rootScope.$broadcast('auth:password-change-success', resp)
                 @mustResetPassword = false
@@ -211,9 +249,9 @@ angular.module('ng-token-auth', ['ngCookies'])
           updateAccount: (params) ->
             acctDfd = $q.defer()
 
-            $http.put(@apiUrl() + config.accountUpdatePath, params)
+            $http.put(@apiUrl() + @getConfig().accountUpdatePath, params)
               .success((resp) =>
-                angular.extend @user, config.handleAccountUpdateResponse(resp)
+                angular.extend @user, @getConfig().handleAccountUpdateResponse(resp)
                 $rootScope.$broadcast('auth:account-update-success', resp)
                 acctDfd.resolve(resp)
               )
@@ -229,7 +267,7 @@ angular.module('ng-token-auth', ['ngCookies'])
           destroyAccount: (params) ->
             destroyDfd = $q.defer()
 
-            $http.delete(@apiUrl() + config.accountUpdatePath, params)
+            $http.delete(@apiUrl() + @getConfig().accountUpdatePath, params)
               .success((resp) =>
                 @invalidateTokens()
                 $rootScope.$broadcast('auth:account-destroy-success', resp)
@@ -265,8 +303,8 @@ angular.module('ng-token-auth', ['ngCookies'])
           buildAuthUrl: (provider, opts) ->
             opts ?= {}
 
-            authUrl  = config.apiUrl
-            authUrl += opts.providerPath || config.authProviderPaths[provider]
+            authUrl  = @getConfig().apiUrl
+            authUrl += opts.providerPath || @getConfig().authProviderPaths[provider]
             authUrl += '?auth_origin_url=' + $location.href
 
             if opts.params?
@@ -367,9 +405,9 @@ angular.module('ng-token-auth', ['ngCookies'])
           # confirm that user's auth token is still valid.
           validateToken: () ->
             unless @tokenHasExpired()
-              $http.get(@apiUrl() + config.tokenValidationPath)
+              $http.get(@apiUrl() + @getConfig().tokenValidationPath)
                 .success((resp) =>
-                  authData = config.handleTokenValidationResponse(resp)
+                  authData = @getConfig().handleTokenValidationResponse(resp)
                   @handleValidAuth(authData)
 
                   # broadcast event for first time login
@@ -417,7 +455,7 @@ angular.module('ng-token-auth', ['ngCookies'])
 
           # get expiry by method provided in config
           getExpiry: ->
-            config.parseExpiry(@headers)
+            @getConfig().parseExpiry(@headers)
 
 
           # this service attempts to cache auth tokens, but sometimes we
@@ -442,7 +480,7 @@ angular.module('ng-token-auth', ['ngCookies'])
           signOut: ->
             signOutDfd = $q.defer()
 
-            $http.delete(@apiUrl() + config.signOutUrl)
+            $http.delete(@apiUrl() + @getConfig().signOutUrl)
               .success((resp) =>
                 @invalidateTokens()
                 $rootScope.$broadcast('auth:logout-success')
@@ -484,7 +522,7 @@ angular.module('ng-token-auth', ['ngCookies'])
           buildAuthHeaders: (ctx) ->
             headers = {}
 
-            for key, val of config.tokenFormat
+            for key, val of @getConfig().tokenFormat
               headers[key] = $interpolate(val)(ctx)
 
             return headers
@@ -492,7 +530,7 @@ angular.module('ng-token-auth', ['ngCookies'])
 
           # abstract persistent data store
           persistData: (key, val) ->
-            switch config.storage
+            switch @getConfig().storage
               when 'localStorage'
                 $window.localStorage.setItem(key, JSON.stringify(val))
               else $cookieStore.put(key, val)
@@ -500,7 +538,7 @@ angular.module('ng-token-auth', ['ngCookies'])
 
           # abstract persistent data retrieval
           retrieveData: (key) ->
-            switch config.storage
+            switch @getConfig().storage
               when 'localStorage'
                 JSON.parse($window.localStorage.getItem(key))
               else $cookieStore.get(key)
@@ -508,7 +546,7 @@ angular.module('ng-token-auth', ['ngCookies'])
 
           # abstract persistent data removal
           deleteData: (key) ->
-            switch config.storage
+            switch @getConfig().storage
               when 'localStorage'
                 $window.localStorage.removeItem(key)
               else $cookieStore.remove(key)
@@ -523,7 +561,7 @@ angular.module('ng-token-auth', ['ngCookies'])
 
           # ie8 + ie9 cannot use xdomain postMessage
           useExternalWindow: ->
-            not (config.forceHardRedirect || $window.isOldIE())
+            not (@getConfig().forceHardRedirect || $window.isOldIE())
 
 
           initDfd: ->
@@ -543,10 +581,23 @@ angular.module('ng-token-auth', ['ngCookies'])
 
           # use proxy for IE
           apiUrl: ->
-            if config.proxyIf()
-              config.proxyUrl
+            if @getConfig().proxyIf()
+              @getConfig().proxyUrl
             else
-              config.apiUrl
+              @getConfig().apiUrl
+
+
+          getConfig: (name) ->
+            configs[@getCurrentConfigName(name)]
+
+
+          # a config name will be return in the following order of precedence:
+          # 1. matches arg
+          # 2. matches @currentConfigName (saved from past authentication)
+          # 3. matches defaultConfigName (first or only available config name)
+          getCurrentConfigName: (name) ->
+            name || @currentConfigName || defaultConfigName
+
       ]
     }
   )
@@ -564,7 +615,7 @@ angular.module('ng-token-auth', ['ngCookies'])
     $httpProvider.interceptors.push ['$injector', ($injector) ->
       request: (req) ->
         $injector.invoke ['$http', '$auth',  ($http, $auth) ->
-          if req.url.match($auth.config.apiUrl)
+          if req.url.match($auth.getConfig().apiUrl)
             for key, val of $auth.headers
               req.headers[key] = val
         ]
@@ -575,7 +626,7 @@ angular.module('ng-token-auth', ['ngCookies'])
         $injector.invoke ['$http', '$auth', ($http, $auth) ->
           newHeaders = {}
 
-          for key, val of $auth.config.tokenFormat
+          for key, val of $auth.getConfig().tokenFormat
             if resp.headers(key)
               newHeaders[key] = resp.headers(key)
 

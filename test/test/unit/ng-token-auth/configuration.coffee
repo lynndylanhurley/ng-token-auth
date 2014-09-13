@@ -19,7 +19,7 @@ suite 'configuration', ->
       })
 
     test 'apiUrl has been changed', ->
-      assert.equal apiUrl, $auth.config.apiUrl
+      assert.equal apiUrl, $auth.getConfig().apiUrl
 
     test '$auth proxies to proxy url', ->
       assert.equal '/proxy', $auth.apiUrl()

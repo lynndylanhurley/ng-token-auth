@@ -17,7 +17,7 @@ suite 'oauth2 login', ->
       altProviderPath = '/altair4/github'
 
       test 'provider path is overridden', ->
-        expectedAuthUrl = $auth.config.apiUrl +
+        expectedAuthUrl = $auth.getConfig().apiUrl +
           altProviderPath +
           '?auth_origin_url=' +
           $location.href
@@ -26,8 +26,8 @@ suite 'oauth2 login', ->
         assert $window.open.calledWith(expectedAuthUrl)
 
       test 'optional params are sent', ->
-        expectedAuthUrl = $auth.config.apiUrl +
-          $auth.config.authProviderPaths['github'] +
+        expectedAuthUrl = $auth.getConfig().apiUrl +
+          $auth.getConfig().authProviderPaths['github'] +
           '?auth_origin_url=' +
           $location.href +
           '&spirit_animal=scorpion'
@@ -36,7 +36,7 @@ suite 'oauth2 login', ->
         assert $window.open.calledWith(expectedAuthUrl)
 
       test 'provider path override and custom params combined', ->
-        expectedAuthUrl = $auth.config.apiUrl +
+        expectedAuthUrl = $auth.getConfig().apiUrl +
           altProviderPath +
           '?auth_origin_url=' +
           $location.href +
