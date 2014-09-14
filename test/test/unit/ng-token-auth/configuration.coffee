@@ -24,7 +24,7 @@ suite 'configuration', ->
     test '$auth proxies to proxy url', ->
       assert.equal '/proxy', $auth.apiUrl()
 
-    test.only 'headers are appended to requests to proxy', ->
+    test 'headers are appended to requests to proxy', ->
       successResp =
         success: true
         data: validUser

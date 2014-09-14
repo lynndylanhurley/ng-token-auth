@@ -14,39 +14,16 @@ suite 'oauth2 login', ->
       sinon.spy($window, 'open')
 
     suite 'using config options', ->
-      altProviderPath = '/altair4/github'
-
-      test 'provider path is overridden', ->
-        expectedAuthUrl = $auth.config.apiUrl +
-          altProviderPath +
-          '?auth_origin_url=' +
-          $location.href
-
-        $auth.authenticate('github', {providerPath: altProviderPath})
-        assert $window.open.calledWith(expectedAuthUrl)
-
       test 'optional params are sent', ->
         expectedAuthUrl = $auth.config.apiUrl +
           $auth.config.authProviderPaths['github'] +
           '?auth_origin_url=' +
-          $location.href +
+          window.location.href +
           '&spirit_animal=scorpion'
+
+        console.log 'expected auth url', expectedAuthUrl
 
         $auth.authenticate('github', {params: {spirit_animal: 'scorpion'}})
-        assert $window.open.calledWith(expectedAuthUrl)
-
-      test 'provider path override and custom params combined', ->
-        expectedAuthUrl = $auth.config.apiUrl +
-          altProviderPath +
-          '?auth_origin_url=' +
-          $location.href +
-          '&spirit_animal=scorpion'
-
-        $auth.authenticate('github', {
-          providerPath: altProviderPath,
-          params: {spirit_animal: 'scorpion'}
-        })
-
         assert $window.open.calledWith(expectedAuthUrl)
 
     suite 'defaults config', ->
@@ -212,7 +189,7 @@ suite 'oauth2 login', ->
         $authProvider.configure({forceHardRedirect: true})
 
         # mock location replace, create spy
-        sinon.stub($location, 'replace').returns(null)
+        sinon.stub($auth, 'visitUrl').returns(null)
 
         $auth.authenticate('github')
         return false
@@ -221,7 +198,7 @@ suite 'oauth2 login', ->
         $authProvider.configure({forceHardRedirect: false})
 
       test 'location should be replaced', ->
-        assert($location.replace.calledWithMatch(redirectUrl))
+        assert($auth.visitUrl.calledWithMatch(redirectUrl))
 
     suite 'on return from api', ->
       setup ->

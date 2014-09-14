@@ -259,16 +259,19 @@ angular.module('ng-token-auth', ['ngCookies'])
             if @useExternalWindow()
               @requestCredentials($window.open(authUrl))
             else
-              #$location.path(authUrl)
-              #$location.replace()
-              window.location.replace(authUrl)
+              @visitUrl(authUrl)
+
+
+          # testing actual redirects is difficult. stub this for testing
+          visitUrl: (url) ->
+            $window.location.replace(url)
 
 
           buildAuthUrl: (provider, opts) ->
             opts ?= {}
 
             authUrl  = config.apiUrl
-            authUrl += opts.providerPath || config.authProviderPaths[provider]
+            authUrl += config.authProviderPaths[provider]
             authUrl += '?auth_origin_url=' + window.location.href
 
             if opts.params?
@@ -613,11 +616,10 @@ window.isOldIE = ->
 
   out
 
+# ie <= 11 do not support postMessage
 window.isIE = ->
   nav = navigator.userAgent.toLowerCase()
   ((nav and nav.indexOf('msie') != -1) || !!navigator.userAgent.match(/Trident.*rv\:11\./))
-
-
 
 window.isEmpty = (obj) ->
   # null and undefined are "empty"
