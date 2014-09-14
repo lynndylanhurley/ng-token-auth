@@ -525,7 +525,7 @@ angular.module('ng-token-auth', ['ngCookies'])
 
           # ie8 + ie9 cannot use xdomain postMessage
           useExternalWindow: ->
-            not (config.forceHardRedirect || $window.isOldIE())
+            not (config.forceHardRedirect || $window.isIE())
 
 
           initDfd: ->
@@ -612,6 +612,11 @@ window.isOldIE = ->
       out = true
 
   out
+
+window.isIE = ->
+  nav = navigator.userAgent.toLowerCase()
+  ((nav and nav.indexOf('msie') != -1) || !!navigator.userAgent.match(/Trident.*rv\:11\./))
+
 
 
 window.isEmpty = (obj) ->
