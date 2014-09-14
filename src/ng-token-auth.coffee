@@ -50,16 +50,19 @@ angular.module('ng-token-auth', ['ngCookies'])
           # extend each item in array from default settings
           for conf in params
             # use copy to preserve original default settings object
+            label = null
+            for k, v of conf
+              label = k
+              if defaultConfigName == 'default'
+                defaultConfigName = label
+
             defaults = angular.copy(configs["default"])
-            angular.extend(configs, angular.extend(defaults, conf))
+            fullConfig = {}
+            fullConfig[label] = angular.extend(defaults, conf[label])
+            angular.extend(configs, fullConfig)
 
           # remove existng default config
-          delete config["default"]
-
-          # set first item in array as default
-          for k in params[0]
-            defaultConfigName = k
-            break
+          delete configs["default"]
 
         # user is extending the single default config
         else if params instanceof Object
@@ -102,7 +105,7 @@ angular.module('ng-token-auth', ['ngCookies'])
           setCurrentConfig: ->
             if typeof $window.localStorage != 'undefined'
               @currentConfigName ?= $window.localStorage.getItem("currentConfigName")
-            @currentConfigName ?=  $cookieStore.get("currentConfigName") || "default"
+            @currentConfigName ?=  $cookieStore.get("currentConfigName") || null
 
 
           initializeListeners: ->
