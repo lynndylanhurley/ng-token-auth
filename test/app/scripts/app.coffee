@@ -12,14 +12,15 @@ angular.module('ngTokenAuthTestApp', [
     $sceProvider.enabled(false)
 
     # push-state routes
-    $locationProvider.html5Mode(true)
+    $locationProvider.html5Mode(false)
 
     # default to 404 if state not found
     $urlRouterProvider.otherwise('/404')
 
     $authProvider.configure({
       apiUrl:  CONFIG.apiUrl
-      proxyIf: -> window.isOldIE()
+      #proxyIf: -> window.isOldIE()
+      proxyIf: -> true
       authProviderPaths:
         github:    '/auth/github'
         facebook:  '/auth/facebook'

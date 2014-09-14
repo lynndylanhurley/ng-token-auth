@@ -259,7 +259,9 @@ angular.module('ng-token-auth', ['ngCookies'])
             if @useExternalWindow()
               @requestCredentials($window.open(authUrl))
             else
-              $location.replace(authUrl)
+              #$location.path(authUrl)
+              #$location.replace()
+              window.location.replace(authUrl)
 
 
           buildAuthUrl: (provider, opts) ->
@@ -267,7 +269,7 @@ angular.module('ng-token-auth', ['ngCookies'])
 
             authUrl  = config.apiUrl
             authUrl += opts.providerPath || config.authProviderPaths[provider]
-            authUrl += '?auth_origin_url=' + $location.href
+            authUrl += '?auth_origin_url=' + window.location.href
 
             if opts.params?
               for key, val of opts.params
@@ -345,6 +347,7 @@ angular.module('ng-token-auth', ['ngCookies'])
                 # has refreshed the page.
                 else if @retrieveData('auth_headers')
                   @headers = @retrieveData('auth_headers')
+
 
                 unless isEmpty(@headers)
                   @validateToken()
@@ -480,7 +483,7 @@ angular.module('ng-token-auth', ['ngCookies'])
             @resolveDfd()
 
 
-          # auth token format. consider making this configurable
+          # configure auth token format.
           buildAuthHeaders: (ctx) ->
             headers = {}
 
@@ -518,7 +521,6 @@ angular.module('ng-token-auth', ['ngCookies'])
           setAuthHeaders: (headers) ->
             @headers = angular.extend((@headers || {}), headers)
             @persistData('auth_headers', @headers)
-
 
 
           # ie8 + ie9 cannot use xdomain postMessage
@@ -564,7 +566,7 @@ angular.module('ng-token-auth', ['ngCookies'])
     $httpProvider.interceptors.push ['$injector', ($injector) ->
       request: (req) ->
         $injector.invoke ['$http', '$auth',  ($http, $auth) ->
-          if req.url.match($auth.config.apiUrl)
+          if req.url.match($auth.apiUrl())
             for key, val of $auth.headers
               req.headers[key] = val
         ]
@@ -573,14 +575,14 @@ angular.module('ng-token-auth', ['ngCookies'])
 
       response: (resp) ->
         $injector.invoke ['$http', '$auth', ($http, $auth) ->
-          newHeaders = {}
+          if resp.config.url.match($auth.apiUrl())
+            newHeaders = {}
 
-          for key, val of $auth.config.tokenFormat
-            if resp.headers(key)
-              newHeaders[key] = resp.headers(key)
+            for key, val of $auth.config.tokenFormat
+              if resp.headers(key)
+                newHeaders[key] = resp.headers(key)
 
-
-          $auth.setAuthHeaders(newHeaders)
+            $auth.setAuthHeaders(newHeaders)
         ]
 
         return resp
