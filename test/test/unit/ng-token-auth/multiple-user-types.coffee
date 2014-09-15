@@ -11,6 +11,8 @@ suite 'multiple concurrent auth configurations', ->
       passwordResetPath:       '/vega/password'
       passwordUpdatePath:      '/vega/password'
       tokenValidationPath:     '/vega/validate_token'
+      authProviderPaths:
+        github:    '/vega/github'
 
     setup ->
       $authProvider.configure(defaultConfig)
@@ -26,15 +28,15 @@ suite 'multiple concurrent auth configurations', ->
       assert.equal(defaultConfig.tokenValidationPath, $auth.getConfig().tokenValidationPath)
 
     test 'authenticate uses only config by default', ->
-      $cookieStore.put('auth_headers', validAuthHeader)
-      $httpBackend
-        .expectGET('/api/vega/validate_token')
-        .respond(201, successResp, validAuthHeader)
+      expectedRoute = "/api/vega/github"
+      sinon.stub($auth, 'createPopup').returns({
+        closed: false
+        postMessage: -> null
+      })
+      $auth.authenticate('github')
+      assert($auth.createPopup.calledWithMatch(expectedRoute))
 
-      $auth.validateUser()
-      $httpBackend.flush()
-
-    test 'signIn uses only config by default', ->
+    test 'submitLogin uses only config by default', ->
       args =
         email: validUser.email
         password: 'secret123'
@@ -70,6 +72,8 @@ suite 'multiple concurrent auth configurations', ->
         passwordResetPath:       '/rigel/password'
         passwordUpdatePath:      '/rigel/password'
         tokenValidationPath:     '/rigel/validate_token'
+        authProviderPaths:
+          github: '/rigel/github'
 
     adminConfig =
       admin:
@@ -81,6 +85,8 @@ suite 'multiple concurrent auth configurations', ->
         passwordResetPath:       '/cygni/password'
         passwordUpdatePath:      '/cygni/password'
         tokenValidationPath:     '/cygni/validate_token'
+        authProviderPaths:
+          github: '/cygni/github'
 
     setup ->
       cs = $authProvider.configure([userConfig, adminConfig])
@@ -108,14 +114,80 @@ suite 'multiple concurrent auth configurations', ->
     test 'default methods still work'
 
     suite 'authenticate', ->
-      test 'uses first config by default'
-      test 'uses second config when specified'
+      test 'uses first config by default', ->
+        expectedRoute = "/api/rigel/github"
+        sinon.stub($auth, 'createPopup').returns({
+          closed: false
+          postMessage: -> null
+        })
+        $auth.authenticate('github')
+        assert($auth.createPopup.calledWithMatch(expectedRoute))
 
-    suite 'signIn', ->
-      test 'uses first config by default'
-      test 'uses second config when specified'
+      test 'uses second config when specified', ->
+        expectedRoute = "/api/cygni/github"
+        sinon.stub($auth, 'createPopup').returns({
+          closed: false
+          postMessage: -> null
+        })
+        $auth.authenticate('github', {config: 'admin'})
+        assert($auth.createPopup.calledWithMatch(expectedRoute))
+
+      test 'config name is persisted locally'
+
+    suite 'submitLogin', ->
+      test 'uses first config by default', ->
+        args =
+          email: validUser.email
+          password: 'secret123'
+
+        $httpBackend
+          .expectPOST('/api/rigel/sign_in')
+          .respond(201, {
+            success: true
+            data: validUser
+          })
+
+        $rootScope.submitLogin(args)
+        $httpBackend.flush()
+
+      test 'uses second config when specified', ->
+        args =
+          email: validUser.email
+          password: 'secret123'
+
+        $httpBackend
+          .expectPOST('/api/cygni/sign_in')
+          .respond(201, {
+            success: true
+            data: validUser
+          })
+
+        $rootScope.submitLogin(args, {config: 'admin'})
+        $httpBackend.flush()
+
+      test 'config name is persisted locally'
+
+    suite 'signOut', ->
+      test 'uses stored named config'
 
     suite 'validateUser', ->
+      test 'uses saved config if present'
+      test 'uses first config as fallback'
+      test 'uses stored named config when present'
+
+    suite 'submitRegistration', ->
       test 'uses first config by default'
-      test 'uses second config when specified'
-      test 'uses cached named config when present'
+      test 'uses stored named config when present'
+
+    suite 'destroyAccount', ->
+      test 'uses stored named config when present'
+
+    suite 'requestPasswordReset', ->
+      test 'uses first config by default'
+      test 'uses stored named config when present'
+
+    suite 'updatePassword', ->
+      test 'uses stored named config'
+
+    suite 'updateAccount', ->
+      test 'uses stored named config'

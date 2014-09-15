@@ -48,14 +48,17 @@ angular.module('ng-token-auth', ['ngCookies'])
         # user is using multiple concurrent configs (>1 user types).
         if params instanceof Array and params.length
           # extend each item in array from default settings
-          for conf in params
-            # use copy to preserve original default settings object
+          for conf, i in params
+            # get the name of the config
             label = null
             for k, v of conf
               label = k
-              if defaultConfigName == 'default'
-                defaultConfigName = label
 
+              # set the first item in array as default config
+              defaultConfigName = label if i == 0
+
+            # use copy preserve the original default settings object while
+            # extending each config object
             defaults = angular.copy(configs["default"])
             fullConfig = {}
             fullConfig[label] = angular.extend(defaults, conf[label])
@@ -115,15 +118,19 @@ angular.module('ng-token-auth', ['ngCookies'])
 
 
           cancel: (reason) ->
+            # cancel any pending timers
             if @t?
               $timeout.cancel(@t)
 
+            # reject any pending promises
             if @dfd?
               @rejectDfd(reason)
 
+            # nullify timer after reflow
             return $timeout((=> @t = null), 0)
 
 
+          # cancel any pending processes, clean up garbage
           destroy: ->
             @cancel()
 
@@ -156,11 +163,11 @@ angular.module('ng-token-auth', ['ngCookies'])
             # template access to view actions
             $rootScope.signOut              = => @signOut()
             $rootScope.destroyAccount       = => @destroyAccount()
-            $rootScope.submitRegistration   = (params) => @submitRegistration(params)
-            $rootScope.submitLogin          = (params) => @submitLogin(params)
-            $rootScope.requestPasswordReset = (params) => @requestPasswordReset(params)
-            $rootScope.updatePassword       = (params) => @updatePassword(params)
-            $rootScope.updateAccount        = (params) => @updateAccount(params)
+            $rootScope.submitRegistration   = (params, opts) => @submitRegistration(params, opts)
+            $rootScope.submitLogin          = (params, opts) => @submitLogin(params, opts)
+            $rootScope.requestPasswordReset = (params, opts) => @requestPasswordReset(params, opts)
+            $rootScope.updatePassword       = (params, opts) => @updatePassword(params, opts)
+            $rootScope.updateAccount        = (params, opts) => @updateAccount(params, opts)
 
             # check to see if user is returning user
             if @getConfig().validateOnPageLoad
@@ -190,11 +197,11 @@ angular.module('ng-token-auth', ['ngCookies'])
 
 
           # capture input from user, authenticate serverside
-          submitLogin: (params) ->
+          submitLogin: (params, opts={}) ->
             @initDfd()
-            $http.post(@apiUrl() + @getConfig().emailSignInPath, params)
+            $http.post(@apiUrl() + @getConfig(opts.config).emailSignInPath, params)
               .success((resp) =>
-                authData = @getConfig().handleLoginResponse(resp)
+                authData = @getConfig(opts.config).handleLoginResponse(resp)
                 @handleValidAuth(authData)
                 $rootScope.$broadcast('auth:login-success', @user)
               )
@@ -298,16 +305,14 @@ angular.module('ng-token-auth', ['ngCookies'])
             authUrl = @buildAuthUrl(provider, opts)
 
             if @useExternalWindow()
-              @requestCredentials($window.open(authUrl))
+              @requestCredentials(@createPopup(authUrl))
             else
               $location.replace(authUrl)
 
 
-          buildAuthUrl: (provider, opts) ->
-            opts ?= {}
-
-            authUrl  = @getConfig().apiUrl
-            authUrl += opts.providerPath || @getConfig().authProviderPaths[provider]
+          buildAuthUrl: (provider, opts={}) ->
+            authUrl  = @getConfig(opts.config).apiUrl
+            authUrl += opts.providerPath || @getConfig(opts.config).authProviderPaths[provider]
             authUrl += '?auth_origin_url=' + $location.href
 
             if opts.params?
@@ -320,7 +325,7 @@ angular.module('ng-token-auth', ['ngCookies'])
             return authUrl
 
           # ping auth window to see if user has completed registration.
-          # recursively call this method until:
+          # this method is recursively called until:
           # 1. user completes authentication
           # 2. user fails authentication
           # 3. auth window is closed
@@ -339,6 +344,10 @@ angular.module('ng-token-auth', ['ngCookies'])
               authWindow.postMessage("requestCredentials", "*")
               @t = $timeout((=>@requestCredentials(authWindow)), 500)
 
+
+          # popups are difficult to test. mock this method in testing.
+          createPopup: (url) ->
+            $window.open(url)
 
 
           # this needs to happen after a reflow so that the promise
@@ -632,7 +641,6 @@ angular.module('ng-token-auth', ['ngCookies'])
           for key, val of $auth.getConfig().tokenFormat
             if resp.headers(key)
               newHeaders[key] = resp.headers(key)
-
 
           $auth.setAuthHeaders(newHeaders)
         ]
