@@ -24,6 +24,25 @@ suite 'configuration', ->
     test '$auth proxies to proxy url', ->
       assert.equal '/proxy', $auth.apiUrl()
 
+    test 'headers are appended to requests to proxy', ->
+      successResp =
+        success: true
+        data: validUser
+
+      $cookieStore.put('auth_headers', validAuthHeader)
+
+      $httpBackend
+        .expectGET('/proxy/auth/validate_token', (headers) ->
+          console.log 'validAuthHeader', validAuthHeader['access-token']
+          console.log 'cur', headers['access-token']
+          assert.equal(validAuthHeader['access-token'], headers['access-token'])
+          headers
+        )
+        .respond(201, successResp, {'access-token', 'whatever'})
+
+      $auth.validateUser()
+      $httpBackend.flush()
+
   suite 'alternate token format', ->
     expectedHeaders =
       "Authorization": "token=#{validToken} expiry=#{validExpiry} uid=#{validUid}"

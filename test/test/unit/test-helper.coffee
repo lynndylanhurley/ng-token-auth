@@ -78,7 +78,16 @@ setValidEmailConfirmQS = ->
   setValidAuthQS()
   $location.search('account_confirmation_success', true)
 
+setValidEmailConfirmQSForAdminUser = ->
+  setValidEmailConfirmQS()
+  $location.search('config', 'admin')
+
+
 setValidPasswordConfirmQS = ->
   setValidAuthQS()
   $location.search('reset_password', true)
 
+
+setValidPasswordConfirmQSForAdminUser = ->
+  setValidPasswordConfirmQS()
+  $location.search('config', 'admin')

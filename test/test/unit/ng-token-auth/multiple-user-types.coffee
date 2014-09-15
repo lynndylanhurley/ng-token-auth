@@ -132,8 +132,6 @@ suite 'multiple concurrent auth configurations', ->
         $auth.authenticate('github', {config: 'admin'})
         assert($auth.createPopup.calledWithMatch(expectedRoute))
 
-      test 'config name is persisted locally'
-
     suite 'submitLogin', ->
       test 'uses first config by default', ->
         args =
@@ -165,29 +163,235 @@ suite 'multiple concurrent auth configurations', ->
         $rootScope.submitLogin(args, {config: 'admin'})
         $httpBackend.flush()
 
-      test 'config name is persisted locally'
+      test 'config name is persisted locally when not using the default config', ->
+        args =
+          email: validUser.email
+          password: 'secret123'
+
+        $httpBackend
+          .expectPOST('/api/cygni/sign_in')
+          .respond(201, {
+            success: true
+            data: validUser
+          })
+
+        $rootScope.submitLogin(args, {config: 'admin'})
+        $httpBackend.flush()
+        assert.equal('admin', $auth.getCurrentConfigName())
+
 
     suite 'signOut', ->
-      test 'uses stored named config'
+      setup ->
+        # ensure that user is signed in, named config is set
+        args =
+          email: validUser.email
+          password: 'secret123'
+
+        $httpBackend
+          .expectPOST('/api/cygni/sign_in')
+          .respond(201, {
+            success: true
+            data: validUser
+          })
+
+        $rootScope.submitLogin(args, {config: 'admin'})
+        $httpBackend.flush()
+
+        $httpBackend
+          .expectDELETE('/api/cygni/sign_out')
+          .respond(201, {success: true})
+
+        $rootScope.signOut()
+        $httpBackend.flush()
+
+      test 'saved config name ref is deleted', ->
+        assert.equal(null, $auth.currentConfigName)
+
+      test 'saved config name cookie is deleted', ->
+        assert.equal(undefined, $auth.retrieveData('currentConfigName'))
+
 
     suite 'validateUser', ->
-      test 'uses saved config if present'
-      test 'uses first config as fallback'
-      test 'uses stored named config when present'
+      test 'uses saved config if present', ->
+        $auth.setConfigName({config: 'admin'})
+
+        $httpBackend
+          .expectGET('/api/cygni/validate_token')
+          .respond(201, successResp, validAuthHeader)
+
+        $cookieStore.put('auth_headers', validAuthHeader)
+        $auth.validateUser()
+        $httpBackend.flush()
+
+      test 'uses first config as fallback', ->
+        $httpBackend
+          .expectGET('/api/rigel/validate_token')
+          .respond(201, successResp, validAuthHeader)
+
+        $cookieStore.put('auth_headers', validAuthHeader)
+        $auth.validateUser()
+        $httpBackend.flush()
+
+      test 'uses named config when specified', ->
+        $httpBackend
+          .expectGET('/api/rigel/validate_token')
+          .respond(201, successResp, validAuthHeader)
+
+        $cookieStore.put('auth_headers', validAuthHeader)
+        $auth.validateUser({config: 'admin'})
+        $httpBackend.flush()
+
 
     suite 'submitRegistration', ->
-      test 'uses first config by default'
-      test 'uses stored named config when present'
+      test 'uses first config by default', ->
+        $httpBackend
+          .expectPOST('/api/rigel')
+          .respond(201, {success: true})
+
+        $auth.submitRegistration({
+          email: validEmail
+          password: 'secret123'
+          password_confirmation: 'secret123'
+        })
+
+        $httpBackend.flush()
+
+      test 'uses stored named config when present', ->
+        $httpBackend
+          .expectPOST('/api/cygni')
+          .respond(201, {success: true})
+
+        $auth.submitRegistration({
+          email: validEmail
+          password: 'secret123'
+          password_confirmation: 'secret123'
+        }, {
+          config: 'admin'
+        })
+
+        $httpBackend.flush()
+
+
+    suite 'registration confirmation', ->
+      test 'admin user is validated using the correct configuration', ->
+        setValidEmailConfirmQSForAdminUser()
+        $httpBackend
+          .expectGET('/api/cygni/validate_token')
+          .respond(201, successResp, validAuthHeader)
+
+        $auth.validateUser()
+        $httpBackend.flush()
+
+
+    suite 'password change request confirmation', ->
+      test 'admin user is validated using the correct configuration', ->
+        setValidPasswordConfirmQSForAdminUser()
+        $httpBackend
+          .expectGET('/api/cygni/validate_token')
+          .respond(201, successResp, validAuthHeader)
+
+        $auth.validateUser()
+        $httpBackend.flush()
+
 
     suite 'destroyAccount', ->
-      test 'uses stored named config when present'
+      test 'uses stored named config when present', ->
+        $auth.setConfigName({config: 'admin'})
+
+        $httpBackend
+          .expectDELETE('/api/cygni/sign_out')
+          .respond(201, successResp)
+
+        $auth.signOut()
+
+        $httpBackend.flush()
+
+
+      test 'falls back to default config name', ->
+        $httpBackend
+          .expectDELETE('/api/rigel/sign_out')
+          .respond(201, successResp)
+
+        $auth.signOut()
+
+        $httpBackend.flush()
+
 
     suite 'requestPasswordReset', ->
-      test 'uses first config by default'
-      test 'uses stored named config when present'
+      test 'uses first config by default', ->
+        $httpBackend
+          .expectPOST('/api/rigel/password')
+          .respond(201, {success: true})
+
+        $auth.requestPasswordReset({
+          email: validUser.email
+        })
+
+        $httpBackend.flush()
+
+      test 'uses stored named config when present', ->
+        $httpBackend
+          .expectPOST('/api/cygni/password')
+          .respond(201, {success: true})
+
+        $auth.requestPasswordReset({
+          email: validUser.email
+        }, {
+          config: 'admin'
+        })
+
+        $httpBackend.flush()
 
     suite 'updatePassword', ->
-      test 'uses stored named config'
+      test 'uses stored named config', ->
+        $auth.setConfigName({config: 'admin'})
+
+        $httpBackend
+          .expectPUT('/api/cygni/password')
+          .respond(201, {success: true})
+
+        $auth.updatePassword({
+          password: 'secret123'
+          password_confirmation: 'secret123'
+        })
+
+        $httpBackend.flush()
+
+      test 'falls back to default config name', ->
+        $httpBackend
+          .expectPUT('/api/rigel/password')
+          .respond(201, {success: true})
+
+        $auth.updatePassword({
+          password: 'secret123'
+          password_confirmation: 'secret123'
+        })
+
+        $httpBackend.flush()
+
+
 
     suite 'updateAccount', ->
-      test 'uses stored named config'
+      test 'uses stored named config', ->
+        $auth.setConfigName({config: 'admin'})
+
+        $httpBackend
+          .expectPUT('/api/cygni')
+          .respond(201, successResp)
+
+        $auth.updateAccount({
+          operating_thetan: 123
+        })
+
+        $httpBackend.flush()
+
+      test 'falls back to default config name', ->
+        $httpBackend
+          .expectPUT('/api/rigel')
+          .respond(201, successResp)
+
+        $auth.updateAccount({
+          operating_thetan: 123
+        })
+
+        $httpBackend.flush()

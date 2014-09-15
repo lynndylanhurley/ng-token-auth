@@ -171,19 +171,20 @@ angular.module('ng-token-auth', ['ngCookies'])
 
             # check to see if user is returning user
             if @getConfig().validateOnPageLoad
-              @validateUser()
+              @validateUser({config: @retrieveData('currentConfigName')})
 
 
           # register by email. server will send confirmation email
           # containing a link to activate the account. the link will
           # redirect to this site.
-          submitRegistration: (params) ->
+          submitRegistration: (params, opts={}) ->
             regDfd = $q.defer()
 
             angular.extend(params, {
-              confirm_success_url: @getConfig().confirmationSuccessUrl
+              confirm_success_url: @getConfig(opts.config).confirmationSuccessUrl,
+              config_name: @getCurrentConfigName()
             })
-            $http.post(@apiUrl() + @getConfig().emailRegistrationPath, params)
+            $http.post(@apiUrl() + @getConfig(opts.config).emailRegistrationPath, params)
               .success((resp)->
                 $rootScope.$broadcast('auth:registration-email-success', params)
                 regDfd.resolve(resp)
@@ -201,6 +202,7 @@ angular.module('ng-token-auth', ['ngCookies'])
             @initDfd()
             $http.post(@apiUrl() + @getConfig(opts.config).emailSignInPath, params)
               .success((resp) =>
+                @setConfigName(opts)
                 authData = @getConfig(opts.config).handleLoginResponse(resp)
                 @handleValidAuth(authData)
                 $rootScope.$broadcast('auth:login-success', @user)
@@ -221,11 +223,12 @@ angular.module('ng-token-auth', ['ngCookies'])
 
 
           # request password reset from API
-          requestPasswordReset: (params) ->
-            params.redirect_url = @getConfig().passwordResetSuccessUrl
+          requestPasswordReset: (params, opts={}) ->
+            params.redirect_url = @getConfig(opts.config).passwordResetSuccessUrl
+            params.config_name  = opts.config if opts.config?
             pwdDfd = $q.defer()
 
-            $http.post(@apiUrl() + @getConfig().passwordResetPath, params)
+            $http.post(@apiUrl() + @getConfig(opts.config).passwordResetPath, params)
               .success((resp) ->
                 $rootScope.$broadcast('auth:password-reset-request-success', params)
                 pwdDfd.resolve(resp)
@@ -294,10 +297,16 @@ angular.module('ng-token-auth', ['ngCookies'])
           # credentials until api auth callback page responds.
           authenticate: (provider, opts) ->
             unless @dfd?
+              @setConfigName(opts)
               @initDfd()
               @openAuthWindow(provider, opts)
 
             @dfd.promise
+
+
+          setConfigName: (opts={}) ->
+            @currentConfigName = opts.config if opts.config?
+            @persistData('currentConfigName', @currentConfigName)
 
 
           # open external window to authentication provider
@@ -307,13 +316,18 @@ angular.module('ng-token-auth', ['ngCookies'])
             if @useExternalWindow()
               @requestCredentials(@createPopup(authUrl))
             else
-              $location.replace(authUrl)
+              @visitUrl(authUrl)
+
+
+          # testing actual redirects is difficult. stub this for testing
+          visitUrl: (url) ->
+            $window.location.replace(url)
 
 
           buildAuthUrl: (provider, opts={}) ->
             authUrl  = @getConfig(opts.config).apiUrl
-            authUrl += opts.providerPath || @getConfig(opts.config).authProviderPaths[provider]
-            authUrl += '?auth_origin_url=' + $location.href
+            authUrl += @getConfig(opts.config).authProviderPaths[provider]
+            authUrl += '?auth_origin_url=' + $window.location.href
 
             if opts.params?
               for key, val of opts.params
@@ -363,6 +377,8 @@ angular.module('ng-token-auth', ['ngCookies'])
           # this is something that can be returned from 'resolve' methods
           # of pages that have restricted access
           validateUser: ->
+            configName = null
+
             unless @dfd?
               @initDfd()
 
@@ -370,9 +386,10 @@ angular.module('ng-token-auth', ['ngCookies'])
                 # token querystring is present. user most likely just came from
                 # registration email link.
                 if $location.search().token != undefined
-                  token    = $location.search().token
-                  clientId = $location.search().client_id
-                  uid      = $location.search().uid
+                  token      = $location.search().token
+                  clientId   = $location.search().client_id
+                  uid        = $location.search().uid
+                  configName = $location.search().config
 
                   # check if redirected from password reset link
                   @mustResetPassword = $location.search().reset_password
@@ -394,10 +411,11 @@ angular.module('ng-token-auth', ['ngCookies'])
                 # token cookie is present. user is returning to the site, or
                 # has refreshed the page.
                 else if @retrieveData('auth_headers')
-                  @headers = @retrieveData('auth_headers')
+                  @headers   = @retrieveData('auth_headers')
+                  configName = @retrieveData('currentConfigName')
 
                 unless isEmpty(@headers)
-                  @validateToken()
+                  @validateToken({config: configName})
 
                 # new user session. will redirect to login
                 else
@@ -415,11 +433,11 @@ angular.module('ng-token-auth', ['ngCookies'])
 
 
           # confirm that user's auth token is still valid.
-          validateToken: () ->
+          validateToken: (opts={}) ->
             unless @tokenHasExpired()
-              $http.get(@apiUrl() + @getConfig().tokenValidationPath)
+              $http.get(@apiUrl() + @getConfig(opts.config).tokenValidationPath)
                 .success((resp) =>
-                  authData = @getConfig().handleTokenValidationResponse(resp)
+                  authData = @getConfig(opts.config).handleTokenValidationResponse(resp)
                   @handleValidAuth(authData)
 
                   # broadcast event for first time login
@@ -484,6 +502,10 @@ angular.module('ng-token-auth', ['ngCookies'])
             # to re-validate credentials with api server when validate is called
             @headers = null
 
+            # remove any assumptions about current configuration
+            @deleteData('currentConfigName')
+            @currentConfigName = null
+
             # kill cookies, otherwise session will resume on page reload
             @deleteData('auth_headers')
 
@@ -530,7 +552,7 @@ angular.module('ng-token-auth', ['ngCookies'])
             @resolveDfd()
 
 
-          # auth token format. consider making this configurable
+          # configure auth token format.
           buildAuthHeaders: (ctx) ->
             headers = {}
 
@@ -570,10 +592,9 @@ angular.module('ng-token-auth', ['ngCookies'])
             @persistData('auth_headers', @headers)
 
 
-
           # ie8 + ie9 cannot use xdomain postMessage
           useExternalWindow: ->
-            not (@getConfig().forceHardRedirect || $window.isOldIE())
+            not (@getConfig().forceHardRedirect || $window.isIE())
 
 
           initDfd: ->
@@ -627,7 +648,7 @@ angular.module('ng-token-auth', ['ngCookies'])
     $httpProvider.interceptors.push ['$injector', ($injector) ->
       request: (req) ->
         $injector.invoke ['$http', '$auth',  ($http, $auth) ->
-          if req.url.match($auth.getConfig().apiUrl)
+          if req.url.match($auth.apiUrl())
             for key, val of $auth.headers
               req.headers[key] = val
         ]
@@ -636,13 +657,14 @@ angular.module('ng-token-auth', ['ngCookies'])
 
       response: (resp) ->
         $injector.invoke ['$http', '$auth', ($http, $auth) ->
-          newHeaders = {}
+          if resp.config.url.match($auth.apiUrl())
+            newHeaders = {}
 
-          for key, val of $auth.getConfig().tokenFormat
-            if resp.headers(key)
-              newHeaders[key] = resp.headers(key)
+            for key, val of $auth.getConfig().tokenFormat
+              if resp.headers(key)
+                newHeaders[key] = resp.headers(key)
 
-          $auth.setAuthHeaders(newHeaders)
+            $auth.setAuthHeaders(newHeaders)
         ]
 
         return resp
@@ -673,6 +695,10 @@ window.isOldIE = ->
 
   out
 
+# ie <= 11 do not support postMessage
+window.isIE = ->
+  nav = navigator.userAgent.toLowerCase()
+  ((nav and nav.indexOf('msie') != -1) || !!navigator.userAgent.match(/Trident.*rv\:11\./))
 
 window.isEmpty = (obj) ->
   # null and undefined are "empty"
