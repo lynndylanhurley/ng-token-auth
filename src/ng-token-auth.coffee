@@ -328,7 +328,7 @@ angular.module('ng-token-auth', ['ngCookies'])
           buildAuthUrl: (provider, opts={}) ->
             authUrl  = @getConfig(opts.config).apiUrl
             authUrl += @getConfig(opts.config).authProviderPaths[provider]
-            authUrl += '?auth_origin_url=' + $window.location.href
+            authUrl += '?auth_origin_url=' + encodeURIComponent($window.location.href)
 
             if opts.params?
               for key, val of opts.params

@@ -8,6 +8,7 @@ suite 'sign out', ->
     success: false
     errors: ['fregg.jpg']
 
+
   suite 'successful request', ->
     setup ->
       $httpBackend
@@ -20,11 +21,14 @@ suite 'sign out', ->
 
       $httpBackend.flush()
 
+
     test '$rootScope should broadcast success event', ->
       assert $rootScope.$broadcast.calledWith('auth:logout-success')
 
+
     test 'cookie should no longer be present', ->
       assert($cookieStore.get('auth_headers') == undefined)
+
 
     test 'promise is resolved', ->
       dfd.then(-> assert(true))
@@ -43,6 +47,7 @@ suite 'sign out', ->
 
       $httpBackend.flush()
 
+
   suite 'failed request', ->
     setup ->
       $httpBackend
@@ -55,11 +60,14 @@ suite 'sign out', ->
 
       $httpBackend.flush()
 
+
     test '$rootScope should broadcast error event', ->
       assert $rootScope.$broadcast.calledWith('auth:logout-error')
 
+
     test 'cookie should no longer be present', ->
       assert($cookieStore.get('auth_headers') == undefined)
+
 
     test 'promise is rejected', ->
       dfd.catch(-> assert(true))
