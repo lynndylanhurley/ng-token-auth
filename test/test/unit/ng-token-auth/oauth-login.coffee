@@ -18,7 +18,7 @@ suite 'oauth2 login', ->
         expectedAuthUrl = $auth.config.apiUrl +
           $auth.config.authProviderPaths['github'] +
           '?auth_origin_url=' +
-          window.location.href +
+          encodeURIComponent(window.location.href) +
           '&spirit_animal=scorpion'
 
         console.log 'expected auth url', expectedAuthUrl
