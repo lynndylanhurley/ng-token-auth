@@ -18,7 +18,7 @@ suite 'oauth2 login', ->
         expectedAuthUrl = $auth.apiUrl() +
           $auth.getConfig().authProviderPaths['github'] +
           '?auth_origin_url=' +
-          window.location.href +
+          encodeURIComponent(window.location.href) +
           '&spirit_animal=scorpion'
 
         $auth.authenticate('github', {params: {spirit_animal: 'scorpion'}})
