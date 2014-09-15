@@ -29,7 +29,7 @@ suite 'password update', ->
       password: 'secret123'
       password_confirmation: 'secret123'
 
-    setup ->
+    test '$auth.updatePassword was called from $rootScope', ->
       $httpBackend
         .expectPUT('/api/auth/password')
         .respond(201, {success: true})
@@ -38,9 +38,6 @@ suite 'password update', ->
 
       $rootScope.updatePassword(args)
       $httpBackend.flush()
-
-    test '$auth.updatePassword was called from $rootScope', ->
-      assert $auth.updatePassword.calledWithMatch(args)
 
   suite 'failed password update', ->
     errorResp =

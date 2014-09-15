@@ -158,16 +158,16 @@ angular.module('ng-token-auth', ['ngCookies'])
             $rootScope.user = @user
 
             # template access to authentication method
-            $rootScope.authenticate  = (provider, opts) => @authenticate(provider, opts)
+            $rootScope.authenticate  = @authenticate.bind(@)
 
             # template access to view actions
-            $rootScope.signOut              = => @signOut()
-            $rootScope.destroyAccount       = => @destroyAccount()
-            $rootScope.submitRegistration   = (params, opts) => @submitRegistration(params, opts)
-            $rootScope.submitLogin          = (params, opts) => @submitLogin(params, opts)
-            $rootScope.requestPasswordReset = (params, opts) => @requestPasswordReset(params, opts)
-            $rootScope.updatePassword       = (params, opts) => @updatePassword(params, opts)
-            $rootScope.updateAccount        = (params, opts) => @updateAccount(params, opts)
+            $rootScope.signOut              = @signOut.bind(@)
+            $rootScope.destroyAccount       = @destroyAccount.bind(@)
+            $rootScope.submitRegistration   = @submitRegistration.bind(@)
+            $rootScope.submitLogin          = @submitLogin.bind(@)
+            $rootScope.requestPasswordReset = @requestPasswordReset.bind(@)
+            $rootScope.updatePassword       = @updatePassword.bind(@)
+            $rootScope.updateAccount        = @updateAccount.bind(@)
 
             # check to see if user is returning user
             if @getConfig().validateOnPageLoad
@@ -184,7 +184,7 @@ angular.module('ng-token-auth', ['ngCookies'])
               confirm_success_url: @getConfig(opts.config).confirmationSuccessUrl,
               config_name: @getCurrentConfigName()
             })
-            $http.post(@apiUrl() + @getConfig(opts.config).emailRegistrationPath, params)
+            $http.post(@apiUrl(opts.config) + @getConfig(opts.config).emailRegistrationPath, params)
               .success((resp)->
                 $rootScope.$broadcast('auth:registration-email-success', params)
                 regDfd.resolve(resp)
@@ -200,7 +200,7 @@ angular.module('ng-token-auth', ['ngCookies'])
           # capture input from user, authenticate serverside
           submitLogin: (params, opts={}) ->
             @initDfd()
-            $http.post(@apiUrl() + @getConfig(opts.config).emailSignInPath, params)
+            $http.post(@apiUrl(opts.config) + @getConfig(opts.config).emailSignInPath, params)
               .success((resp) =>
                 @setConfigName(opts)
                 authData = @getConfig(opts.config).handleLoginResponse(resp)
@@ -228,7 +228,7 @@ angular.module('ng-token-auth', ['ngCookies'])
             params.config_name  = opts.config if opts.config?
             pwdDfd = $q.defer()
 
-            $http.post(@apiUrl() + @getConfig(opts.config).passwordResetPath, params)
+            $http.post(@apiUrl(opts.config) + @getConfig(opts.config).passwordResetPath, params)
               .success((resp) ->
                 $rootScope.$broadcast('auth:password-reset-request-success', params)
                 pwdDfd.resolve(resp)
@@ -257,6 +257,7 @@ angular.module('ng-token-auth', ['ngCookies'])
               )
 
             pwdDfd.promise
+
 
           # update user account info
           updateAccount: (params) ->
@@ -435,7 +436,7 @@ angular.module('ng-token-auth', ['ngCookies'])
           # confirm that user's auth token is still valid.
           validateToken: (opts={}) ->
             unless @tokenHasExpired()
-              $http.get(@apiUrl() + @getConfig(opts.config).tokenValidationPath)
+              $http.get(@apiUrl(opts.config) + @getConfig(opts.config).tokenValidationPath)
                 .success((resp) =>
                   authData = @getConfig(opts.config).handleTokenValidationResponse(resp)
                   @handleValidAuth(authData)
@@ -613,11 +614,11 @@ angular.module('ng-token-auth', ['ngCookies'])
 
 
           # use proxy for IE
-          apiUrl: ->
-            if @getConfig().proxyIf()
-              @getConfig().proxyUrl
+          apiUrl: (configName) ->
+            if @getConfig(configName).proxyIf()
+              @getConfig(configName).proxyUrl
             else
-              @getConfig().apiUrl
+              @getConfig(configName).apiUrl
 
 
           getConfig: (name) ->

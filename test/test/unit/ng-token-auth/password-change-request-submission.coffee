@@ -23,7 +23,7 @@ suite 'email user password change request', ->
     args =
       email: validUser.email
 
-    setup ->
+    test '$rootScope should broadcast success event', ->
       $httpBackend
         .expectPOST('/api/auth/password')
         .respond(201, {success: true})
@@ -34,8 +34,6 @@ suite 'email user password change request', ->
 
       $httpBackend.flush()
 
-    test '$rootScope should broadcast success event', ->
-      assert $auth.requestPasswordReset.calledWithMatch(args)
 
   suite 'failed request', ->
     errorResp =

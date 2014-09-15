@@ -32,7 +32,7 @@ suite 'sign out', ->
 
 
   suite 'directive access', ->
-    setup ->
+    test '$auth.signOut was called from $rootScope', ->
       $httpBackend
         .expectDELETE('/api/auth/sign_out')
         .respond(201, successResp)
@@ -42,10 +42,6 @@ suite 'sign out', ->
       $rootScope.signOut()
 
       $httpBackend.flush()
-
-    test '$auth.signOut was called from $rootScope', ->
-      assert $auth.signOut.called
-
 
   suite 'failed request', ->
     setup ->

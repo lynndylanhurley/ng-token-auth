@@ -30,15 +30,12 @@ suite 'email registration submission', ->
         password: 'secret123'
         password_confirmation: 'secret123'
 
-      setup ->
+      test '$auth.submitRegistration should have been called', ->
         sinon.spy $auth, 'submitRegistration'
 
         $rootScope.submitRegistration(args)
 
         $httpBackend.flush()
-
-      test '$auth.submitRegistration should have been called', ->
-        assert $auth.submitRegistration.calledWithMatch(args)
 
 
   suite 'failed submission', ->

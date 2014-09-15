@@ -31,7 +31,7 @@ suite 'email user sign in', ->
       email: validUser.email
       password: 'secret123'
 
-    setup ->
+    test '$auth.submitLogin was called from $rootScope', ->
       $httpBackend
         .expectPOST('/api/auth/sign_in')
         .respond(201, {
@@ -44,10 +44,6 @@ suite 'email user sign in', ->
       $rootScope.submitLogin(args)
 
       $httpBackend.flush()
-
-    test '$auth.submitLogin was called from $rootScope', ->
-      assert $auth.submitLogin.calledWithMatch(args)
-
 
 
   suite 'failed sign in', ->

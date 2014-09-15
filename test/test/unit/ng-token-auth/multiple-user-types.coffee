@@ -1,6 +1,7 @@
 suite 'multiple concurrent auth configurations', ->
   successResp = validUser
 
+
   suite 'single unnamed config', ->
     defaultConfig =
       signOutUrl:              '/vega/sign_out'
@@ -14,8 +15,10 @@ suite 'multiple concurrent auth configurations', ->
       authProviderPaths:
         github:    '/vega/github'
 
+
     setup ->
       $authProvider.configure(defaultConfig)
+
 
     test 'getConfig returns "default" config when no params specified', ->
       assert.equal(defaultConfig.signOutUrl, $auth.getConfig().signOutUrl)
@@ -36,6 +39,7 @@ suite 'multiple concurrent auth configurations', ->
       $auth.authenticate('github')
       assert($auth.createPopup.calledWithMatch(expectedRoute))
 
+
     test 'submitLogin uses only config by default', ->
       args =
         email: validUser.email
@@ -50,6 +54,7 @@ suite 'multiple concurrent auth configurations', ->
 
       $rootScope.submitLogin(args)
       $httpBackend.flush()
+
 
     test 'validateUser uses only config by default', ->
       $httpBackend
@@ -88,8 +93,10 @@ suite 'multiple concurrent auth configurations', ->
         authProviderPaths:
           github: '/cygni/github'
 
+
     setup ->
       cs = $authProvider.configure([userConfig, adminConfig])
+
 
     test 'getConfig returns first ("user") config when no params specified', ->
       assert.equal(userConfig.user.signOutUrl, $auth.getConfig().signOutUrl)
@@ -101,6 +108,7 @@ suite 'multiple concurrent auth configurations', ->
       assert.equal(userConfig.user.accountUpdatePath, $auth.getConfig().accountUpdatePath)
       assert.equal(userConfig.user.tokenValidationPath, $auth.getConfig().tokenValidationPath)
 
+
     test 'getConfig returns "admin" config when specified', ->
       assert.equal(adminConfig.admin.signOutUrl, $auth.getConfig("admin").signOutUrl)
       assert.equal(adminConfig.admin.emailSignInPath, $auth.getConfig("admin").emailSignInPath)
@@ -111,7 +119,9 @@ suite 'multiple concurrent auth configurations', ->
       assert.equal(adminConfig.admin.accountUpdatePath, $auth.getConfig("admin").accountUpdatePath)
       assert.equal(adminConfig.admin.tokenValidationPath, $auth.getConfig("admin").tokenValidationPath)
 
+
     test 'default methods still work'
+
 
     suite 'authenticate', ->
       test 'uses first config by default', ->
@@ -123,6 +133,7 @@ suite 'multiple concurrent auth configurations', ->
         $auth.authenticate('github')
         assert($auth.createPopup.calledWithMatch(expectedRoute))
 
+
       test 'uses second config when specified', ->
         expectedRoute = "/api/cygni/github"
         sinon.stub($auth, 'createPopup').returns({
@@ -131,6 +142,7 @@ suite 'multiple concurrent auth configurations', ->
         })
         $auth.authenticate('github', {config: 'admin'})
         assert($auth.createPopup.calledWithMatch(expectedRoute))
+
 
     suite 'submitLogin', ->
       test 'uses first config by default', ->
@@ -148,6 +160,7 @@ suite 'multiple concurrent auth configurations', ->
         $rootScope.submitLogin(args)
         $httpBackend.flush()
 
+
       test 'uses second config when specified', ->
         args =
           email: validUser.email
@@ -162,6 +175,7 @@ suite 'multiple concurrent auth configurations', ->
 
         $rootScope.submitLogin(args, {config: 'admin'})
         $httpBackend.flush()
+
 
       test 'config name is persisted locally when not using the default config', ->
         args =
@@ -204,8 +218,10 @@ suite 'multiple concurrent auth configurations', ->
         $rootScope.signOut()
         $httpBackend.flush()
 
+
       test 'saved config name ref is deleted', ->
         assert.equal(null, $auth.currentConfigName)
+
 
       test 'saved config name cookie is deleted', ->
         assert.equal(undefined, $auth.retrieveData('currentConfigName'))
@@ -223,6 +239,7 @@ suite 'multiple concurrent auth configurations', ->
         $auth.validateUser()
         $httpBackend.flush()
 
+
       test 'uses first config as fallback', ->
         $httpBackend
           .expectGET('/api/rigel/validate_token')
@@ -231,6 +248,7 @@ suite 'multiple concurrent auth configurations', ->
         $cookieStore.put('auth_headers', validAuthHeader)
         $auth.validateUser()
         $httpBackend.flush()
+
 
       test 'uses named config when specified', ->
         $httpBackend
@@ -255,6 +273,7 @@ suite 'multiple concurrent auth configurations', ->
         })
 
         $httpBackend.flush()
+
 
       test 'uses stored named config when present', ->
         $httpBackend
@@ -329,6 +348,7 @@ suite 'multiple concurrent auth configurations', ->
 
         $httpBackend.flush()
 
+
       test 'uses stored named config when present', ->
         $httpBackend
           .expectPOST('/api/cygni/password')
@@ -341,6 +361,7 @@ suite 'multiple concurrent auth configurations', ->
         })
 
         $httpBackend.flush()
+
 
     suite 'updatePassword', ->
       test 'uses stored named config', ->
@@ -357,6 +378,7 @@ suite 'multiple concurrent auth configurations', ->
 
         $httpBackend.flush()
 
+
       test 'falls back to default config name', ->
         $httpBackend
           .expectPUT('/api/rigel/password')
@@ -368,7 +390,6 @@ suite 'multiple concurrent auth configurations', ->
         })
 
         $httpBackend.flush()
-
 
 
     suite 'updateAccount', ->
@@ -384,6 +405,7 @@ suite 'multiple concurrent auth configurations', ->
         })
 
         $httpBackend.flush()
+
 
       test 'falls back to default config name', ->
         $httpBackend
