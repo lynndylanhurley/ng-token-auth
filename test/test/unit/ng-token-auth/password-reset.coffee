@@ -20,8 +20,10 @@ suite 'password update', ->
       assert $rootScope.$broadcast.calledWithMatch('auth:password-change-success', successResp)
 
     test 'promise is resolved', ->
-      dfd.then(-> assert(true))
+      resolved = false
+      dfd.then(-> resolved = true)
       $timeout.flush()
+      assert(resolved)
 
 
   suite 'directive access', ->
@@ -63,6 +65,8 @@ suite 'password update', ->
       assert $rootScope.$broadcast.calledWithMatch('auth:password-change-error', errorResp)
 
     test 'promise is rejected', ->
-      dfd.catch(-> assert(true))
+      caught = false
+      dfd.catch(-> caught = true)
       $timeout.flush()
+      assert(caught)
 

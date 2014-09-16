@@ -24,8 +24,10 @@ suite 'account update', ->
       assert.deepEqual($rootScope.user, updatedUser)
 
     test 'promise is resolved', ->
-      dfd.then(-> assert(true))
+      resolved = false
+      dfd.then(-> resolved = true)
       $timeout.flush()
+      assert(resolved)
 
   suite 'failed update', ->
     failedResp =
@@ -47,5 +49,7 @@ suite 'account update', ->
       assert $rootScope.$broadcast.calledWithMatch('auth:account-update-error', failedResp)
 
     test 'promise is rejected', ->
-      dfd.catch(-> assert(true))
+      caught = false
+      dfd.catch(-> caught = true)
       $timeout.flush()
+      assert(caught)

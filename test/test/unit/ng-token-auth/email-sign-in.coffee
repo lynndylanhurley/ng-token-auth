@@ -23,8 +23,10 @@ suite 'email user sign in', ->
       assert $rootScope.$broadcast.calledWithMatch('auth:login-success', validUser)
 
     test 'promise is resolved', ->
-      dfd.then(-> assert(true))
+      resolved = false
+      dfd.then(-> resolved = true)
       $timeout.flush()
+      assert(resolved)
 
   suite 'directive access', ->
     args =
@@ -70,5 +72,7 @@ suite 'email user sign in', ->
       assert $rootScope.$broadcast.calledWithMatch('auth:login-error', errorResp)
 
     test 'promise is rejected', ->
-      dfd.catch(-> assert(true))
-      $timeout.flush
+      caught = false
+      dfd.catch(-> caught = true)
+      $timeout.flush()
+      assert(caught)

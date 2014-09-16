@@ -25,8 +25,10 @@ suite 'email registration confirmation', ->
       assert $rootScope.$broadcast.calledWith('auth:email-confirmation-success')
 
     test 'promise is resolved', ->
-      dfd.then(-> assert(true))
+      resolved = false
+      dfd.then(-> resolved = true)
       $timeout.flush()
+      assert(resolved)
 
 
   suite 'failed registration', ->
@@ -54,5 +56,7 @@ suite 'email registration confirmation', ->
       assert $rootScope.$broadcast.calledWith('auth:email-confirmation-error')
 
     test 'promise is rejected', ->
-      dfd.catch(-> assert(true))
+      caught = false
+      dfd.catch(-> caught = true)
       $timeout.flush()
+      assert(caught)

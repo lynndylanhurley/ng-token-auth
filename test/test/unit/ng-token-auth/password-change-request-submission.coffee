@@ -16,8 +16,10 @@ suite 'email user password change request', ->
       assert $rootScope.$broadcast.calledWith('auth:password-reset-request-success')
 
     test 'promise is resolved', ->
-      dfd.then(-> assert(true))
+      resolved = false
+      dfd.then(-> resolved = true)
       $timeout.flush()
+      assert(resolved)
 
   suite 'directive access', ->
     args =
@@ -45,7 +47,7 @@ suite 'email user password change request', ->
         .expectPOST('/api/auth/password')
         .respond(401, errorResp)
 
-      $auth.requestPasswordReset({
+      dfd = $auth.requestPasswordReset({
         email: validUser.email
       })
 
@@ -55,6 +57,8 @@ suite 'email user password change request', ->
       assert $rootScope.$broadcast.calledWithMatch('auth:password-reset-request-error', errorResp)
 
     test 'promise is rejected', ->
-      dfd.catch(-> assert(true))
+      caught = false
+      dfd.catch(-> caught = true)
       $timeout.flush()
+      assert(caught)
 

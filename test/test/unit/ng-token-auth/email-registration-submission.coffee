@@ -21,8 +21,10 @@ suite 'email registration submission', ->
         assert $rootScope.$broadcast.calledWithMatch('auth:registration-email-success')
 
       test 'promise is resolved', ->
-        dfd.then(-> assert(true))
+        resolved = false
+        dfd.then(-> resolved = true)
         $timeout.flush()
+        assert(resolved)
 
     suite 'directive access', ->
       args =
@@ -64,8 +66,10 @@ suite 'email registration submission', ->
         assert $rootScope.$broadcast.calledWithMatch('auth:registration-email-error', errorResp)
 
       test 'promise is rejected', ->
-        dfd.catch(-> assert(true))
+        caught = false
+        dfd.catch(-> caught = true)
         $timeout.flush()
+        assert(caught)
 
 
     suite 'existing user', ->
@@ -92,5 +96,7 @@ suite 'email registration submission', ->
         assert $rootScope.$broadcast.calledWithMatch('auth:registration-email-error', errorResp)
 
       test 'promise is rejected', ->
-        dfd.catch(-> assert(true))
+        caught = false
+        dfd.catch(-> caught = true)
         $timeout.flush()
+        assert(caught)

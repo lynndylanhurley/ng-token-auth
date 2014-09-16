@@ -26,8 +26,10 @@ suite 'password change confirmation', ->
       assert $rootScope.$broadcast.calledWithMatch('auth:validation-success', validUser)
 
     test 'promise is resolved', ->
-      dfd.then(-> assert(true))
+      resolved = false
+      dfd.then(-> resolved = true)
       $timeout.flush()
+      assert(resolved)
 
 
   suite 'failed authentication', ->
@@ -56,5 +58,7 @@ suite 'password change confirmation', ->
       assert $rootScope.$broadcast.calledWithMatch('auth:validation-error', errorResp)
 
     test 'promise is rejected', ->
-      dfd.catch(-> assert(true))
+      caught = false
+      dfd.catch(-> caught = true)
       $timeout.flush()
+      assert(caught)

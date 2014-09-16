@@ -32,7 +32,7 @@ suite 'oauth2 login', ->
 
 
       suite 'postMessage success', ->
-        test 'user should be authenticated', (done)->
+        test 'user should be authenticated, promise is resolved', (done)->
           called = false
           dfd.then(=>
             called = true
@@ -67,10 +67,6 @@ suite 'oauth2 login', ->
             done()
           ))
 
-        test 'promise is resolved', ->
-          dfd.then(-> assert(true))
-          $timeout.flush()
-
       suite 'directive access', ->
         args = 'github'
 
@@ -88,11 +84,11 @@ suite 'oauth2 login', ->
         setup ->
           sinon.spy($auth, 'cancel')
 
-        test 'error response cancels authentication', (done) ->
-          called = false
+        test 'error response cancels authentication, rejects promise', (done) ->
+          caught = false
 
-          dfd.finally(->
-            called = true
+          dfd.catch(->
+            caught = true
           )
 
           # fake response from api redirect
@@ -100,16 +96,11 @@ suite 'oauth2 login', ->
 
           setTimeout((->
             $timeout.flush()
-            assert true, called
+            assert true, caught
             assert $auth.cancel.called
             assert $rootScope.$broadcast.calledWith('auth:login-error')
             done()
           ), 0)
-
-        test 'promise is rejected', ->
-          dfd.catch(-> assert(true))
-          $timeout.flush()
-
 
       suite 'postMessage window closed before message is sent', ->
         setup ->
@@ -118,24 +109,20 @@ suite 'oauth2 login', ->
         teardown ->
           popupWindow.closed = false
 
-        test 'auth is cancelled', (done) ->
-          called = false
+        test 'auth is cancelled, promise is rejected', (done) ->
+          caught = false
 
           dfd.catch =>
-            called = true
+            caught = true
 
           popupWindow.closed = true
 
           $timeout.flush()
 
           assert $auth.cancel.called
-          assert.equal(true, called)
+          assert.equal(true, caught)
           assert.equal(null, $auth.t)
           done()
-
-        test 'promise is rejected', ->
-          dfd.catch(-> assert(true))
-          $timeout.flush()
 
 
       suite 'cancel method', ->

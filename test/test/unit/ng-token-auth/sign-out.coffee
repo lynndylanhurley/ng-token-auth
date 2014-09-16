@@ -31,8 +31,10 @@ suite 'sign out', ->
 
 
     test 'promise is resolved', ->
-      dfd.then(-> assert(true))
+      resolved = false
+      dfd.then(-> resolved = true)
       $timeout.flush()
+      assert(resolved)
 
 
   suite 'directive access', ->
@@ -70,5 +72,7 @@ suite 'sign out', ->
 
 
     test 'promise is rejected', ->
-      dfd.catch(-> assert(true))
+      caught = false
+      dfd.catch(-> caught = true)
       $timeout.flush()
+      assert(caught)

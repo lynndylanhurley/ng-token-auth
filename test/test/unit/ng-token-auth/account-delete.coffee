@@ -27,8 +27,10 @@ suite 'account delete', ->
       assert.isUndefined $auth.retrieveData('auth_headers')
 
     test 'promise is resolved', ->
-      dfd.then(-> assert(true))
+      resolved = false
+      dfd.then(-> resolved = true)
       $timeout.flush()
+      assert(resolved)
 
   suite 'failed update', ->
     failedResp =
@@ -54,5 +56,7 @@ suite 'account delete', ->
       assert.deepEqual($auth.retrieveData('auth_headers'), validAuthHeader)
 
     test 'promise is rejected', ->
-      dfd.catch(-> assert(true))
+      caught = false
+      dfd.catch(-> caught = true)
       $timeout.flush()
+      assert(caught)
