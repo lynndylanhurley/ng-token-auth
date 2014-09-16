@@ -19,8 +19,7 @@ angular.module('ngTokenAuthTestApp', [
 
     $authProvider.configure({
       apiUrl:  CONFIG.apiUrl
-      #proxyIf: -> window.isOldIE()
-      proxyIf: -> true
+      proxyIf: -> window.isOldIE()
       authProviderPaths:
         github:    '/auth/github'
         facebook:  '/auth/facebook'

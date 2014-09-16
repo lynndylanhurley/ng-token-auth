@@ -134,23 +134,29 @@ angular.module('ngTokenAuthTestApp')
     )
 
     $scope.$on('auth:login-success', (ev, user) ->
+      console.log 'sign in success'
       $modal({
         title: "Success"
         html: true
         content: "<div id='alert-auth-login-success'>Welcome back " + user.email + '</div>'
       })
 
+      console.log 'modal called'
+
       delete $scope.loginForm[field] for field, val of $scope.loginForm
       delete $scope.registrationForm[field] for field, val of $scope.registrationForm
     )
 
     $scope.$on('auth:login-error', (ev, data) ->
+      console.log 'sign in error'
       $modal({
         title: "Error"
         html: true
         content: "<div id='alert-login-error'>Authentication failure: " +
           data.errors[0] + '</div>'
       })
+
+      console.log 'modal called'
     )
 
     $scope.$on('auth:logout-success', (ev) ->
