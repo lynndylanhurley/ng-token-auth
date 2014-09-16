@@ -71,7 +71,7 @@ This project comes bundled with a test app. You can run the demo locally by foll
 * [Notes on Token Management](#about-token-management)
 * [Notes on Batch Requests](#about-batch-requests)
 * [Notes on Token Formatting](#identifying-users-on-the-server)
-* [IE8 and IE9 Caveats](#ie8-and-ie9)
+* [IE Caveats](#internet-explorer)
 * [Development](#development)
 * [Contribution Guidelines](#contributing)
 * [Alteratives to This Module](#alternatives)
@@ -182,7 +182,7 @@ angular.module('myApp', ['ng-token-auth'])
 ##### Config options:
 | param | description |
 |---|---|
-| **apiUrl** | the base route to your api. Each of the following paths will be relative to this URL. |
+| **apiUrl** | the base route to your api. Each of the following paths will be relative to this URL. Authentication headers will only be added to requests with this value as the base URL. |
 | **authProviderPaths** | an object containing paths to auth endpoints. keys are names of the providers, values are their auth paths relative to the `apiUrl`. [Read more](#oauth2-authentication-flow). |
 | **tokenValidationPath** | relative path to validate authentication tokens. [Read more](#token-validation-flow). |
 | **signOutUrl** | relative path to sign user out. this will destroy the user's token both server-side and client-side. |
@@ -1055,13 +1055,13 @@ This will all happen automatically when using this module.
 
 **Note**: You can customize the auth headers however you like. [Read more](#using-alternate-header-formats).
 
-# IE8 and IE9
+# Internet explorer
 
-IE8 and IE9 present the following obstacles:
+Internet Explorer (8, 9, 10, & 11) present the following obstacles:
 
-* They don't really support cross origin requests (CORS).
-* Their `postMessage` implementations don't work for our purposes.
-* They both try to cache ajax requests.
+* IE8 & IE9 don't really support cross origin requests (CORS).
+* Their `postMessage` implementations don't work for our purposes (IE8+).
+* IE8 & IE9 both try to cache ajax requests.
 
 The following measures are necessary when dealing with these older browsers.
 
@@ -1115,16 +1115,16 @@ app.all('/proxy/*', function(req, res, next) {
 
 The above example assumes that you're using [express](http://expressjs.com/), [request](https://github.com/mikeal/request), and [http-proxy](https://github.com/nodejitsu/node-http-proxy), and that you have set the API_URL value using [node-config](https://github.com/lorenwest/node-config).
 
-#### IE8 and IE9 must use hard redirects for provider authentication
+#### IE8+ must use hard redirects for provider authentication
 
-Modern browsers can communicate across tabs and windows using [postMessage](https://developer.mozilla.org/en-US/docs/Web/API/Window.postMessage). This doesn't work for older browsers such as IE8 and IE9. In these cases the client must take the following steps when performing provider authentication (facebook, github, etc.):
+Most modern browsers can communicate across tabs and windows using [postMessage](https://developer.mozilla.org/en-US/docs/Web/API/Window.postMessage). This doesn't work for certain flawed browsers. In these cases the client must take the following steps when performing provider authentication (facebook, github, etc.):
 
 1. navigate from the client site to the API
 1. navigate from the API to the provider
 1. navigate from the provider to the API
 1. navigate from the API back to the client
 
-These steps are taken automatically when using this module with IE8 and IE9. I am currently investigating several `postMessage` polyfills. Hopefully this issue will be resolved shortly.
+These steps are taken automatically when using this module with IE8+.
 
 ---
 

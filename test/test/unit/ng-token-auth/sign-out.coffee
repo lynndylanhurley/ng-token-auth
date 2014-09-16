@@ -8,6 +8,7 @@ suite 'sign out', ->
     success: false
     errors: ['fregg.jpg']
 
+
   suite 'successful request', ->
     setup ->
       $httpBackend
@@ -20,11 +21,14 @@ suite 'sign out', ->
 
       $httpBackend.flush()
 
+
     test '$rootScope should broadcast success event', ->
       assert $rootScope.$broadcast.calledWith('auth:logout-success')
 
+
     test 'cookie should no longer be present', ->
       assert($cookieStore.get('auth_headers') == undefined)
+
 
     test 'promise is resolved', ->
       dfd.then(-> assert(true))
@@ -32,7 +36,7 @@ suite 'sign out', ->
 
 
   suite 'directive access', ->
-    setup ->
+    test '$auth.signOut was called from $rootScope', ->
       $httpBackend
         .expectDELETE('/api/auth/sign_out')
         .respond(201, successResp)
@@ -42,9 +46,6 @@ suite 'sign out', ->
       $rootScope.signOut()
 
       $httpBackend.flush()
-
-    test '$auth.signOut was called from $rootScope', ->
-      assert $auth.signOut.called
 
 
   suite 'failed request', ->
@@ -59,11 +60,14 @@ suite 'sign out', ->
 
       $httpBackend.flush()
 
+
     test '$rootScope should broadcast error event', ->
       assert $rootScope.$broadcast.calledWith('auth:logout-error')
 
+
     test 'cookie should no longer be present', ->
       assert($cookieStore.get('auth_headers') == undefined)
+
 
     test 'promise is rejected', ->
       dfd.catch(-> assert(true))

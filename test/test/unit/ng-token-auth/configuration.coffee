@@ -19,7 +19,7 @@ suite 'configuration', ->
       })
 
     test 'apiUrl has been changed', ->
-      assert.equal apiUrl, $auth.config.apiUrl
+      assert.equal apiUrl, $auth.getConfig().apiUrl
 
     test '$auth proxies to proxy url', ->
       assert.equal '/proxy', $auth.apiUrl()
@@ -33,6 +33,8 @@ suite 'configuration', ->
 
       $httpBackend
         .expectGET('/proxy/auth/validate_token', (headers) ->
+          console.log 'validAuthHeader', validAuthHeader['access-token']
+          console.log 'cur', headers['access-token']
           assert.equal(validAuthHeader['access-token'], headers['access-token'])
           headers
         )
