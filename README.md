@@ -18,7 +18,7 @@ This module provides the following features:
 * Extensive [event notifications](#events)
 * Allows for extensive [configuration](#configuration) to work with any API
 * Session support using cookies or localStorage
-* Tested with Chrome, Safari, Firefox and [IE8+](#ie8-and-ie9)
+* Tested with Chrome, Safari, Firefox and [IE8+](#internet-explorer)
 
 # [Live Demo](http://ng-token-auth-demo.herokuapp.com/)
 
@@ -71,7 +71,7 @@ This project comes bundled with a test app. You can run the demo locally by foll
 * [Notes on Token Management](#about-token-management)
 * [Notes on Batch Requests](#about-batch-requests)
 * [Notes on Token Formatting](#identifying-users-on-the-server)
-* [IE Caveats](#internet-explorer)
+* [Internet Explorer Caveats](#internet-explorer)
 * [Development](#development)
 * [Contribution Guidelines](#contributing)
 * [Alteratives to This Module](#alternatives)
@@ -195,7 +195,7 @@ angular.module('myApp', ['ng-token-auth'])
 | **passwordUpdatePath** | path for submitting new passwords for authenticated users. [Read more](#password-reset-flow) |
 | **passwordResetSuccessUrl** | the URL to which the API should redirect after users visit the links contained in password-reset emails. [Read more](#password-reset-flow). |
 | **storage** | the method used to persist tokens between sessions. cookies are used by default, but `window.localStorage` can be used as well. allowed values are `cookies` and `localStorage`. |
-| **proxyIf** | older browsers have trouble with CORS ([read more](#ie8-and-ie9)). pass a method here to determine whether or not a proxy should be used. example: `function() { return !Modernizr.cors }` |
+| **proxyIf** | older browsers have trouble with CORS ([read more](#internet-explorer)). pass a method here to determine whether or not a proxy should be used. example: `function() { return !Modernizr.cors }` |
 | **proxyUrl** | proxy url if proxy is to be used |
 | **tokenFormat** | a template for authentication tokens. the template will be provided a context with the following params:<br><ul><li>token</li><li>clientId</li><li>uid</li><li>expiry</li></ul>Defaults to the [RFC 6750 Bearer Token](http://tools.ietf.org/html/rfc6750) format. [Read more](#using-alternate-header-formats). |
 | **parseExpiry** | a function that will return the token's expiry from the current headers. Returns null if no headers or expiry are found. [Read more](#using-alternate-header-formats). |
@@ -1055,12 +1055,12 @@ This will all happen automatically when using this module.
 
 **Note**: You can customize the auth headers however you like. [Read more](#using-alternate-header-formats).
 
-# Internet explorer
+# Internet Explorer
 
 Internet Explorer (8, 9, 10, & 11) present the following obstacles:
 
 * IE8 & IE9 don't really support cross origin requests (CORS).
-* Their `postMessage` implementations don't work for our purposes (IE8+).
+* IE8+ `postMessage` implementations don't work for our purposes.
 * IE8 & IE9 both try to cache ajax requests.
 
 The following measures are necessary when dealing with these older browsers.
@@ -1168,7 +1168,7 @@ Just send a pull request. You will be granted commit access if you send quality 
 ###[Satellizer](https://github.com/sahat/satellizer) 
 
 Satellizer occupies the same problem domain as ng-token-auth. Advantages of ng-token-auth (at the time of this writing) include:
-  * Support for [IE8 and IE9](#ie8-and-ie9).
+  * Support for [IE8+](#internet-explorer).
   * [Events](#events).
   * Seamless, out-of-the-box integration with the [devise token auth](https://github.com/lynndylanhurley/devise_token_auth) gem. This gem provides a high level of security with minimal configuration.
   * [Auth header customization](#using-alternate-header-formats).
