@@ -182,7 +182,7 @@ angular.module('myApp', ['ng-token-auth'])
 ##### Config options:
 | param | description |
 |---|---|
-| **apiUrl** | the base route to your api. Each of the following paths will be relative to this URL. |
+| **apiUrl** | the base route to your api. Each of the following paths will be relative to this URL. Authentication headers will only be added to requests with this value as the base URL. |
 | **authProviderPaths** | an object containing paths to auth endpoints. keys are names of the providers, values are their auth paths relative to the `apiUrl`. [Read more](#oauth2-authentication-flow). |
 | **tokenValidationPath** | relative path to validate authentication tokens. [Read more](#token-validation-flow). |
 | **signOutUrl** | relative path to sign user out. this will destroy the user's token both server-side and client-side. |
