@@ -37,7 +37,7 @@ suite 'alternate storage', ->
         $httpBackend.flush()
 
       test 'headers should be updated', ->
-        assert.deepEqual(newAuthHeader, $auth.headers)
+        assert.deepEqual(newAuthHeader, $auth.retrieveData('auth_headers'))
 
       test 'header is included with the next request to the api', ->
         $httpBackend

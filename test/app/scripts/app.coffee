@@ -17,27 +17,32 @@ angular.module('ngTokenAuthTestApp', [
     # default to 404 if state not found
     $urlRouterProvider.otherwise('/404')
 
-    $authProvider.configure({
-      apiUrl:  CONFIG.apiUrl
-      proxyIf: -> window.isOldIE()
-      authProviderPaths:
-        github:    '/auth/github'
-        facebook:  '/auth/facebook'
-        google:    '/auth/google_oauth2'
-        developer: '/auth/developer'
-
-      ### uncomment to test alternate user model ###
-      #signOutUrl:              '/bong/sign_out'
-      #emailSignInPath:         '/bong/sign_in'
-      #emailRegistrationPath:   '/bong'
-      #passwordResetPath:       '/bong/password'
-      #passwordUpdatePath:      '/bong/password'
-      #tokenValidationPath:     '/bong/validate_token'
-      #authProviderPaths:
-        #github:    '/bong/github'
-        #facebook:  '/bong/facebook'
-        #google:    '/bong/google_oauth2'
-    })
+    $authProvider.configure([
+      default:
+        apiUrl:  CONFIG.apiUrl
+        proxyIf: -> window.isOldIE()
+        authProviderPaths:
+          github:    '/auth/github'
+          facebook:  '/auth/facebook'
+          google:    '/auth/google_oauth2'
+          developer: '/auth/developer'
+    ,
+      altUser:
+        apiUrl:                CONFIG.apiUrl
+        proxyIf:               -> window.isOldIE()
+        signOutUrl:              '/mangs/sign_out'
+        emailSignInPath:         '/mangs/sign_in'
+        emailRegistrationPath:   '/mangs'
+        accountUpdatePath:       '/mangs'
+        accountDeletePath:       '/mangs'
+        passwordResetPath:       '/mangs/password'
+        passwordUpdatePath:      '/mangs/password'
+        tokenValidationPath:     '/mangs/validate_token'
+        authProviderPaths:
+          github:    '/mangs/github'
+          facebook:  '/mangs/facebook'
+          google:    '/mangs/google_oauth2'
+    ])
 
     $stateProvider
       .state 'index',
@@ -49,6 +54,11 @@ angular.module('ngTokenAuthTestApp', [
         url: ''
         templateUrl: 'index.html'
         controller: 'IndexCtrl'
+
+      .state 'alt-user',
+        url: '/alt-user'
+        templateUrl: 'alt-user.html'
+        controller: 'AltUserCtrl'
 
       .state '404',
         url: '/404'

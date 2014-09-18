@@ -4,205 +4,230 @@ br
 
 .row
   div.col-sm-12
-    h3 <u>current user</u>
+    .panel.panel-default
+      .panel-body
+        h2 Account Info
+        p This panel displays the info associated with the current user.
 
-    .row
+        h3 <u>current user</u>
 
-      .col-sm-8
-        label user signed in?
-        p {{ user.signedIn ? "true" : "false" }}
+        .row
 
-        label user email
-        p {{ user.email || "n/a" }}
+          .col-sm-8
+            label user signed in?
+            p {{ user.signedIn ? "true" : "false" }}
 
-        label favorite color (optional)
-        p {{ user.favorite_color || "n/a" }}
+            label user email
+            p {{ user.email || "n/a" }}
+
+            label favorite color (optional)
+            p {{ user.favorite_color || "n/a" }}
+
+          .col-sm-4(ng-if='user.signedIn')
+            img(ng-src='{{ user.image }}', width="100%")
+
+
+.row
+  .col-sm-12
+    .panel.panel-default
+      .panel-body
+        h2 Authenticate using an oauth2 provider
+
+        p
+          = 'The "favorite color" field will be saved using the optional '
+          a(
+            href='https://github.com/lynndylanhurley/ng-token-auth#authauthenticate'
+            target='_blank') params
+          = ' argument.'
+
+        .row
+          fieldset(
+            ng-disabled='user.signedIn'
+            ng-init='oAuthForm = {}'
+          )
+            .col-sm-6
+              .form-group
+                label favorite color (optional)
+                br
+                input.form-control(
+                  type='text'
+                  name='favorite_color'
+                  ng-model='oAuthForm.favorite_color'
+                )
+
+            .col-sm-6
+              label authenticate using:
+              .form-group
+                button.btn.btn-primary(ng-click="authenticate('github', {params: oAuthForm})") Github
+                button.btn.btn-primary(ng-click="authenticate('facebook', {params: oAuthForm})") Facebook
+                button.btn.btn-primary(ng-click="authenticate('google', {params: oAuthForm})") Google
+
+
+
+  .col-sm-6
+    .panel.panel-default
+      .panel-body
+        h2 Register by email
+
+        form(
+          ng-submit='submitRegistration(registrationForm)'
+          role='form'
+          ng-init='registrationForm = {}'
+        )
+          fieldset(ng-disabled='user.signedIn')
+            .form-group
+              label email
+              input.form-control(
+                type='email'
+                name='email'
+                ng-model='registrationForm.email'
+                required
+              )
+
+            .form-group
+              label password
+              input.form-control(
+                type='password'
+                name='password'
+                ng-model='registrationForm.password'
+                required
+              )
+
+            .form-group
+              label password confirmation
+              input.form-control(
+                type='password'
+                name='password_confirmation'
+                ng-model='registrationForm.password_confirmation'
+                required
+              )
+
+            .form-group
+              label favorite color (optional)
+              input.form-control(
+                type='text'
+                name='favorite_color'
+                ng-model='registrationForm.favorite_color'
+              )
+
+            button#reg-submit.btn.btn-primary.btn-lg(type='submit') Register
+
+  .col-sm-6
+    .panel.panel-default
+      .panel-body
+        h2 Sign in by email
+
+        form(
+          ng-submit='submitLogin(loginForm)'
+          role='form'
+          ng-init='loginForm = {}'
+        )
+          fieldset(ng-disabled='user.signedIn')
+            .form-group
+              label email
+              input.form-control(
+                type='email'
+                name='email'
+                ng-model='loginForm.email'
+                required
+              )
+
+            .form-group
+              label password
+              input.form-control(
+                type='password'
+                name='password'
+                ng-model='loginForm.password'
+                required
+              )
+
+            button.btn.btn-primary.btn-lg(type='submit') Sign in
+
+
+    .panel.panel-default
+      .panel-body
+        h2 Sign out
 
         button.btn.btn-primary(
           ng-click='signOut()'
           ng-disabled='!user.signedIn'
         ) Sign out
 
-      .col-sm-4(ng-if='user.signedIn')
-        img(ng-src='{{ user.image }}', width="100%")
-
-
-.row
-  .col-sm-12
-    h2 Authenticate using an oauth2 provider
-
-    p
-      = 'The "favorite color" field will be saved using the optional '
-      a(
-        href='https://github.com/lynndylanhurley/ng-token-auth#authauthenticate'
-        target='_blank') params
-      = ' argument.'
-
-    .row
-      fieldset(
-        ng-disabled='user.signedIn'
-        ng-init='oAuthForm = {}'
-      )
-        .col-sm-6
-          .form-group
-            label favorite color (optional)
-            br
-            input.form-control(
-              type='text'
-              name='favorite_color'
-              ng-model='oAuthForm.favorite_color'
-            )
-
-        .col-sm-6
-          label authenticate using:
-          .form-group
-            button.btn.btn-primary(ng-click="authenticate('github', {params: oAuthForm})") Github
-            button.btn.btn-primary(ng-click="authenticate('facebook', {params: oAuthForm})") Facebook
-            button.btn.btn-primary(ng-click="authenticate('google', {params: oAuthForm})") Google
-
-
-
-  .col-sm-6
-    h2 Register by email
-
-    form(
-      ng-submit='submitRegistration(registrationForm)'
-      role='form'
-      ng-init='registrationForm = {}'
-    )
-      fieldset(ng-disabled='user.signedIn')
-        .form-group
-          label email
-          input.form-control(
-            type='email'
-            name='email'
-            ng-model='registrationForm.email'
-            required
-          )
-
-        .form-group
-          label password
-          input.form-control(
-            type='password'
-            name='password'
-            ng-model='registrationForm.password'
-            required
-          )
-
-        .form-group
-          label password confirmation
-          input.form-control(
-            type='password'
-            name='password_confirmation'
-            ng-model='registrationForm.password_confirmation'
-            required
-          )
-
-        .form-group
-          label favorite color (optional)
-          input.form-control(
-            type='text'
-            name='favorite_color'
-            ng-model='registrationForm.favorite_color'
-          )
-
-        button#reg-submit.btn.btn-primary.btn-lg(type='submit') Register
-
-  .col-sm-6
-    h2 Sign in by email
-
-    form(
-      ng-submit='submitLogin(loginForm)'
-      role='form'
-      ng-init='loginForm = {}'
-    )
-      fieldset(ng-disabled='user.signedIn')
-        .form-group
-          label email
-          input.form-control(
-            type='email'
-            name='email'
-            ng-model='loginForm.email'
-            required
-          )
-
-        .form-group
-          label password
-          input.form-control(
-            type='password'
-            name='password'
-            ng-model='loginForm.password'
-            required
-          )
-
-        button.btn.btn-primary.btn-lg(type='submit') Sign in
-
 .row
   div.col-sm-6
-    h3 Reset password
+    .panel.panel-default
+      .panel-body
+        h2 Reset password
 
-    form(
-      ng-submit='requestPasswordReset(passwordResetForm)'
-      role='form'
-      ng-init='passwordResetForm = {}'
-    )
-      fieldset
-        .form-group
-          label email
-          input.form-control(
-            type='email'
-            name='email'
-            ng-model='passwordResetForm.email'
-            required
-          )
+        form(
+          ng-submit='requestPasswordReset(passwordResetForm)'
+          role='form'
+          ng-init='passwordResetForm = {}'
+        )
+          fieldset
+            .form-group
+              label email
+              input.form-control(
+                type='email'
+                name='email'
+                ng-model='passwordResetForm.email'
+                required
+              )
 
-        button.btn.btn-primary.btn-lg(type='submit') Send password reset email
+            button.btn.btn-primary.btn-lg(type='submit') Send password reset email
 
-        button.btn.btn-primary.btn-lg(
-          type='button'
-          ng-click='showPasswordChangeModal()'
-          ng-disabled='!user.signedIn'
-        ) Change password
+            button.btn.btn-primary.btn-lg(
+              type='button'
+              ng-click='showPasswordChangeModal()'
+              ng-disabled='!user.signedIn'
+            ) Change password
 
   div.col-sm-6
-    h3 Change your favorite color
+    .panel.panel-default
+      .panel-body
+        h2 Update Account
 
-    form(
-      ng-submit='updateAccount(updateAccountForm)'
-      role='form'
-      ng-init='updateAccountForm = {favorite_color: null}'
-    )
-      fieldset(ng-disabled='!user.signedIn')
-        .form-group
-          label favorite color
-          input.form-control(
-            type='text'
-            name='text'
-            ng-model='updateAccountForm.favorite_color'
-          )
+        form(
+          ng-submit='updateAccount(updateAccountForm)'
+          role='form'
+          ng-init='updateAccountForm = {favorite_color: null}'
+        )
+          fieldset(ng-disabled='!user.signedIn')
+            .form-group
+              label favorite color
+              input.form-control(
+                type='text'
+                name='text'
+                ng-model='updateAccountForm.favorite_color'
+              )
 
-        button.btn.btn-primary.btn-lg(type='submit') Update your favorite color
+            button.btn.btn-primary.btn-lg(type='submit') Update your favorite color
 
 
 .row
   div.col-sm-6
-    h3 Destroy account
-    button.btn.bn-lg.btn-primary(
-      ng-click='destroyAccount()'
-      ng-class='{disabled: !user.signedIn}'
-    ) Destroy account
+    .panel.panel-default
+      .panel-body
+        h2 Destroy account
+        button.btn.bn-lg.btn-primary(
+          ng-click='destroyAccount()'
+          ng-class='{disabled: !user.signedIn}'
+        ) Destroy account
 
   div.col-sm-6
-    h3 Restricted routes
-    p(ng-show='user.signedIn') You are signed in, these will work
-    p(ng-show='!user.signedIn') You are signed NOT in, these will NOT work
+    .panel.panel-default
+      .panel-body
+        h2 Restricted routes
+        p.bg-info(ng-show='user.signedIn && user.configName == "default"') You are signed in as a "User", these will work
+        p.bg-info(ng-show='!user.signedIn') You are signed NOT in, these will NOT work
+        p.bg-info(ng-show='user.signedIn && user.configName == "altUser"') You are signed in as an "Alt User", these will NOT work
 
-    button.btn.btn-lg(
-      ng-click='accessRestrictedRoute()'
-      ng-class='{"btn-primary": user.signedIn, "btn-danger": !user.signedIn}'
-    ) Make single <br />privileged request
+        button.btn.btn-lg(
+          ng-click='accessRestrictedRoute()'
+          ng-class='{"btn-primary": user.signedIn && user.configName == "default", "btn-danger": !user.signedIn || user.configName != "default"}'
+        ) Make single <br />privileged request
 
-    button.btn.btn-lg(
-      ng-click='restrictedRoutesBatch()'
-      ng-class='{"btn-primary": user.signedIn, "btn-danger": !user.signedIn}'
-    ) Make multiple <br />privileged requests
+        button.btn.btn-lg(
+          ng-click='restrictedRoutesBatch()'
+          ng-class='{"btn-primary": user.signedIn && user.configName == "default", "btn-danger": !user.signedIn || user.configName != "default"}'
+        ) Make multiple <br />privileged requests

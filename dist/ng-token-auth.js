@@ -1,1 +1,631 @@
-angular.module("ng-token-auth",["ngCookies"]).provider("$auth",function(){var t,e;return t={"default":{apiUrl:"/api",signOutUrl:"/auth/sign_out",emailSignInPath:"/auth/sign_in",emailRegistrationPath:"/auth",accountUpdatePath:"/auth",accountDeletePath:"/auth",confirmationSuccessUrl:window.location.href,passwordResetPath:"/auth/password",passwordUpdatePath:"/auth/password",passwordResetSuccessUrl:window.location.href,tokenValidationPath:"/auth/validate_token",proxyIf:function(){return!1},proxyUrl:"/proxy",validateOnPageLoad:!0,forceHardRedirect:!1,storage:"cookies",tokenFormat:{"access-token":"{{ token }}","token-type":"Bearer",client:"{{ clientId }}",expiry:"{{ expiry }}",uid:"{{ uid }}"},parseExpiry:function(t){return 1e3*parseInt(t.expiry,10)||null},handleLoginResponse:function(t){return t.data},handleAccountUpdateResponse:function(t){return t.data},handleTokenValidationResponse:function(t){return t.data},authProviderPaths:{github:"/auth/github",facebook:"/auth/facebook",google:"/auth/google_oauth2"}}},e="default",{configure:function(n){var r,i,s,a,o,u,c,h,d;if(n instanceof Array&&n.length){for(a=h=0,d=n.length;d>h;a=++h){r=n[a],u=null;for(o in r)c=r[o],u=o,0===a&&(e=u);i=angular.copy(t["default"]),s={},s[u]=angular.extend(i,r[u]),angular.extend(t,s)}delete t["default"]}else{if(!(n instanceof Object))throw"Invalid argument: ng-token-auth config should be an Array or Object.";angular.extend(t["default"],n)}return t},$get:["$http","$q","$location","$cookieStore","$window","$timeout","$rootScope","$interpolate",function(){return function(n,r,i,s,a,o,u,c){return{header:null,dfd:null,user:{},mustResetPassword:!1,currentConfigName:null,listener:null,initialize:function(){return this.setCurrentConfig(),this.initializeListeners(),this.addScopeMethods()},setCurrentConfig:function(){return"undefined"!=typeof a.localStorage&&null==this.currentConfigName&&(this.currentConfigName=a.localStorage.getItem("currentConfigName")),null!=this.currentConfigName?this.currentConfigName:this.currentConfigName=s.get("currentConfigName")||null},initializeListeners:function(){return this.listener=this.handlePostMessage.bind(this),a.addEventListener?a.addEventListener("message",this.listener,!1):void 0},cancel:function(t){return null!=this.t&&o.cancel(this.t),null!=this.dfd&&this.rejectDfd(t),o(function(t){return function(){return t.t=null}}(this),0)},destroy:function(){return this.cancel(),a.removeEventListener?a.removeEventListener("message",this.listener,!1):void 0},handlePostMessage:function(t){var e;return"deliverCredentials"===t.data.message&&(delete t.data.message,this.handleValidAuth(t.data,!0),u.$broadcast("auth:login-success",t.data)),"authFailure"===t.data.message?(e={reason:"unauthorized",errors:[t.data.error]},this.cancel(e),u.$broadcast("auth:login-error",e)):void 0},addScopeMethods:function(){return u.user=this.user,u.authenticate=this.authenticate.bind(this),u.signOut=this.signOut.bind(this),u.destroyAccount=this.destroyAccount.bind(this),u.submitRegistration=this.submitRegistration.bind(this),u.submitLogin=this.submitLogin.bind(this),u.requestPasswordReset=this.requestPasswordReset.bind(this),u.updatePassword=this.updatePassword.bind(this),u.updateAccount=this.updateAccount.bind(this),this.getConfig().validateOnPageLoad?this.validateUser({config:this.retrieveData("currentConfigName")}):void 0},submitRegistration:function(t,e){return null==e&&(e={}),angular.extend(t,{confirm_success_url:this.getConfig(e.config).confirmationSuccessUrl,config_name:this.getCurrentConfigName()}),n.post(this.apiUrl(e.config)+this.getConfig(e.config).emailRegistrationPath,t).success(function(){return u.$broadcast("auth:registration-email-success",t)}).error(function(t){return u.$broadcast("auth:registration-email-error",t)})},submitLogin:function(t,e){return null==e&&(e={}),this.initDfd(),n.post(this.apiUrl(e.config)+this.getConfig(e.config).emailSignInPath,t).success(function(t){return function(n){var r;return t.setConfigName(e),r=t.getConfig(e.config).handleLoginResponse(n),t.handleValidAuth(r),u.$broadcast("auth:login-success",t.user)}}(this)).error(function(t){return function(e){return t.rejectDfd({reason:"unauthorized",errors:["Invalid credentials"]}),u.$broadcast("auth:login-error",e)}}(this)),this.dfd.promise},userIsAuthenticated:function(){return this.headers&&this.user.signedIn},requestPasswordReset:function(t,e){return null==e&&(e={}),t.redirect_url=this.getConfig(e.config).passwordResetSuccessUrl,null!=e.config&&(t.config_name=e.config),n.post(this.apiUrl(e.config)+this.getConfig(e.config).passwordResetPath,t).success(function(){return u.$broadcast("auth:password-reset-request-success",t)}).error(function(t){return u.$broadcast("auth:password-reset-request-error",t)})},updatePassword:function(t){return n.put(this.apiUrl()+this.getConfig().passwordUpdatePath,t).success(function(t){return function(e){return u.$broadcast("auth:password-change-success",e),t.mustResetPassword=!1}}(this)).error(function(t){return u.$broadcast("auth:password-change-error",t)})},updateAccount:function(t){return n.put(this.apiUrl()+this.getConfig().accountUpdatePath,t).success(function(t){return function(e){return angular.extend(t.user,t.getConfig().handleAccountUpdateResponse(e)),u.$broadcast("auth:account-update-success",e)}}(this)).error(function(t){return u.$broadcast("auth:account-update-error",t)})},destroyAccount:function(t){return n["delete"](this.apiUrl()+this.getConfig().accountUpdatePath,t).success(function(t){return function(e){return t.invalidateTokens(),u.$broadcast("auth:account-destroy-success",e)}}(this)).error(function(t){return u.$broadcast("auth:account-destroy-error",t)})},authenticate:function(t,e){return null==this.dfd&&(this.setConfigName(e),this.initDfd(),this.openAuthWindow(t,e)),this.dfd.promise},setConfigName:function(t){return null==t&&(t={}),null!=t.config&&(this.currentConfigName=t.config),this.persistData("currentConfigName",this.currentConfigName)},openAuthWindow:function(t,e){var n;return n=this.buildAuthUrl(t,e),this.useExternalWindow()?this.requestCredentials(this.createPopup(n)):this.visitUrl(n)},visitUrl:function(t){return a.location.replace(t)},buildAuthUrl:function(t,e){var n,r,i,s;if(null==e&&(e={}),n=this.getConfig(e.config).apiUrl,n+=this.getConfig(e.config).authProviderPaths[t],n+="?auth_origin_url="+encodeURIComponent(a.location.href),null!=e.params){s=e.params;for(r in s)i=s[r],n+="&",n+=encodeURIComponent(r),n+="=",n+=encodeURIComponent(i)}return n},requestCredentials:function(t){return t.closed?(this.cancel({reason:"unauthorized",errors:["User canceled login"]}),u.$broadcast("auth:window-closed")):(t.postMessage("requestCredentials","*"),this.t=o(function(e){return function(){return e.requestCredentials(t)}}(this),500))},createPopup:function(t){return a.open(t)},resolveDfd:function(){return this.dfd.resolve(this.user),o(function(t){return function(){return t.dfd=null,u.$$phase?void 0:u.$digest()}}(this),0)},validateUser:function(){var t,e,n,r;return e=null,null==this.dfd&&(this.initDfd(),this.userIsAuthenticated()?this.resolveDfd():(void 0!==i.search().token?(n=i.search().token,t=i.search().client_id,r=i.search().uid,e=i.search().config,this.mustResetPassword=i.search().reset_password,this.firstTimeLogin=i.search().account_confirmation_success,this.setAuthHeaders(this.buildAuthHeaders({token:n,clientId:t,uid:r})),i.url(i.path()||"/")):this.retrieveData("auth_headers")&&(this.headers=this.retrieveData("auth_headers"),e=this.retrieveData("currentConfigName")),isEmpty(this.headers)?(this.rejectDfd({reason:"unauthorized",errors:["No credentials"]}),u.$broadcast("auth:invalid")):this.validateToken({config:e}))),this.dfd.promise},validateToken:function(t){return null==t&&(t={}),this.tokenHasExpired()?this.rejectDfd({reason:"unauthorized",errors:["Expired credentials"]}):n.get(this.apiUrl(t.config)+this.getConfig(t.config).tokenValidationPath).success(function(e){return function(n){var r;return r=e.getConfig(t.config).handleTokenValidationResponse(n),e.handleValidAuth(r),e.firstTimeLogin&&u.$broadcast("auth:email-confirmation-success",e.user),e.mustResetPassword&&u.$broadcast("auth:password-reset-confirm-success",e.user),u.$broadcast("auth:validation-success",e.user)}}(this)).error(function(t){return function(e){return t.firstTimeLogin&&u.$broadcast("auth:email-confirmation-error",e),t.mustResetPassword&&u.$broadcast("auth:password-reset-confirm-error",e),u.$broadcast("auth:validation-error",e),t.rejectDfd({reason:"unauthorized",errors:e.errors})}}(this))},tokenHasExpired:function(){var t,e;return t=this.getExpiry(),e=(new Date).getTime(),this.headers&&t?t&&e>t:null},getExpiry:function(){return this.getConfig().parseExpiry(this.headers)},invalidateTokens:function(){var t,e,n;n=this.user;for(t in n)e=n[t],delete this.user[t];return this.headers=null,this.deleteData("currentConfigName"),this.currentConfigName=null,this.deleteData("auth_headers")},signOut:function(){return n["delete"](this.apiUrl()+this.getConfig().signOutUrl).success(function(t){return function(){return t.invalidateTokens(),u.$broadcast("auth:logout-success")}}(this)).error(function(t){return function(e){return t.invalidateTokens(),u.$broadcast("auth:logout-error",e)}}(this))},handleValidAuth:function(t,e){return null==e&&(e=!1),null!=this.t&&o.cancel(this.t),angular.extend(this.user,t),this.user.signedIn=!0,e&&this.setAuthHeaders(this.buildAuthHeaders({token:this.user.auth_token,clientId:this.user.client_id,uid:this.user.uid})),this.resolveDfd()},buildAuthHeaders:function(t){var e,n,r,i;e={},i=this.getConfig().tokenFormat;for(n in i)r=i[n],e[n]=c(r)(t);return e},persistData:function(t,e){switch(this.getConfig().storage){case"localStorage":return a.localStorage.setItem(t,JSON.stringify(e));default:return s.put(t,e)}},retrieveData:function(t){switch(this.getConfig().storage){case"localStorage":return JSON.parse(a.localStorage.getItem(t));default:return s.get(t)}},deleteData:function(t){switch(this.getConfig().storage){case"localStorage":return a.localStorage.removeItem(t);default:return s.remove(t)}},setAuthHeaders:function(t){return this.headers=angular.extend(this.headers||{},t),this.persistData("auth_headers",this.headers)},useExternalWindow:function(){return!(this.getConfig().forceHardRedirect||a.isIE())},initDfd:function(){return this.dfd=r.defer()},rejectDfd:function(t){return this.invalidateTokens(),null!=this.dfd?(this.dfd.reject(t),o(function(t){return function(){return t.dfd=null}}(this),0)):void 0},apiUrl:function(t){return this.getConfig(t).proxyIf()?this.getConfig(t).proxyUrl:this.getConfig(t).apiUrl},getConfig:function(e){return t[this.getCurrentConfigName(e)]},getCurrentConfigName:function(t){return t||this.currentConfigName||e}}}}(this)]}}).config(["$httpProvider",function(t){var e;return t.interceptors.push(["$injector",function(t){return{request:function(e){return t.invoke(["$http","$auth",function(t,n){var r,i,s,a;if(e.url.match(n.apiUrl())){s=n.headers,a=[];for(r in s)i=s[r],a.push(e.headers[r]=i);return a}}]),e},response:function(e){return t.invoke(["$http","$auth",function(t,n){var r,i,s,a;if(e.config.url.match(n.apiUrl())){i={},a=n.getConfig().tokenFormat;for(r in a)s=a[r],e.headers(r)&&(i[r]=e.headers(r));return n.setAuthHeaders(i)}}]),e}}}]),e=["get","post","put","patch","delete"],angular.forEach(e,function(e){var n;return null==(n=t.defaults.headers)[e]&&(n[e]={}),t.defaults.headers[e]["If-Modified-Since"]="0"})}]).run(["$auth","$window","$rootScope",function(t){return t.initialize()}]),window.isOldIE=function(){var t,e,n;return e=!1,t=navigator.userAgent.toLowerCase(),t&&-1!==t.indexOf("msie")&&(n=parseInt(t.split("msie")[1]),10>n&&(e=!0)),e},window.isIE=function(){var t;return t=navigator.userAgent.toLowerCase(),t&&-1!==t.indexOf("msie")||!!navigator.userAgent.match(/Trident.*rv\:11\./)},window.isEmpty=function(t){var e,n;if(!t)return!0;if(t.length>0)return!1;if(0===t.length)return!0;for(e in t)if(n=t[e],Object.prototype.hasOwnProperty.call(t,e))return!1;return!0};
+angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
+  var configs, defaultConfigName;
+  configs = {
+    "default": {
+      apiUrl: '/api',
+      signOutUrl: '/auth/sign_out',
+      emailSignInPath: '/auth/sign_in',
+      emailRegistrationPath: '/auth',
+      accountUpdatePath: '/auth',
+      accountDeletePath: '/auth',
+      confirmationSuccessUrl: window.location.href,
+      passwordResetPath: '/auth/password',
+      passwordUpdatePath: '/auth/password',
+      passwordResetSuccessUrl: window.location.href,
+      tokenValidationPath: '/auth/validate_token',
+      proxyIf: function() {
+        return false;
+      },
+      proxyUrl: '/proxy',
+      validateOnPageLoad: true,
+      forceHardRedirect: false,
+      storage: 'cookies',
+      tokenFormat: {
+        "access-token": "{{ token }}",
+        "token-type": "Bearer",
+        client: "{{ clientId }}",
+        expiry: "{{ expiry }}",
+        uid: "{{ uid }}"
+      },
+      parseExpiry: function(headers) {
+        return (parseInt(headers['expiry'], 10) * 1000) || null;
+      },
+      handleLoginResponse: function(resp) {
+        return resp.data;
+      },
+      handleAccountUpdateResponse: function(resp) {
+        return resp.data;
+      },
+      handleTokenValidationResponse: function(resp) {
+        return resp.data;
+      },
+      authProviderPaths: {
+        github: '/auth/github',
+        facebook: '/auth/facebook',
+        google: '/auth/google_oauth2'
+      }
+    }
+  };
+  defaultConfigName = "default";
+  return {
+    configure: function(params) {
+      var conf, defaults, fullConfig, i, k, label, v, _i, _len;
+      if (params instanceof Array && params.length) {
+        for (i = _i = 0, _len = params.length; _i < _len; i = ++_i) {
+          conf = params[i];
+          label = null;
+          for (k in conf) {
+            v = conf[k];
+            label = k;
+            if (i === 0) {
+              defaultConfigName = label;
+            }
+          }
+          defaults = angular.copy(configs["default"]);
+          fullConfig = {};
+          fullConfig[label] = angular.extend(defaults, conf[label]);
+          angular.extend(configs, fullConfig);
+        }
+        if (defaultConfigName !== "default") {
+          delete configs["default"];
+        }
+      } else if (params instanceof Object) {
+        angular.extend(configs["default"], params);
+      } else {
+        throw "Invalid argument: ng-token-auth config should be an Array or Object.";
+      }
+      return configs;
+    },
+    $get: [
+      '$http', '$q', '$location', '$cookieStore', '$window', '$timeout', '$rootScope', '$interpolate', (function(_this) {
+        return function($http, $q, $location, $cookieStore, $window, $timeout, $rootScope, $interpolate) {
+          return {
+            header: null,
+            dfd: null,
+            user: {},
+            mustResetPassword: false,
+            listener: null,
+            initialize: function() {
+              this.initializeListeners();
+              return this.addScopeMethods();
+            },
+            initializeListeners: function() {
+              this.listener = this.handlePostMessage.bind(this);
+              if ($window.addEventListener) {
+                return $window.addEventListener("message", this.listener, false);
+              }
+            },
+            cancel: function(reason) {
+              if (this.t != null) {
+                $timeout.cancel(this.t);
+              }
+              if (this.dfd != null) {
+                this.rejectDfd(reason);
+              }
+              return $timeout(((function(_this) {
+                return function() {
+                  return _this.t = null;
+                };
+              })(this)), 0);
+            },
+            destroy: function() {
+              this.cancel();
+              if ($window.removeEventListener) {
+                return $window.removeEventListener("message", this.listener, false);
+              }
+            },
+            handlePostMessage: function(ev) {
+              var error;
+              if (ev.data.message === 'deliverCredentials') {
+                delete ev.data.message;
+                this.handleValidAuth(ev.data, true);
+                $rootScope.$broadcast('auth:login-success', ev.data);
+              }
+              if (ev.data.message === 'authFailure') {
+                error = {
+                  reason: 'unauthorized',
+                  errors: [ev.data.error]
+                };
+                this.cancel(error);
+                return $rootScope.$broadcast('auth:login-error', error);
+              }
+            },
+            addScopeMethods: function() {
+              $rootScope.user = this.user;
+              $rootScope.authenticate = this.authenticate.bind(this);
+              $rootScope.signOut = this.signOut.bind(this);
+              $rootScope.destroyAccount = this.destroyAccount.bind(this);
+              $rootScope.submitRegistration = this.submitRegistration.bind(this);
+              $rootScope.submitLogin = this.submitLogin.bind(this);
+              $rootScope.requestPasswordReset = this.requestPasswordReset.bind(this);
+              $rootScope.updatePassword = this.updatePassword.bind(this);
+              $rootScope.updateAccount = this.updateAccount.bind(this);
+              if (this.getConfig().validateOnPageLoad) {
+                return this.validateUser({
+                  config: this.getSavedConfig()
+                });
+              }
+            },
+            submitRegistration: function(params, opts) {
+              if (opts == null) {
+                opts = {};
+              }
+              angular.extend(params, {
+                confirm_success_url: this.getConfig(opts.config).confirmationSuccessUrl,
+                config_name: this.getCurrentConfigName()
+              });
+              return $http.post(this.apiUrl(opts.config) + this.getConfig(opts.config).emailRegistrationPath, params).success(function(resp) {
+                return $rootScope.$broadcast('auth:registration-email-success', params);
+              }).error(function(resp) {
+                return $rootScope.$broadcast('auth:registration-email-error', resp);
+              });
+            },
+            submitLogin: function(params, opts) {
+              if (opts == null) {
+                opts = {};
+              }
+              this.initDfd();
+              $http.post(this.apiUrl(opts.config) + this.getConfig(opts.config).emailSignInPath, params).success((function(_this) {
+                return function(resp) {
+                  var authData;
+                  _this.setConfigName(opts);
+                  authData = _this.getConfig(opts.config).handleLoginResponse(resp);
+                  _this.handleValidAuth(authData);
+                  return $rootScope.$broadcast('auth:login-success', _this.user);
+                };
+              })(this)).error((function(_this) {
+                return function(resp) {
+                  _this.rejectDfd({
+                    reason: 'unauthorized',
+                    errors: ['Invalid credentials']
+                  });
+                  return $rootScope.$broadcast('auth:login-error', resp);
+                };
+              })(this));
+              return this.dfd.promise;
+            },
+            userIsAuthenticated: function() {
+              return this.retrieveData('auth_headers') && this.user.signedIn;
+            },
+            requestPasswordReset: function(params, opts) {
+              if (opts == null) {
+                opts = {};
+              }
+              params.redirect_url = this.getConfig(opts.config).passwordResetSuccessUrl;
+              if (opts.config != null) {
+                params.config_name = opts.config;
+              }
+              return $http.post(this.apiUrl(opts.config) + this.getConfig(opts.config).passwordResetPath, params).success(function(resp) {
+                return $rootScope.$broadcast('auth:password-reset-request-success', params);
+              }).error(function(resp) {
+                return $rootScope.$broadcast('auth:password-reset-request-error', resp);
+              });
+            },
+            updatePassword: function(params) {
+              return $http.put(this.apiUrl() + this.getConfig().passwordUpdatePath, params).success((function(_this) {
+                return function(resp) {
+                  $rootScope.$broadcast('auth:password-change-success', resp);
+                  return _this.mustResetPassword = false;
+                };
+              })(this)).error(function(resp) {
+                return $rootScope.$broadcast('auth:password-change-error', resp);
+              });
+            },
+            updateAccount: function(params) {
+              return $http.put(this.apiUrl() + this.getConfig().accountUpdatePath, params).success((function(_this) {
+                return function(resp) {
+                  angular.extend(_this.user, _this.getConfig().handleAccountUpdateResponse(resp));
+                  return $rootScope.$broadcast('auth:account-update-success', resp);
+                };
+              })(this)).error(function(resp) {
+                return $rootScope.$broadcast('auth:account-update-error', resp);
+              });
+            },
+            destroyAccount: function(params) {
+              return $http["delete"](this.apiUrl() + this.getConfig().accountUpdatePath, params).success((function(_this) {
+                return function(resp) {
+                  _this.invalidateTokens();
+                  return $rootScope.$broadcast('auth:account-destroy-success', resp);
+                };
+              })(this)).error(function(resp) {
+                return $rootScope.$broadcast('auth:account-destroy-error', resp);
+              });
+            },
+            authenticate: function(provider, opts) {
+              if (this.dfd == null) {
+                this.setConfigName(opts);
+                this.initDfd();
+                this.openAuthWindow(provider, opts);
+              }
+              return this.dfd.promise;
+            },
+            setConfigName: function(opts) {
+              if (opts == null) {
+                opts = {};
+              }
+              if (opts.config != null) {
+                return this.persistData('currentConfigName', opts.config);
+              }
+            },
+            openAuthWindow: function(provider, opts) {
+              var authUrl;
+              authUrl = this.buildAuthUrl(provider, opts);
+              if (this.useExternalWindow()) {
+                return this.requestCredentials(this.createPopup(authUrl));
+              } else {
+                return this.visitUrl(authUrl);
+              }
+            },
+            visitUrl: function(url) {
+              return $window.location.replace(url);
+            },
+            buildAuthUrl: function(provider, opts) {
+              var authUrl, key, val, _ref;
+              if (opts == null) {
+                opts = {};
+              }
+              authUrl = this.getConfig(opts.config).apiUrl;
+              authUrl += this.getConfig(opts.config).authProviderPaths[provider];
+              authUrl += '?auth_origin_url=' + encodeURIComponent($window.location.href);
+              if (opts.params != null) {
+                _ref = opts.params;
+                for (key in _ref) {
+                  val = _ref[key];
+                  authUrl += '&';
+                  authUrl += encodeURIComponent(key);
+                  authUrl += '=';
+                  authUrl += encodeURIComponent(val);
+                }
+              }
+              return authUrl;
+            },
+            requestCredentials: function(authWindow) {
+              if (authWindow.closed) {
+                this.cancel({
+                  reason: 'unauthorized',
+                  errors: ['User canceled login']
+                });
+                return $rootScope.$broadcast('auth:window-closed');
+              } else {
+                authWindow.postMessage("requestCredentials", "*");
+                return this.t = $timeout(((function(_this) {
+                  return function() {
+                    return _this.requestCredentials(authWindow);
+                  };
+                })(this)), 500);
+              }
+            },
+            createPopup: function(url) {
+              return $window.open(url);
+            },
+            resolveDfd: function() {
+              this.dfd.resolve(this.user);
+              return $timeout(((function(_this) {
+                return function() {
+                  _this.dfd = null;
+                  if (!$rootScope.$$phase) {
+                    return $rootScope.$digest();
+                  }
+                };
+              })(this)), 0);
+            },
+            validateUser: function() {
+              var clientId, configName, token, uid;
+              configName = null;
+              if (this.dfd == null) {
+                this.initDfd();
+                if (!this.userIsAuthenticated()) {
+                  if ($location.search().token !== void 0) {
+                    token = $location.search().token;
+                    clientId = $location.search().client_id;
+                    uid = $location.search().uid;
+                    configName = $location.search().config;
+                    this.mustResetPassword = $location.search().reset_password;
+                    this.firstTimeLogin = $location.search().account_confirmation_success;
+                    this.setAuthHeaders(this.buildAuthHeaders({
+                      token: token,
+                      clientId: clientId,
+                      uid: uid
+                    }));
+                    $location.url($location.path() || '/');
+                  } else if (this.retrieveData('currentConfigName')) {
+                    configName = this.retrieveData('currentConfigName');
+                  }
+                  if (!isEmpty(this.retrieveData('auth_headers'))) {
+                    this.validateToken({
+                      config: configName
+                    });
+                  } else {
+                    this.rejectDfd({
+                      reason: 'unauthorized',
+                      errors: ['No credentials']
+                    });
+                    $rootScope.$broadcast('auth:invalid');
+                  }
+                } else {
+                  this.resolveDfd();
+                }
+              }
+              return this.dfd.promise;
+            },
+            validateToken: function(opts) {
+              if (opts == null) {
+                opts = {};
+              }
+              if (!this.tokenHasExpired()) {
+                return $http.get(this.apiUrl(opts.config) + this.getConfig(opts.config).tokenValidationPath).success((function(_this) {
+                  return function(resp) {
+                    var authData;
+                    authData = _this.getConfig(opts.config).handleTokenValidationResponse(resp);
+                    _this.handleValidAuth(authData);
+                    if (_this.firstTimeLogin) {
+                      $rootScope.$broadcast('auth:email-confirmation-success', _this.user);
+                    }
+                    if (_this.mustResetPassword) {
+                      $rootScope.$broadcast('auth:password-reset-confirm-success', _this.user);
+                    }
+                    return $rootScope.$broadcast('auth:validation-success', _this.user);
+                  };
+                })(this)).error((function(_this) {
+                  return function(data) {
+                    if (_this.firstTimeLogin) {
+                      $rootScope.$broadcast('auth:email-confirmation-error', data);
+                    }
+                    if (_this.mustResetPassword) {
+                      $rootScope.$broadcast('auth:password-reset-confirm-error', data);
+                    }
+                    $rootScope.$broadcast('auth:validation-error', data);
+                    return _this.rejectDfd({
+                      reason: 'unauthorized',
+                      errors: data.errors
+                    });
+                  };
+                })(this));
+              } else {
+                return this.rejectDfd({
+                  reason: 'unauthorized',
+                  errors: ['Expired credentials']
+                });
+              }
+            },
+            tokenHasExpired: function() {
+              var expiry, now;
+              expiry = this.getExpiry();
+              now = new Date().getTime();
+              if (this.retrieveData('auth_headers') && expiry) {
+                return expiry && expiry < now;
+              } else {
+                return null;
+              }
+            },
+            getExpiry: function() {
+              return this.getConfig().parseExpiry(this.retrieveData('auth_headers'));
+            },
+            invalidateTokens: function() {
+              var key, val, _ref;
+              _ref = this.user;
+              for (key in _ref) {
+                val = _ref[key];
+                delete this.user[key];
+              }
+              this.deleteData('currentConfigName');
+              return this.deleteData('auth_headers');
+            },
+            signOut: function() {
+              return $http["delete"](this.apiUrl() + this.getConfig().signOutUrl).success((function(_this) {
+                return function(resp) {
+                  _this.invalidateTokens();
+                  return $rootScope.$broadcast('auth:logout-success');
+                };
+              })(this)).error((function(_this) {
+                return function(resp) {
+                  _this.invalidateTokens();
+                  return $rootScope.$broadcast('auth:logout-error', resp);
+                };
+              })(this));
+            },
+            handleValidAuth: function(user, setHeader) {
+              if (setHeader == null) {
+                setHeader = false;
+              }
+              if (this.t != null) {
+                $timeout.cancel(this.t);
+              }
+              angular.extend(this.user, user);
+              this.user.signedIn = true;
+              this.user.configName = this.getCurrentConfigName();
+              if (setHeader) {
+                this.setAuthHeaders(this.buildAuthHeaders({
+                  token: this.user.auth_token,
+                  clientId: this.user.client_id,
+                  uid: this.user.uid
+                }));
+              }
+              return this.resolveDfd();
+            },
+            buildAuthHeaders: function(ctx) {
+              var headers, key, val, _ref;
+              headers = {};
+              _ref = this.getConfig().tokenFormat;
+              for (key in _ref) {
+                val = _ref[key];
+                headers[key] = $interpolate(val)(ctx);
+              }
+              return headers;
+            },
+            persistData: function(key, val) {
+              switch (this.getConfig().storage) {
+                case 'localStorage':
+                  return $window.localStorage.setItem(key, JSON.stringify(val));
+                default:
+                  return $cookieStore.put(key, val);
+              }
+            },
+            retrieveData: function(key) {
+              switch (this.getConfig().storage) {
+                case 'localStorage':
+                  return JSON.parse($window.localStorage.getItem(key));
+                default:
+                  return $cookieStore.get(key);
+              }
+            },
+            deleteData: function(key) {
+              switch (this.getConfig().storage) {
+                case 'localStorage':
+                  return $window.localStorage.removeItem(key);
+                default:
+                  return $cookieStore.remove(key);
+              }
+            },
+            setAuthHeaders: function(h) {
+              var newHeaders;
+              newHeaders = angular.extend(this.retrieveData('auth_headers') || {}, h);
+              return this.persistData('auth_headers', newHeaders);
+            },
+            useExternalWindow: function() {
+              return !(this.getConfig().forceHardRedirect || $window.isIE());
+            },
+            initDfd: function() {
+              return this.dfd = $q.defer();
+            },
+            rejectDfd: function(reason) {
+              this.invalidateTokens();
+              if (this.dfd != null) {
+                this.dfd.reject(reason);
+                return $timeout(((function(_this) {
+                  return function() {
+                    return _this.dfd = null;
+                  };
+                })(this)), 0);
+              }
+            },
+            apiUrl: function(configName) {
+              if (this.getConfig(configName).proxyIf()) {
+                return this.getConfig(configName).proxyUrl;
+              } else {
+                return this.getConfig(configName).apiUrl;
+              }
+            },
+            getConfig: function(name) {
+              return configs[this.getCurrentConfigName(name)];
+            },
+            getCurrentConfigName: function(name) {
+              return name || this.getSavedConfig();
+            },
+            getSavedConfig: function() {
+              var c, key;
+              c = void 0;
+              key = 'currentConfigName';
+              if ($window.localStorage) {
+                if (c == null) {
+                  c = JSON.parse($window.localStorage.getItem(key));
+                }
+              }
+              if (c == null) {
+                c = $cookieStore.get(key);
+              }
+              return c != null ? c : c = defaultConfigName;
+            }
+          };
+        };
+      })(this)
+    ]
+  };
+}).config([
+  '$httpProvider', function($httpProvider) {
+    var httpMethods;
+    $httpProvider.interceptors.push([
+      '$injector', function($injector) {
+        return {
+          request: function(req) {
+            $injector.invoke([
+              '$http', '$auth', function($http, $auth) {
+                var key, val, _ref, _results;
+                if (req.url.match($auth.apiUrl())) {
+                  _ref = $auth.retrieveData('auth_headers');
+                  _results = [];
+                  for (key in _ref) {
+                    val = _ref[key];
+                    _results.push(req.headers[key] = val);
+                  }
+                  return _results;
+                }
+              }
+            ]);
+            return req;
+          },
+          response: function(resp) {
+            $injector.invoke([
+              '$http', '$auth', function($http, $auth) {
+                var key, newHeaders, val, _ref;
+                if (resp.config.url.match($auth.apiUrl())) {
+                  newHeaders = {};
+                  _ref = $auth.getConfig().tokenFormat;
+                  for (key in _ref) {
+                    val = _ref[key];
+                    if (resp.headers(key)) {
+                      newHeaders[key] = resp.headers(key);
+                    }
+                  }
+                  return $auth.setAuthHeaders(newHeaders);
+                }
+              }
+            ]);
+            return resp;
+          }
+        };
+      }
+    ]);
+    httpMethods = ['get', 'post', 'put', 'patch', 'delete'];
+    return angular.forEach(httpMethods, function(method) {
+      var _base;
+      if ((_base = $httpProvider.defaults.headers)[method] == null) {
+        _base[method] = {};
+      }
+      return $httpProvider.defaults.headers[method]['If-Modified-Since'] = '0';
+    });
+  }
+]).run([
+  '$auth', '$window', '$rootScope', function($auth, $window, $rootScope) {
+    return $auth.initialize();
+  }
+]);
+
+window.isOldIE = function() {
+  var nav, out, version;
+  out = false;
+  nav = navigator.userAgent.toLowerCase();
+  if (nav && nav.indexOf('msie') !== -1) {
+    version = parseInt(nav.split('msie')[1]);
+    if (version < 10) {
+      out = true;
+    }
+  }
+  return out;
+};
+
+window.isIE = function() {
+  var nav;
+  nav = navigator.userAgent.toLowerCase();
+  return (nav && nav.indexOf('msie') !== -1) || !!navigator.userAgent.match(/Trident.*rv\:11\./);
+};
+
+window.isEmpty = function(obj) {
+  var key, val;
+  if (!obj) {
+    return true;
+  }
+  if (obj.length > 0) {
+    return false;
+  }
+  if (obj.length === 0) {
+    return true;
+  }
+  for (key in obj) {
+    val = obj[key];
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
+      return false;
+    }
+  }
+  return true;
+};

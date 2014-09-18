@@ -107,7 +107,7 @@ gulp.task('component-coffee', function() {
       $.util.log(e.toString());
       this.emit('end');
     })
-    .pipe($.uglify())
+    //.pipe($.uglify())
     .pipe(ngAnnotate())
     .pipe(gulp.dest(componentDistDir))
     .pipe(gulp.dest(tmpDir + 'scripts/'))

@@ -22,16 +22,16 @@ angular.module('ng-token-auth', ['ngCookies'])
         tokenFormat:
           "access-token": "{{ token }}"
           "token-type":   "Bearer"
-          client:       "{{ clientId }}"
-          expiry:       "{{ expiry }}"
-          uid:          "{{ uid }}"
+          client:         "{{ clientId }}"
+          expiry:         "{{ expiry }}"
+          uid:            "{{ uid }}"
 
         parseExpiry: (headers) ->
           # convert from ruby time (seconds) to js time (millis)
           (parseInt(headers['expiry'], 10) * 1000) || null
 
-        handleLoginResponse: (resp) -> resp.data
-        handleAccountUpdateResponse: (resp) -> resp.data
+        handleLoginResponse:           (resp) -> resp.data
+        handleAccountUpdateResponse:   (resp) -> resp.data
         handleTokenValidationResponse: (resp) -> resp.data
 
         authProviderPaths:
@@ -65,7 +65,7 @@ angular.module('ng-token-auth', ['ngCookies'])
             angular.extend(configs, fullConfig)
 
           # remove existng default config
-          delete configs["default"]
+          delete configs["default"] unless defaultConfigName == "default"
 
         # user is extending the single default config
         else if params instanceof Object
@@ -92,23 +92,13 @@ angular.module('ng-token-auth', ['ngCookies'])
           dfd:               null
           user:              {}
           mustResetPassword: false
-          currentConfigName: null
           listener:          null
 
 
           # called once at startup
           initialize: ->
-            @setCurrentConfig()
             @initializeListeners()
             @addScopeMethods()
-
-
-          # check if named configuration was set in a previous session
-          # fall back to "default" if named config is not found
-          setCurrentConfig: ->
-            if typeof $window.localStorage != 'undefined'
-              @currentConfigName ?= $window.localStorage.getItem("currentConfigName")
-            @currentConfigName ?=  $cookieStore.get("currentConfigName") || null
 
 
           initializeListeners: ->
@@ -138,6 +128,7 @@ angular.module('ng-token-auth', ['ngCookies'])
               $window.removeEventListener("message", @listener, false)
 
 
+          # handle the events broadcast from external auth tabs/popups
           handlePostMessage: (ev) ->
             if ev.data.message == 'deliverCredentials'
               delete ev.data.message
@@ -153,6 +144,7 @@ angular.module('ng-token-auth', ['ngCookies'])
               $rootScope.$broadcast('auth:login-error', error)
 
 
+          # make all public API methods available to directives
           addScopeMethods: ->
             # bind global user object to auth user
             $rootScope.user = @user
@@ -171,7 +163,7 @@ angular.module('ng-token-auth', ['ngCookies'])
 
             # check to see if user is returning user
             if @getConfig().validateOnPageLoad
-              @validateUser({config: @retrieveData('currentConfigName')})
+              @validateUser({config: @getSavedConfig()})
 
 
           # register by email. server will send confirmation email
@@ -213,7 +205,7 @@ angular.module('ng-token-auth', ['ngCookies'])
 
           # check if user is authenticated
           userIsAuthenticated: ->
-            @headers and @user.signedIn
+            @retrieveData('auth_headers') and @user.signedIn
 
 
           # request password reset from API
@@ -278,8 +270,7 @@ angular.module('ng-token-auth', ['ngCookies'])
 
 
           setConfigName: (opts={}) ->
-            @currentConfigName = opts.config if opts.config?
-            @persistData('currentConfigName', @currentConfigName)
+            @persistData('currentConfigName', opts.config) if opts.config?
 
 
           # open external window to authentication provider
@@ -383,11 +374,10 @@ angular.module('ng-token-auth', ['ngCookies'])
 
                 # token cookie is present. user is returning to the site, or
                 # has refreshed the page.
-                else if @retrieveData('auth_headers')
-                  @headers   = @retrieveData('auth_headers')
+                else if @retrieveData('currentConfigName')
                   configName = @retrieveData('currentConfigName')
 
-                unless isEmpty(@headers)
+                unless isEmpty(@retrieveData('auth_headers'))
                   @validateToken({config: configName})
 
                 # new user session. will redirect to login
@@ -450,7 +440,7 @@ angular.module('ng-token-auth', ['ngCookies'])
 
             now = new Date().getTime()
 
-            if @headers and expiry
+            if @retrieveData('auth_headers') and expiry
               return (expiry and expiry < now)
             else
               return null
@@ -458,7 +448,7 @@ angular.module('ng-token-auth', ['ngCookies'])
 
           # get expiry by method provided in config
           getExpiry: ->
-            @getConfig().parseExpiry(@headers)
+            @getConfig().parseExpiry(@retrieveData('auth_headers'))
 
 
           # this service attempts to cache auth tokens, but sometimes we
@@ -471,15 +461,12 @@ angular.module('ng-token-auth', ['ngCookies'])
             # all keys on object.
             delete @user[key] for key, val of @user
 
-            # setting this value to null will force the validateToken method
-            # to re-validate credentials with api server when validate is called
-            @headers = null
-
             # remove any assumptions about current configuration
             @deleteData('currentConfigName')
-            @currentConfigName = null
 
             # kill cookies, otherwise session will resume on page reload
+            # setting this value to null will force the validateToken method
+            # to re-validate credentials with api server when validate is called
             @deleteData('auth_headers')
 
 
@@ -505,7 +492,8 @@ angular.module('ng-token-auth', ['ngCookies'])
             angular.extend @user, user
 
             # add shortcut to determine user auth status
-            @user.signedIn = true
+            @user.signedIn   = true
+            @user.configName = @getCurrentConfigName()
 
             # postMessage will not contain header. must save headers manually.
             if setHeader
@@ -554,9 +542,9 @@ angular.module('ng-token-auth', ['ngCookies'])
 
 
           # persist authentication token, client id, uid
-          setAuthHeaders: (headers) ->
-            @headers = angular.extend((@headers || {}), headers)
-            @persistData('auth_headers', @headers)
+          setAuthHeaders: (h) ->
+            newHeaders = angular.extend((@retrieveData('auth_headers') || {}), h)
+            @persistData('auth_headers', newHeaders)
 
 
           # ie8 + ie9 cannot use xdomain postMessage
@@ -593,10 +581,29 @@ angular.module('ng-token-auth', ['ngCookies'])
 
           # a config name will be return in the following order of precedence:
           # 1. matches arg
-          # 2. matches @currentConfigName (saved from past authentication)
-          # 3. matches defaultConfigName (first or only available config name)
+          # 2. saved from past authentication
+          # 3. first available config name
           getCurrentConfigName: (name) ->
-            name || @currentConfigName || defaultConfigName
+            name || @getSavedConfig()
+
+
+          # can't rely on retrieveData because it will cause a recursive loop
+          # if config hasn't been initialized. instead find first available
+          # value of 'defaultConfigName' searches the following places in
+          # this priority:
+          # 1. localStorage
+          # 2. cookies
+          # 3. default (first available config)
+          getSavedConfig: ->
+            c   = undefined
+            key = 'currentConfigName'
+
+            if $window.localStorage
+              c ?= JSON.parse($window.localStorage.getItem(key))
+
+            c ?= $cookieStore.get(key)
+
+            c ?= defaultConfigName
 
       ]
     }
@@ -616,7 +623,7 @@ angular.module('ng-token-auth', ['ngCookies'])
       request: (req) ->
         $injector.invoke ['$http', '$auth',  ($http, $auth) ->
           if req.url.match($auth.apiUrl())
-            for key, val of $auth.headers
+            for key, val of $auth.retrieveData('auth_headers')
               req.headers[key] = val
         ]
 

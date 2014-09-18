@@ -1,0 +1,547 @@
+.row
+  .col-sm-12
+    h1 Angular Token Auth
+    h2 Multiple User Type Demo
+    p This page demonstrates the use of multiple user types within an application.
+    p.
+      This demo assumes that there are two classes of users, <code>User</code> and <code>AltUser</code>. The configurations for these user types were named <code>default</code> and <code>altUser</code> respectively. The full client and server configurations are provided at the bottom of this page.
+
+br
+
+.row
+  div.col-sm-12
+    .panel.panel-default
+      .panel-body
+        h2 Account Info
+        p This panel displays the info associated with the current user.
+        h3 <u>current user</u>
+
+        .row
+
+          .col-sm-8
+            label user signed in?
+            p {{ user.signedIn ? "true" : "false" }}
+
+            label using config:
+            p {{ user.configName }}
+
+            label user email
+            p {{ user.email || "n/a" }}
+
+            label favorite color (optional)
+            p {{ user.favorite_color || "n/a" }}
+
+
+          .col-sm-4(ng-if='user.signedIn')
+            img(ng-src='{{ user.image }}', width="100%")
+
+
+.row
+  .col-sm-6
+    .panel.panel-default
+      .panel-body
+        h2 Authenticate as an Alt User using an oauth2 provider
+
+        p.
+          Pass an optional <code>config</code> param to specify the configuration that you want to use. When the <code>config</code> param is not provided, the first available configuration will be used.
+
+        p
+          = 'The "favorite color" field will be saved using the optional '
+          a(
+            href='https://github.com/lynndylanhurley/ng-token-auth#authauthenticate'
+            target='_blank') params
+          = ' argument.'
+
+        fieldset(
+          ng-disabled='user.signedIn'
+          ng-init='oAuthForm = {}'
+        )
+          .form-group
+            label favorite color (optional)
+            br
+            input.form-control(
+              type='text'
+              name='favorite_color'
+              ng-model='oAuthForm.favorite_color'
+            )
+
+          label authenticate using:
+          .form-group
+            button.btn.btn-primary(ng-click="authenticate('github', {params: oAuthForm, config: 'altUser'})") Github
+            button.btn.btn-primary(ng-click="authenticate('facebook', {params: oAuthForm, config: 'altUser'})") Facebook
+            button.btn.btn-primary(ng-click="authenticate('google', {params: oAuthForm, config: 'altUser'})") Google
+
+        .panel.panel-info
+          p.panel-heading Code sample:
+          .panel-body
+            p
+              = 'Note the optional '
+              code config
+              = ' and '
+              code params
+              = ' parameters:'
+
+            pre.
+              $auth.authenticate('github', {
+                config: 'altUser',
+                params: {
+                  favorite_color: $scope.favoriteColor
+                }
+              });
+
+  .col-sm-6
+    .panel.panel-default
+      .panel-body
+        h2 Register as an Alt User by email
+
+        p.
+          Pass an optional <code>config</code> param to specify the configuration that you want to use. When the <code>config</code> param is not provided, the first available configuration will be used.
+
+        form(
+          ng-submit='submitRegistration(registrationForm, {config: "altUser"})'
+          role='form'
+          ng-init='registrationForm = {}'
+        )
+          fieldset(ng-disabled='user.signedIn')
+            .form-group
+              label email
+              input.form-control(
+                type='email'
+                name='email'
+                ng-model='registrationForm.email'
+                required
+              )
+
+            .form-group
+              label password
+              input.form-control(
+                type='password'
+                name='password'
+                ng-model='registrationForm.password'
+                required
+              )
+
+            .form-group
+              label password confirmation
+              input.form-control(
+                type='password'
+                name='password_confirmation'
+                ng-model='registrationForm.password_confirmation'
+                required
+              )
+
+            .form-group
+              label favorite color (optional)
+              input.form-control(
+                type='text'
+                name='favorite_color'
+                ng-model='registrationForm.favorite_color'
+              )
+
+            button#reg-submit.btn.btn-primary.btn-lg(type='submit') Register As Alt User
+
+        br
+
+        .panel.panel-info
+          p.panel-heading Code sample:
+          .panel-body
+            p
+              = 'Note the optional '
+              code config
+              = ' parameter '
+
+            pre.
+              $auth.submitRegistration({
+                email:                 $scope.email,
+                password:              $scope.password,
+                password_confirmation: $scope.passwordConfirmation,
+                favorite_color:        $scope.favoriteColor
+              }, {
+                config: 'altUser'
+              });
+
+  .col-sm-6
+    .panel.panel-default
+      .panel-body
+        h2 Sign in as an Alt User by email
+
+        p.
+          Pass an optional <code>config</code> param to specify the configuration that you want to use. When the <code>config</code> param is not provided, the first available configuration will be used.
+
+        form(
+          ng-submit='submitLogin(loginForm, {config: "altUser"})'
+          role='form'
+          ng-init='loginForm = {}'
+        )
+          fieldset(ng-disabled='user.signedIn')
+            .form-group
+              label email
+              input.form-control(
+                type='email'
+                name='email'
+                ng-model='loginForm.email'
+                required
+              )
+
+            .form-group
+              label password
+              input.form-control(
+                type='password'
+                name='password'
+                ng-model='loginForm.password'
+                required
+              )
+
+
+            button.btn.btn-primary.btn-lg(type='submit') Sign in
+
+        br
+
+        .panel.panel-info
+          p.panel-heading Code sample:
+          .panel-body
+            p
+              = 'Note the optional '
+              code config
+              = ' parameter '
+            pre.
+              $auth.submitLogin(loginForm, {
+                config: 'altUser'
+              });
+
+  .col-sm-6
+    .panel.panel-default
+      .panel-body
+        h2 Sign Out
+        p There is no need to pass a <code>config</code> param to this method. The correct user config type will be derived from session data.
+        button.btn.btn-primary(
+          ng-click='signOut()'
+          ng-disabled='!user.signedIn'
+        ) Sign out
+
+        br
+        br
+
+        .panel.panel-info
+          p.panel-heading Code sample:
+          .panel-body
+            p
+              a(
+                href="https://github.com/lynndylanhurley/ng-token-auth#authsignout"
+              ) Documentation
+            pre.
+              $auth.signOut()
+
+  .col-sm-6
+    .panel.panel-default
+      .panel-body
+        h2 Destroy Account
+        p There is no need to pass a <code>config</code> param to this method. The correct user config type will be derived from session data.
+        button.btn.bn-lg.btn-primary(
+          ng-click='destroyAccount()'
+          ng-class='{disabled: !user.signedIn}'
+        ) Destroy account
+
+        br
+        br
+
+        .panel.panel-info
+          p.panel-heading Code sample:
+          .panel-body
+            p
+              a(
+                href="https://github.com/lynndylanhurley/ng-token-auth#authdestroyaccount"
+              ) Documentation
+            pre.
+              $auth.destroyAccount()
+
+  div.col-sm-6
+    .panel.panel-default
+      .panel-body
+        h2 Request Password Reset
+
+        p.
+          Pass an optional <code>config</code> param to specify the configuration that you want to use. When the <code>config</code> param is not provided, the first available configuration will be used.
+
+        form(
+          ng-submit='requestPasswordReset(passwordResetForm, {config: "altUser"})'
+          role='form'
+          ng-init='passwordResetForm = {}'
+        )
+          fieldset
+            .form-group
+              label email
+              input.form-control(
+                type='email'
+                name='email'
+                ng-model='passwordResetForm.email'
+                required
+              )
+
+            button.btn.btn-primary.btn-lg(type='submit') Send password reset email
+
+        br
+
+        .panel.panel-info
+          p.panel-heading Code sample:
+          .panel-body
+            p
+              = 'Note the optional '
+              code config
+              = ' parameter '
+
+            pre.
+              $auth.requestPasswordReset({
+                email: $scope.passwordResetEmail
+              }, {
+                config: 'altUser'
+              });
+
+  div.col-sm-6
+    .panel.panel-default
+      .panel-body
+        h2 Update Password
+
+        p There is no need to pass a <code>config</code> param to this method. The correct user config type will be derived from session data.
+
+        button.btn.btn-primary.btn-lg(
+          type='button'
+          ng-click='showPasswordChangeModal()'
+          ng-disabled='!user.signedIn'
+        ) Change password
+
+        br
+        br
+
+        .panel.panel-info
+          p.panel-heading Code sample:
+          .panel-body
+            p
+              a(href="https://github.com/lynndylanhurley/ng-token-auth#authupdatepassword").
+                Documentation
+
+            pre.
+              $auth.updatePassword({
+                password: $scope.password,
+                password_confirmation: $scope.passwordConfirmation
+              });
+
+  div.col-sm-6
+    .panel.panel-default
+      .panel-body
+        h2 Update Account
+
+        p There is no need to pass a <code>config</code> param to this method. The correct user config type will be derived from session data.
+
+        form(
+          ng-submit='updateAccount(updateAccountForm)'
+          role='form'
+          ng-init='updateAccountForm = {favorite_color: null}'
+        )
+          fieldset(ng-disabled='!user.signedIn')
+            .form-group
+              label favorite color
+              input.form-control(
+                type='text'
+                name='text'
+                ng-model='updateAccountForm.favorite_color'
+              )
+
+            button.btn.btn-primary.btn-lg(type='submit') Update your favorite color
+
+        br
+
+        .panel.panel-info
+          p.panel-heading Code sample:
+          .panel-body
+            p
+              a(href="https://github.com/lynndylanhurley/ng-token-auth#authupdateaccount").
+                Documentation
+
+            pre.
+              $auth.updateAccount({
+                favorite_color: $scope.favoriteColor
+              });
+
+.row
+  .col-sm-12
+    h2 Access Control
+    p(ng-show='user.signedIn') You are currently signed in using the <code>{{ user.configName }}</code> config.
+  div.col-sm-6
+    .panel.panel-default
+      .panel-body
+        h3 Default User Restricted routes
+        p These routes are accessible to Users.
+
+        p.bg-info(ng-show='user.signedIn && user.configName == "default"') You are signed in as a "User", these will work
+        p.bg-info(ng-show='!user.signedIn') You are signed NOT in, these will NOT work
+        p.bg-info(ng-show='user.signedIn && user.configName == "altUser"') You are signed in as an "Alt User", these will NOT work
+
+        button.btn.btn-lg(
+          ng-click='accessRestrictedRoute()'
+          ng-class='{"btn-primary": user.signedIn && user.configName == "default", "btn-danger": !user.signedIn || user.configName == "altUser"}'
+        ) Make single <br />privileged request
+
+        button.btn.btn-lg(
+          ng-click='restrictedRoutesBatch()'
+          ng-class='{"btn-primary": user.signedIn && user.configName == "default", "btn-danger": !user.signedIn || user.configName == "altUser"}'
+        ) Make multiple <br />privileged requests
+
+
+  div.col-sm-6
+    .panel.panel-default
+      .panel-body
+        h3 Alt User Restricted routes
+        p These routes are accessible to Alt Users.
+
+        p.bg-info(ng-show='user.signedIn && user.configName == "altUser"') You are signed in as an "Alt User", these will work
+        p.bg-info(ng-show='user.signedIn && user.configName == "default"') You are signed in as a "User", these will NOT work
+        p.bg-info(ng-show='!user.signedIn') You are signed NOT in, these will NOT work
+
+        button.btn.btn-lg(
+          ng-click='accessRestrictedRouteAltUser()'
+          ng-class='{"btn-primary": user.signedIn && user.configName == "altUser", "btn-danger": !user.signedIn || user.configName == "default"}'
+        ) Make single <br />privileged request
+
+        button.btn.btn-lg(
+          ng-click='restrictedRoutesBatchAltUser()'
+          ng-class='{"btn-primary": user.signedIn && user.configName == "altUser", "btn-danger": !user.signedIn || user.configName == "default"}'
+        ) Make multiple <br />privileged requests
+
+
+  div.col-sm-6
+    .panel.panel-default
+      .panel-body
+        h3 Group Restricted routes
+        p These routes are accessible to both types of users.
+
+        p.bg-info(ng-show='user.signedIn && user.configName == "altUser"') You are signed in as an "Alt User", these will work
+        p.bg-info(ng-show='user.signedIn && user.configName == "default"') You are signed in as a "User", these will work
+        p.bg-info(ng-show='!user.signedIn') You are signed NOT in, these will NOT work
+
+        button.btn.btn-lg(
+          ng-click='accessRestrictedRouteMember()'
+          ng-class='{"btn-primary": user.signedIn, "btn-danger": !user.signedIn}'
+        ) Make single <br />privileged request
+
+        button.btn.btn-lg(
+          ng-click='restrictedRoutesBatchMember()'
+          ng-class='{"btn-primary": user.signedIn, "btn-danger": !user.signedIn}'
+        ) Make multiple <br />privileged requests
+
+.row
+  .col-sm-12
+    h2 Configuration
+    p
+      = "The following configuration examples assume that the installation instructions for both "
+      a(href='https://github.com/lynndylanhurley/ng-token-auth').
+        Angular Token Auth
+      = " and "
+
+      a(href="https://github.com/lynndylanhurley/devise_token_auth").
+        Devise Token Auth
+      = " have already been followed."
+
+  .col-sm-6
+    h3 Client
+    .panel.panel-info
+      .panel-heading Code sample
+      .panel-body
+        p This page uses the following configuration:
+        pre.
+          $authProvider.configure([{
+            default: {
+              apiUrl:  CONFIG.apiUrl,
+              proxyIf: -> window.isOldIE(),
+              authProviderPaths: {
+                github:    '/auth/github',
+                facebook:  '/auth/facebook',
+                google:    '/auth/google_oauth2'
+              }
+          }, {
+            altUser: {
+              apiUrl:                CONFIG.apiUrl,
+              proxyIf:               function() { window.isOldIE() },
+              signOutUrl:              '/alt_auth/sign_out',
+              emailSignInPath:         '/alt_auth/sign_in',
+              emailRegistrationPath:   '/alt_auth',
+              accountUpdatePath:       '/alt_auth',
+              accountDeletePath:       '/alt_auth',
+              passwordResetPath:       '/alt_auth/password',
+              passwordUpdatePath:      '/alt_auth/password',
+              tokenValidationPath:     '/alt_auth/validate_token',
+              authProviderPaths: {
+                github:    '/alt_auth/github',
+                facebook:  '/alt_auth/facebook',
+                google:    '/alt_auth/google_oauth2'
+              }
+          }])
+
+  .col-sm-6
+    h3 Server
+    .panel.panel-info
+      .panel-heading Code sample
+      .panel-body
+        p
+          = "The Rails API (using "
+          a(href="https://github.com/lynndylanhurley/devise_token_auth")
+            | Devise Token Auth
+          = ") uses the following configuration:"
+
+        h5 Routes:
+        pre.
+          Rails.application.routes.draw do
+            mount_devise_token_auth_for 'User',    at: '/auth'
+            mount_devise_token_auth_for 'AltUser', at: '/alt_auth'
+
+            get 'demo/members_only',       to: 'demo_user#members_only'
+            get 'demo/members_only_alt',   to: 'demo_alt#members_only'
+            get 'demo/members_only_group', to: 'demo_group#members_only'
+          end
+
+        h5 Users Restricted Controller:
+        pre.
+          class DemoUserController < ApplicationController
+            before_action :authenticate_user!
+
+            def members_only
+              render json: {
+                data: {
+                  message: "Welcome \#{current_user.name}",
+                  user: @user
+                }
+              }, status: 200
+            end
+          end
+
+        h5 Alt Users Restricted Controller:
+        pre.
+          class DemoAltUserController < ApplicationController
+            before_action :authenticate_alt_user!
+
+            def members_only
+              render json: {
+                data: {
+                  message: "Welcome \#{current_alt_user.name}",
+                  user: @user
+                }
+              }, status: 200
+            end
+          end
+
+
+        h5 Group Access Restricted Controller:
+        pre.
+          class DemoGroupController < ApplicationController
+            devise_token_auth_group :member, contains: [:user, :alt_user]
+            before_action :authenticate_member!
+
+            def members_only
+              render json: {
+                data: {
+                  message: "Welcome \#{current_member.name}",
+                  user: current_member
+                }
+              }, status: 200
+            end
+          end

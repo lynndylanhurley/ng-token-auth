@@ -27,11 +27,20 @@ suite 'oauth2 login', ->
     suite 'defaults config', ->
       setup ->
         dfd = $auth.authenticate('github')
-
         return false
 
 
       suite 'postMessage success', ->
+        expectedUser =
+          id:         validUser.id
+          uid:        validUser.uid
+          email:      validUser.email
+          auth_token: validToken
+          expiry:     validExpiry
+          client_id:  validClient
+          signedIn:   true
+          configName: "default"
+
         test 'user should be authenticated, promise is resolved', (done)->
           called = false
           dfd.then(=>
@@ -39,28 +48,14 @@ suite 'oauth2 login', ->
           )
 
           # fake response from api redirect
-          $window.postMessage({
-            message:    "deliverCredentials"
-            id:         validUser.id
-            uid:        validUser.uid
-            email:      validUser.email
-            auth_token: validToken
-            expiry:     validExpiry
-            client_id:  validClient
-          }, '*')
+          $window.postMessage(angular.extend({message: 'deliverCredentials'}, expectedUser), '*')
 
           setTimeout((->
             $timeout.flush()
 
-            assert.deepEqual($rootScope.user, {
-              id:         validUser.id
-              uid:        validUser.uid
-              email:      validUser.email
-              auth_token: validToken
-              expiry:     validExpiry
-              client_id:  validClient
-              signedIn:   true
-            })
+            debugger
+
+            assert.deepEqual($rootScope.user, expectedUser)
 
             assert(true, called)
 
