@@ -279,7 +279,7 @@ angular.module('ng-token-auth', ['ngCookies'])
 
           setConfigName: (opts={}) ->
             @currentConfigName = opts.config if opts.config?
-            @persistData('currentConfigName', @currentConfigName)
+            @persistData('currentConfigName', @currentConfigName) if @currentConfigName?
 
 
           # open external window to authentication provider
