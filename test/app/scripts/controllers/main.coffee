@@ -18,18 +18,18 @@ angular.module('ngTokenAuthTestApp')
         .catch((resp) -> alert('Multiple requests to default user routes failed'))
 
 
-    $scope.accessRestrictedRouteAltUser = ->
+    $scope.accessRestrictedRouteEvilUser = ->
       $http.get($auth.apiUrl() + '/demo/members_only_mang')
         .success((resp) -> alert(resp.data.message))
         .error((resp) -> alert(resp.errors[0]))
 
-    $scope.restrictedRoutesBatchAltUser = ->
+    $scope.restrictedRoutesBatchEvilUser = ->
       $q.all([
         $http.get($auth.apiUrl() + '/demo/members_only_mang')
         $http.get($auth.apiUrl() + '/demo/members_only_mang')
       ])
-        .then((resp) -> alert('Multiple requests to alt user routes succeeded'))
-        .catch((resp) -> alert('Multiple requests to alt user routes failed'))
+        .then((resp) -> alert('Multiple requests to evil user routes succeeded'))
+        .catch((resp) -> alert('Multiple requests to evil user routes failed'))
 
 
     $scope.accessRestrictedRouteMember = ->
@@ -42,8 +42,8 @@ angular.module('ngTokenAuthTestApp')
         $http.get($auth.apiUrl() + '/demo/members_only_group')
         $http.get($auth.apiUrl() + '/demo/members_only_group')
       ])
-        .then((resp) -> alert('Multiple requests to alt user routes succeeded'))
-        .catch((resp) -> alert('Multiple requests to alt user routes failed'))
+        .then((resp) -> alert('Multiple requests to evil user routes succeeded'))
+        .catch((resp) -> alert('Multiple requests to evil user routes failed'))
 
 
     # called on page change (ui-sref)

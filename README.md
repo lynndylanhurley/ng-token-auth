@@ -62,6 +62,7 @@ This project comes bundled with a test app. You can run the demo locally by foll
   * [`auth:account-destroy-success`](#authaccount-destroy-success)
   * [`auth:account-destroy-error`](#authaccount-destroy-error)
 * [Using alternate response formats](#using-alternate-response-formats)
+* [Multiple user types](#using-multiple-user-types)
 * [Conceptual Diagrams](#conceptual)
   * [OAuth2 Authentication](#oauth2-authentication-flow)
   * [Token Validation](#token-validation-flow)
@@ -905,6 +906,102 @@ angular.module('myApp', ['ng-token-auth'])
   });
 ~~~
 
+## Using multiple user types
+
+### [View Live Multi-User Demo](http://ng-token-auth-demo.herokuapp.com/multi-user)
+
+This module allows for the use of multiple user authentication configurations. The following example assumes that the API supports two user classes, `User` an `EvilUser`. The following examples assume that `User` authentication routes are mounted at `/auth`, and the `EvilUser` authentication routes are mounted at `evil_user_auth`.
+
+### Multiple user type configuration
+
+To set up an application for multiple users, pass an array of configuration objects to the [`$auth.configure`](#configure) method. The keys of these configuration objects (`default` and `evilUser` in this example) will be used to select the desired configuration for authentication.
+
+##### Multiple user configuration example
+~~~javascript
+$authProvider.configure([
+  { 
+    default: {
+      apiUrl:  CONFIG.apiUrl,
+      proxyIf: function() { window.isOldIE() },
+      authProviderPaths: {
+        github:    '/auth/github',
+        facebook:  '/auth/facebook',
+        google:    '/auth/google_oauth2'
+      }
+    }   
+  }, {
+    evilUser: {
+      apiUrl:                CONFIG.apiUrl,
+      proxyIf:               function() { window.isOldIE() },
+      signOutUrl:            '/evil_user_auth/sign_out',
+      emailSignInPath:       '/evil_user_auth/sign_in',
+      emailRegistrationPath: '/evil_user_auth',
+      accountUpdatePath:     '/evil_user_auth',
+      accountDeletePath:     '/evil_user_auth',
+      passwordResetPath:     '/evil_user_auth/password',
+      passwordUpdatePath:    '/evil_user_auth/password',
+      tokenValidationPath:   '/evil_user_auth/validate_token',
+      authProviderPaths: {
+        github:    '/evil_user_auth/github',
+        facebook:  '/evil_user_auth/facebook',
+        google:    '/evil_user_auth/google_oauth2'
+      }
+    }
+  }
+]);
+~~~
+
+### Multiple user type usage
+
+The following API methods accept a `config` option that can be used to specify the desired configuration. 
+
+* [`$auth.authenticate`](#authauthenticate)
+* [`$auth.validateUser`](#authvalidateuser)
+* [`$auth.submitRegistration`](#authsubmitregistration)
+* [`$auth.submitLogin`](#authsubmitlogin)
+* [`$auth.requestPasswordReset`](#authrequestpasswordreset)
+
+All other methods (`$auth.signOut`, `$auth.updateAccount`, etc.) derive the configuration type from the current signed-in user.
+
+The first available configuration will be used if none is provided (`default` in this example).
+
+##### Examples using an alternate user type
+
+~~~javascript
+// OAuth
+$auth.authenticate('github', {
+  config: 'evilUser',
+  params: {
+    favorite_color: $scope.favoriteColor
+  }
+});
+
+// Email Registration
+$auth.submitRegistration({
+  email:                 $scope.email,
+  password:              $scope.password,
+  password_confirmation: $scope.passwordConfirmation,
+  favorite_color:        $scope.favoriteColor
+}, {
+  config: 'evilUser'
+});
+
+// Email Sign In
+$auth.submitLogin({
+  email: $scope.email,
+  password: $scope.password
+}, {
+  config: 'evilUser'
+});
+
+// Password reset request
+$auth.requestPasswordReset({
+  email: $scope.passwordResetEmail
+}, {
+  config: 'evilUser'
+});
+~~~
+
 # Conceptual
 
 The following is a high-level overview of this module's implementation.
@@ -1177,6 +1274,7 @@ Satellizer occupies the same problem domain as ng-token-auth. Advantages of ng-t
   * Supports [password reset](#authrequestpasswordreset) and [password update](#authupdatepassword) for users that registered by email.
   * Supports [account updates](#authupdateaccount) and [account deletion](#authdestroyaccount).
   * Supports [changing tokens with each request](#about-token-management).
+  * Supports [multiple user types](#using-multiple-user-types).
 
 # License
 

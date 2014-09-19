@@ -28,7 +28,7 @@ br
 
 
 .row
-  .col-sm-12
+  .col-sm-6
     .panel.panel-default
       .panel-body
         h2 Authenticate using an oauth2 provider
@@ -40,27 +40,34 @@ br
             target='_blank') params
           = ' argument.'
 
-        .row
-          fieldset(
-            ng-disabled='user.signedIn'
-            ng-init='oAuthForm = {}'
-          )
-            .col-sm-6
-              .form-group
-                label favorite color (optional)
-                br
-                input.form-control(
-                  type='text'
-                  name='favorite_color'
-                  ng-model='oAuthForm.favorite_color'
-                )
+        fieldset(
+          ng-disabled='user.signedIn'
+          ng-init='oAuthForm = {}'
+        )
+          .form-group
+            label favorite color (optional)
+            br
+            input.form-control(
+              type='text'
+              name='favorite_color'
+              ng-model='oAuthForm.favorite_color'
+            )
 
-            .col-sm-6
-              label authenticate using:
-              .form-group
-                button.btn.btn-primary(ng-click="authenticate('github', {params: oAuthForm})") Github
-                button.btn.btn-primary(ng-click="authenticate('facebook', {params: oAuthForm})") Facebook
-                button.btn.btn-primary(ng-click="authenticate('google', {params: oAuthForm})") Google
+          label authenticate using:
+          .form-group
+            button.btn.btn-primary(ng-click="authenticate('github', {params: oAuthForm})") Github
+            button.btn.btn-primary(ng-click="authenticate('facebook', {params: oAuthForm})") Facebook
+            button.btn.btn-primary(ng-click="authenticate('google', {params: oAuthForm})") Google
+
+        .panel.panel-info
+          p.panel-heading Code sample:
+          .panel-body
+            pre.
+              $auth.authenticate('github', {
+                params: {
+                  favorite_color: $scope.favoriteColor
+                }
+              });
 
 
 
@@ -112,6 +119,20 @@ br
 
             button#reg-submit.btn.btn-primary.btn-lg(type='submit') Register
 
+        br
+        br
+
+        .panel.panel-info
+          p.panel-heading Code sample:
+          .panel-body
+            pre.
+              $auth.submitRegistration({
+                email:                 $scope.email,
+                password:              $scope.password,
+                password_confirmation: $scope.passwordConfirmation,
+                favorite_color:        $scope.favoriteColor
+              });
+
   .col-sm-6
     .panel.panel-default
       .panel-body
@@ -143,6 +164,17 @@ br
 
             button.btn.btn-primary.btn-lg(type='submit') Sign in
 
+        br
+
+        .panel.panel-info
+          p.panel-heading Code sample:
+          .panel-body
+            pre.
+              $auth.submitLogin({
+                email: $scope.email,
+                password: $scope.password
+              });
+
 
     .panel.panel-default
       .panel-body
@@ -153,11 +185,19 @@ br
           ng-disabled='!user.signedIn'
         ) Sign out
 
-.row
+        br
+        br
+
+        .panel.panel-info
+          p.panel-heading Code sample:
+          .panel-body
+            pre.
+              $auth.signOut()
+
   div.col-sm-6
     .panel.panel-default
       .panel-body
-        h2 Reset password
+        h2 Reset Password Reset
 
         form(
           ng-submit='requestPasswordReset(passwordResetForm)'
@@ -176,11 +216,41 @@ br
 
             button.btn.btn-primary.btn-lg(type='submit') Send password reset email
 
-            button.btn.btn-primary.btn-lg(
-              type='button'
-              ng-click='showPasswordChangeModal()'
-              ng-disabled='!user.signedIn'
-            ) Change password
+        br
+
+        .panel.panel-info
+          p.panel-heading Code sample:
+          .panel-body
+            pre.
+              $auth.requestPasswordReset({
+                email: $scope.passwordResetEmail
+              });
+
+
+  .col-sm-6
+    .panel.panel-default
+      .panel-body
+        h2 Update Password
+
+        p This method is only available to users that registered by email.
+
+        button.btn.btn-primary.btn-lg(
+          type='button'
+          ng-click='showPasswordChangeModal()'
+          ng-disabled='!user.signedIn || user.provider != "email"'
+        ) Change password
+
+        br
+        br
+
+        .panel.panel-info
+          p.panel-heading Code sample:
+          .panel-body
+            pre.
+              $auth.updatePassword({
+                password: $scope.password,
+                password_confirmation: $scope.passwordConfirmation
+              });
 
   div.col-sm-6
     .panel.panel-default
@@ -203,8 +273,16 @@ br
 
             button.btn.btn-primary.btn-lg(type='submit') Update your favorite color
 
+        br
 
-.row
+        .panel.panel-info
+          p.panel-heading Code sample:
+          .panel-body
+            pre.
+              $auth.updateAccount({
+                favorite_color: $scope.favoriteColor
+              });
+
   div.col-sm-6
     .panel.panel-default
       .panel-body
@@ -214,20 +292,39 @@ br
           ng-class='{disabled: !user.signedIn}'
         ) Destroy account
 
-  div.col-sm-6
-    .panel.panel-default
-      .panel-body
-        h2 Restricted routes
-        p.bg-info(ng-show='user.signedIn && user.configName == "default"') You are signed in as a "User", these will work
-        p.bg-info(ng-show='!user.signedIn') You are signed NOT in, these will NOT work
-        p.bg-info(ng-show='user.signedIn && user.configName == "altUser"') You are signed in as an "Alt User", these will NOT work
 
-        button.btn.btn-lg(
-          ng-click='accessRestrictedRoute()'
-          ng-class='{"btn-primary": user.signedIn && user.configName == "default", "btn-danger": !user.signedIn || user.configName != "default"}'
-        ) Make single <br />privileged request
+        br
+        br
 
-        button.btn.btn-lg(
-          ng-click='restrictedRoutesBatch()'
-          ng-class='{"btn-primary": user.signedIn && user.configName == "default", "btn-danger": !user.signedIn || user.configName != "default"}'
-        ) Make multiple <br />privileged requests
+        .panel.panel-info
+          p.panel-heading Code sample:
+          .panel-body
+            p
+              a(
+                href="https://github.com/lynndylanhurley/ng-token-auth#authdestroyaccount"
+              ) Documentation
+            pre.
+              $auth.destroyAccount()
+
+.row
+  .col-sm-12
+    h2 Access Control
+
+    .row
+      div.col-sm-6
+        .panel.panel-default
+          .panel-body
+            h3 Signed in users only
+            p.bg-info(ng-show='user.signedIn && user.configName == "default"') You are signed in as a "User", these will work
+            p.bg-info(ng-show='!user.signedIn') You are signed NOT in, these will NOT work
+            p.bg-info(ng-show='user.signedIn && user.configName == "altUser"') You are signed in as an "Alt User", these will NOT work
+
+            button.btn.btn-lg(
+              ng-click='accessRestrictedRoute()'
+              ng-class='{"btn-primary": user.signedIn && user.configName == "default", "btn-danger": !user.signedIn || user.configName != "default"}'
+            ) Make single <br />privileged request
+
+            button.btn.btn-lg(
+              ng-click='restrictedRoutesBatch()'
+              ng-class='{"btn-primary": user.signedIn && user.configName == "default", "btn-danger": !user.signedIn || user.configName != "default"}'
+            ) Make multiple <br />privileged requests

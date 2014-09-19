@@ -4,7 +4,7 @@
     h2 Multiple User Type Demo
     p This page demonstrates the use of multiple user types within an application.
     p.
-      This demo assumes that there are two classes of users, <code>User</code> and <code>AltUser</code>. The configurations for these user types were named <code>default</code> and <code>altUser</code> respectively. The full client and server configurations are provided at the bottom of this page.
+      This demo assumes that there are two classes of users, <code>User</code> and <code>EvilUser</code>. The configurations for these user types were named <code>default</code> and <code>evilUser</code> respectively. The full client and server configurations are provided at the bottom of this page.
 
 br
 
@@ -40,7 +40,7 @@ br
   .col-sm-6
     .panel.panel-default
       .panel-body
-        h2 Authenticate as an Alt User using an oauth2 provider
+        h2 Authenticate as an Evil User using an oauth2 provider
 
         p.
           Pass an optional <code>config</code> param to specify the configuration that you want to use. When the <code>config</code> param is not provided, the first available configuration will be used.
@@ -67,9 +67,9 @@ br
 
           label authenticate using:
           .form-group
-            button.btn.btn-primary(ng-click="authenticate('github', {params: oAuthForm, config: 'altUser'})") Github
-            button.btn.btn-primary(ng-click="authenticate('facebook', {params: oAuthForm, config: 'altUser'})") Facebook
-            button.btn.btn-primary(ng-click="authenticate('google', {params: oAuthForm, config: 'altUser'})") Google
+            button.btn.btn-primary(ng-click="authenticate('github', {params: oAuthForm, config: 'evilUser'})") Github
+            button.btn.btn-primary(ng-click="authenticate('facebook', {params: oAuthForm, config: 'evilUser'})") Facebook
+            button.btn.btn-primary(ng-click="authenticate('google', {params: oAuthForm, config: 'evilUser'})") Google
 
         .panel.panel-info
           p.panel-heading Code sample:
@@ -83,7 +83,7 @@ br
 
             pre.
               $auth.authenticate('github', {
-                config: 'altUser',
+                config: 'evilUser',
                 params: {
                   favorite_color: $scope.favoriteColor
                 }
@@ -92,13 +92,13 @@ br
   .col-sm-6
     .panel.panel-default
       .panel-body
-        h2 Register as an Alt User by email
+        h2 Register as an Evil User by email
 
         p.
           Pass an optional <code>config</code> param to specify the configuration that you want to use. When the <code>config</code> param is not provided, the first available configuration will be used.
 
         form(
-          ng-submit='submitRegistration(registrationForm, {config: "altUser"})'
+          ng-submit='submitRegistration(registrationForm, {config: "evilUser"})'
           role='form'
           ng-init='registrationForm = {}'
         )
@@ -138,7 +138,7 @@ br
                 ng-model='registrationForm.favorite_color'
               )
 
-            button#reg-submit.btn.btn-primary.btn-lg(type='submit') Register As Alt User
+            button#reg-submit.btn.btn-primary.btn-lg(type='submit') Register As Evil User
 
         br
 
@@ -157,19 +157,19 @@ br
                 password_confirmation: $scope.passwordConfirmation,
                 favorite_color:        $scope.favoriteColor
               }, {
-                config: 'altUser'
+                config: 'evilUser'
               });
 
   .col-sm-6
     .panel.panel-default
       .panel-body
-        h2 Sign in as an Alt User by email
+        h2 Sign in as an Evil User by email
 
         p.
           Pass an optional <code>config</code> param to specify the configuration that you want to use. When the <code>config</code> param is not provided, the first available configuration will be used.
 
         form(
-          ng-submit='submitLogin(loginForm, {config: "altUser"})'
+          ng-submit='submitLogin(loginForm, {config: "evilUser"})'
           role='form'
           ng-init='loginForm = {}'
         )
@@ -206,7 +206,7 @@ br
               = ' parameter '
             pre.
               $auth.submitLogin(loginForm, {
-                config: 'altUser'
+                config: 'evilUser'
               });
 
   .col-sm-6
@@ -264,7 +264,7 @@ br
           Pass an optional <code>config</code> param to specify the configuration that you want to use. When the <code>config</code> param is not provided, the first available configuration will be used.
 
         form(
-          ng-submit='requestPasswordReset(passwordResetForm, {config: "altUser"})'
+          ng-submit='requestPasswordReset(passwordResetForm, {config: "evilUser"})'
           role='form'
           ng-init='passwordResetForm = {}'
         )
@@ -294,7 +294,7 @@ br
               $auth.requestPasswordReset({
                 email: $scope.passwordResetEmail
               }, {
-                config: 'altUser'
+                config: 'evilUser'
               });
 
   div.col-sm-6
@@ -302,12 +302,14 @@ br
       .panel-body
         h2 Update Password
 
+        p This method is only available to users that registered by email.
+
         p There is no need to pass a <code>config</code> param to this method. The correct user config type will be derived from session data.
 
         button.btn.btn-primary.btn-lg(
           type='button'
           ng-click='showPasswordChangeModal()'
-          ng-disabled='!user.signedIn'
+          ng-disabled='!user.signedIn || user.provider != "email"'
         ) Change password
 
         br
@@ -375,37 +377,37 @@ br
 
         p.bg-info(ng-show='user.signedIn && user.configName == "default"') You are signed in as a "User", these will work
         p.bg-info(ng-show='!user.signedIn') You are signed NOT in, these will NOT work
-        p.bg-info(ng-show='user.signedIn && user.configName == "altUser"') You are signed in as an "Alt User", these will NOT work
+        p.bg-info(ng-show='user.signedIn && user.configName == "evilUser"') You are signed in as an "Evil User", these will NOT work
 
         button.btn.btn-lg(
           ng-click='accessRestrictedRoute()'
-          ng-class='{"btn-primary": user.signedIn && user.configName == "default", "btn-danger": !user.signedIn || user.configName == "altUser"}'
+          ng-class='{"btn-primary": user.signedIn && user.configName == "default", "btn-danger": !user.signedIn || user.configName == "evilUser"}'
         ) Make single <br />privileged request
 
         button.btn.btn-lg(
           ng-click='restrictedRoutesBatch()'
-          ng-class='{"btn-primary": user.signedIn && user.configName == "default", "btn-danger": !user.signedIn || user.configName == "altUser"}'
+          ng-class='{"btn-primary": user.signedIn && user.configName == "default", "btn-danger": !user.signedIn || user.configName == "evilUser"}'
         ) Make multiple <br />privileged requests
 
 
   div.col-sm-6
     .panel.panel-default
       .panel-body
-        h3 Alt User Restricted routes
-        p These routes are accessible to Alt Users.
+        h3 Evil User Restricted routes
+        p These routes are accessible to Evil Users.
 
-        p.bg-info(ng-show='user.signedIn && user.configName == "altUser"') You are signed in as an "Alt User", these will work
+        p.bg-info(ng-show='user.signedIn && user.configName == "evilUser"') You are signed in as an "Evil User", these will work
         p.bg-info(ng-show='user.signedIn && user.configName == "default"') You are signed in as a "User", these will NOT work
         p.bg-info(ng-show='!user.signedIn') You are signed NOT in, these will NOT work
 
         button.btn.btn-lg(
-          ng-click='accessRestrictedRouteAltUser()'
-          ng-class='{"btn-primary": user.signedIn && user.configName == "altUser", "btn-danger": !user.signedIn || user.configName == "default"}'
+          ng-click='accessRestrictedRouteEvilUser()'
+          ng-class='{"btn-primary": user.signedIn && user.configName == "evilUser", "btn-danger": !user.signedIn || user.configName == "default"}'
         ) Make single <br />privileged request
 
         button.btn.btn-lg(
-          ng-click='restrictedRoutesBatchAltUser()'
-          ng-class='{"btn-primary": user.signedIn && user.configName == "altUser", "btn-danger": !user.signedIn || user.configName == "default"}'
+          ng-click='restrictedRoutesBatchEvilUser()'
+          ng-class='{"btn-primary": user.signedIn && user.configName == "evilUser", "btn-danger": !user.signedIn || user.configName == "default"}'
         ) Make multiple <br />privileged requests
 
 
@@ -415,7 +417,7 @@ br
         h3 Group Restricted routes
         p These routes are accessible to both types of users.
 
-        p.bg-info(ng-show='user.signedIn && user.configName == "altUser"') You are signed in as an "Alt User", these will work
+        p.bg-info(ng-show='user.signedIn && user.configName == "evilUser"') You are signed in as an "Evil User", these will work
         p.bg-info(ng-show='user.signedIn && user.configName == "default"') You are signed in as a "User", these will work
         p.bg-info(ng-show='!user.signedIn') You are signed NOT in, these will NOT work
 
@@ -459,21 +461,21 @@ br
                 google:    '/auth/google_oauth2'
               }
           }, {
-            altUser: {
+            evilUser: {
               apiUrl:                CONFIG.apiUrl,
               proxyIf:               function() { window.isOldIE() },
-              signOutUrl:              '/alt_auth/sign_out',
-              emailSignInPath:         '/alt_auth/sign_in',
-              emailRegistrationPath:   '/alt_auth',
-              accountUpdatePath:       '/alt_auth',
-              accountDeletePath:       '/alt_auth',
-              passwordResetPath:       '/alt_auth/password',
-              passwordUpdatePath:      '/alt_auth/password',
-              tokenValidationPath:     '/alt_auth/validate_token',
+              signOutUrl:              '/evil_auth/sign_out',
+              emailSignInPath:         '/evil_auth/sign_in',
+              emailRegistrationPath:   '/evil_auth',
+              accountUpdatePath:       '/evil_auth',
+              accountDeletePath:       '/evil_auth',
+              passwordResetPath:       '/evil_auth/password',
+              passwordUpdatePath:      '/evil_auth/password',
+              tokenValidationPath:     '/evil_auth/validate_token',
               authProviderPaths: {
-                github:    '/alt_auth/github',
-                facebook:  '/alt_auth/facebook',
-                google:    '/alt_auth/google_oauth2'
+                github:    '/evil_auth/github',
+                facebook:  '/evil_auth/facebook',
+                google:    '/evil_auth/google_oauth2'
               }
           }])
 
@@ -492,10 +494,10 @@ br
         pre.
           Rails.application.routes.draw do
             mount_devise_token_auth_for 'User',    at: '/auth'
-            mount_devise_token_auth_for 'AltUser', at: '/alt_auth'
+            mount_devise_token_auth_for 'EvilUser', at: '/evil_auth'
 
             get 'demo/members_only',       to: 'demo_user#members_only'
-            get 'demo/members_only_alt',   to: 'demo_alt#members_only'
+            get 'demo/members_only_evil',   to: 'demo_evil#members_only'
             get 'demo/members_only_group', to: 'demo_group#members_only'
           end
 
@@ -514,15 +516,15 @@ br
             end
           end
 
-        h5 Alt Users Restricted Controller:
+        h5 Evil Users Restricted Controller:
         pre.
-          class DemoAltUserController < ApplicationController
-            before_action :authenticate_alt_user!
+          class DemoEvilUserController < ApplicationController
+            before_action :authenticate_evil_user!
 
             def members_only
               render json: {
                 data: {
-                  message: "Welcome \#{current_alt_user.name}",
+                  message: "Welcome \#{current_evil_user.name}",
                   user: @user
                 }
               }, status: 200
@@ -533,7 +535,7 @@ br
         h5 Group Access Restricted Controller:
         pre.
           class DemoGroupController < ApplicationController
-            devise_token_auth_group :member, contains: [:user, :alt_user]
+            devise_token_auth_group :member, contains: [:user, :evil_user]
             before_action :authenticate_member!
 
             def members_only

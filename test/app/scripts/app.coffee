@@ -27,7 +27,7 @@ angular.module('ngTokenAuthTestApp', [
           google:    '/auth/google_oauth2'
           developer: '/auth/developer'
     ,
-      altUser:
+      evilUser:
         apiUrl:                CONFIG.apiUrl
         proxyIf:               -> window.isOldIE()
         signOutUrl:              '/mangs/sign_out'
@@ -55,9 +55,9 @@ angular.module('ngTokenAuthTestApp', [
         templateUrl: 'index.html'
         controller: 'IndexCtrl'
 
-      .state 'alt-user',
-        url: '/alt-user'
-        templateUrl: 'alt-user.html'
+      .state 'multi-user',
+        url: '/multi-user'
+        templateUrl: 'multi-user.html'
         controller: 'AltUserCtrl'
 
       .state '404',
