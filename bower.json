@@ -27,5 +27,8 @@
   "dependencies": {
     "angular": ">=1.2.0",
     "angular-cookies": ">=1.2.0"
+  },
+  "resolutions": {
+    "angular": "1.2.25"
   }
 }
