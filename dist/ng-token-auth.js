@@ -240,6 +240,9 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
               });
             },
             authenticate: function(provider, opts) {
+              if (opts == null) {
+                opts = {};
+              }
               if (this.dfd == null) {
                 this.setConfigName(opts.config);
                 this.initDfd();
@@ -248,7 +251,6 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
               return this.dfd.promise;
             },
             setConfigName: function(configName) {
-              console.log('setting config name', configName);
               if (configName == null) {
                 configName = defaultConfigName;
               }
@@ -316,9 +318,12 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
                 };
               })(this)), 0);
             },
-            validateUser: function() {
+            validateUser: function(opts) {
               var clientId, configName, token, uid;
-              configName = null;
+              if (opts == null) {
+                opts = {};
+              }
+              configName = opts.config;
               if (this.dfd == null) {
                 this.initDfd();
                 if (!this.userIsAuthenticated()) {
@@ -327,8 +332,6 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
                     clientId = $location.search().client_id;
                     uid = $location.search().uid;
                     configName = $location.search().config;
-                    console.log('setting config name', configName);
-                    console.log('search params', $location.search());
                     this.setConfigName(configName);
                     this.mustResetPassword = $location.search().reset_password;
                     this.firstTimeLogin = $location.search().account_confirmation_success;
