@@ -265,7 +265,7 @@ angular.module('ng-token-auth', ['ngCookies'])
 
           # open external auth provider in separate window, send requests for
           # credentials until api auth callback page responds.
-          authenticate: (provider, opts) ->
+          authenticate: (provider, opts={}) ->
             unless @dfd?
               @setConfigName(opts.config)
               @initDfd()
@@ -275,7 +275,6 @@ angular.module('ng-token-auth', ['ngCookies'])
 
 
           setConfigName: (configName) ->
-            console.log 'setting config name', configName
             configName ?= defaultConfigName
             @persistData('currentConfigName', configName, configName)
 
@@ -346,8 +345,8 @@ angular.module('ng-token-auth', ['ngCookies'])
 
           # this is something that can be returned from 'resolve' methods
           # of pages that have restricted access
-          validateUser: ->
-            configName = null
+          validateUser: (opts={}) ->
+            configName = opts.config
 
             unless @dfd?
               @initDfd()
@@ -361,10 +360,8 @@ angular.module('ng-token-auth', ['ngCookies'])
                   uid        = $location.search().uid
                   configName = $location.search().config
 
-                  # save configuration that was used in creating
+                  # use the configuration that was used in creating
                   # the confirmation link
-                  console.log 'setting config name', configName
-                  console.log 'search params', $location.search()
                   @setConfigName(configName)
 
                   # check if redirected from password reset link
@@ -388,7 +385,6 @@ angular.module('ng-token-auth', ['ngCookies'])
                 # has refreshed the page.
                 else if @retrieveData('currentConfigName')
                   configName = @retrieveData('currentConfigName')
-
 
                 unless isEmpty(@retrieveData('auth_headers'))
                   @validateToken({config: configName})

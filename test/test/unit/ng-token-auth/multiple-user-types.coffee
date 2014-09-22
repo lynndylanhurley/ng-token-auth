@@ -229,7 +229,7 @@ suite 'multiple concurrent auth configurations', ->
 
     suite 'validateUser', ->
       test 'uses saved config if present', ->
-        $auth.setConfigName({config: 'admin'})
+        $auth.setConfigName('admin')
 
         $httpBackend
           .expectGET('/api/cygni/validate_token')
@@ -256,7 +256,7 @@ suite 'multiple concurrent auth configurations', ->
           .respond(201, successResp, validAuthHeader)
 
         $cookieStore.put('auth_headers', validAuthHeader)
-        $auth.validateUser({config: 'admin'})
+        $auth.validateUser('admin')
         $httpBackend.flush()
 
 
@@ -315,7 +315,7 @@ suite 'multiple concurrent auth configurations', ->
 
     suite 'destroyAccount', ->
       test 'uses stored named config when present', ->
-        $auth.setConfigName({config: 'admin'})
+        $auth.setConfigName('admin')
 
         $httpBackend
           .expectDELETE('/api/cygni/sign_out')
@@ -365,7 +365,7 @@ suite 'multiple concurrent auth configurations', ->
 
     suite 'updatePassword', ->
       test 'uses stored named config', ->
-        $auth.setConfigName({config: 'admin'})
+        $auth.setConfigName('admin')
 
         $httpBackend
           .expectPUT('/api/cygni/password')
@@ -394,7 +394,7 @@ suite 'multiple concurrent auth configurations', ->
 
     suite 'updateAccount', ->
       test 'uses stored named config', ->
-        $auth.setConfigName({config: 'admin'})
+        $auth.setConfigName('admin')
 
         $httpBackend
           .expectPUT('/api/cygni')

@@ -1,5 +1,3 @@
-os = require('os')
-
 module.exports = (config) ->
   config.set
     basePath : '../../'
@@ -14,18 +12,8 @@ module.exports = (config) ->
       'test/app/bower_components/angular-mocks/angular-mocks.js'
       'src/*.coffee'
       'test/test/unit/test-helper.coffee'
-      #'test/test/unit/ng-token-auth/**/*.coffee'
-      'test/test/e2e/scenarios.coffee'
+      'test/test/unit/ng-token-auth/**/*.coffee'
     ]
-
-
-    baseUrl: 'http://'+os.hostname()+':7777/',
-    capabilities: {
-      'browserName': 'chrome',
-      'name': 'ng e2e',
-      'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER,
-      'build': process.env.TRAVIS_BUILD_NUMBER
-    }
 
     autoWatch: true
 
