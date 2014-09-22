@@ -62,14 +62,13 @@ br
         .panel.panel-info
           p.panel-heading Code sample:
           .panel-body
-            pre.
-              $auth.authenticate('github', {
-                params: {
-                  favorite_color: $scope.favoriteColor
-                }
-              });
-
-
+            pre
+              code.language-javascript.
+                $auth.authenticate('github', {
+                  params: {
+                    favorite_color: $scope.favoriteColor
+                  }
+                });
 
   .col-sm-6
     .panel.panel-default
@@ -125,13 +124,14 @@ br
         .panel.panel-info
           p.panel-heading Code sample:
           .panel-body
-            pre.
-              $auth.submitRegistration({
-                email:                 $scope.email,
-                password:              $scope.password,
-                password_confirmation: $scope.passwordConfirmation,
-                favorite_color:        $scope.favoriteColor
-              });
+            pre
+              code.language-javascript.
+                $auth.submitRegistration({
+                  email:                 $scope.email,
+                  password:              $scope.password,
+                  password_confirmation: $scope.passwordConfirmation,
+                  favorite_color:        $scope.favoriteColor
+                });
 
   .col-sm-6
     .panel.panel-default
@@ -169,12 +169,12 @@ br
         .panel.panel-info
           p.panel-heading Code sample:
           .panel-body
-            pre.
-              $auth.submitLogin({
-                email: $scope.email,
-                password: $scope.password
-              });
-
+            pre
+              code.language-javascript.
+                $auth.submitLogin({
+                  email: $scope.email,
+                  password: $scope.password
+                });
 
     .panel.panel-default
       .panel-body
@@ -191,8 +191,9 @@ br
         .panel.panel-info
           p.panel-heading Code sample:
           .panel-body
-            pre.
-              $auth.signOut()
+            pre
+              code.language-javascript.
+                $auth.signOut()
 
   div.col-sm-6
     .panel.panel-default
@@ -221,11 +222,11 @@ br
         .panel.panel-info
           p.panel-heading Code sample:
           .panel-body
-            pre.
-              $auth.requestPasswordReset({
-                email: $scope.passwordResetEmail
-              });
-
+            pre
+              code.language-javascript.
+                $auth.requestPasswordReset({
+                  email: $scope.passwordResetEmail
+                });
 
   .col-sm-6
     .panel.panel-default
@@ -246,11 +247,12 @@ br
         .panel.panel-info
           p.panel-heading Code sample:
           .panel-body
-            pre.
-              $auth.updatePassword({
-                password: $scope.password,
-                password_confirmation: $scope.passwordConfirmation
-              });
+            pre
+              code.language-javascript.
+                $auth.updatePassword({
+                  password: $scope.password,
+                  password_confirmation: $scope.passwordConfirmation
+                });
 
   div.col-sm-6
     .panel.panel-default
@@ -278,10 +280,11 @@ br
         .panel.panel-info
           p.panel-heading Code sample:
           .panel-body
-            pre.
-              $auth.updateAccount({
-                favorite_color: $scope.favoriteColor
-              });
+            pre
+              code.language-javascript.
+                $auth.updateAccount({
+                  favorite_color: $scope.favoriteColor
+                });
 
   div.col-sm-6
     .panel.panel-default
@@ -303,8 +306,9 @@ br
               a(
                 href="https://github.com/lynndylanhurley/ng-token-auth#authdestroyaccount"
               ) Documentation
-            pre.
-              $auth.destroyAccount()
+            pre
+              code.language-javascript.
+                $auth.destroyAccount()
 
 .row
   .col-sm-12

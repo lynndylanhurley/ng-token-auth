@@ -8,10 +8,10 @@ angular.module('ng-token-auth', ['ngCookies'])
         emailRegistrationPath:   '/auth'
         accountUpdatePath:       '/auth'
         accountDeletePath:       '/auth'
-        confirmationSuccessUrl:  window.location.href
+        confirmationSuccessUrl:  -> window.location.href
         passwordResetPath:       '/auth/password'
         passwordUpdatePath:      '/auth/password'
-        passwordResetSuccessUrl: window.location.href
+        passwordResetSuccessUrl: -> window.location.href
         tokenValidationPath:     '/auth/validate_token'
         proxyIf:                 -> false
         proxyUrl:                '/proxy'
@@ -170,9 +170,10 @@ angular.module('ng-token-auth', ['ngCookies'])
           # containing a link to activate the account. the link will
           # redirect to this site.
           submitRegistration: (params, opts={}) ->
+            successUrl = @getResultOrValue(@getConfig(opts.config).confirmationSuccessUrl)
             angular.extend(params, {
-              confirm_success_url: @getConfig(opts.config).confirmationSuccessUrl,
-              config_name: @getCurrentConfigName()
+              confirm_success_url: successUrl,
+              config_name: @getCurrentConfigName(opts.config)
             })
             $http.post(@apiUrl(opts.config) + @getConfig(opts.config).emailRegistrationPath, params)
               .success((resp)->
@@ -188,7 +189,7 @@ angular.module('ng-token-auth', ['ngCookies'])
             @initDfd()
             $http.post(@apiUrl(opts.config) + @getConfig(opts.config).emailSignInPath, params)
               .success((resp) =>
-                @setConfigName(opts)
+                @setConfigName(opts.config)
                 authData = @getConfig(opts.config).handleLoginResponse(resp)
                 @handleValidAuth(authData)
                 $rootScope.$broadcast('auth:login-success', @user)
@@ -210,7 +211,11 @@ angular.module('ng-token-auth', ['ngCookies'])
 
           # request password reset from API
           requestPasswordReset: (params, opts={}) ->
-            params.redirect_url = @getConfig(opts.config).passwordResetSuccessUrl
+            successUrl = @getResultOrValue(
+              @getConfig(opts.config).passwordResetSuccessUrl
+            )
+
+            params.redirect_url = successUrl
             params.config_name  = opts.config if opts.config?
 
             $http.post(@apiUrl(opts.config) + @getConfig(opts.config).passwordResetPath, params)
@@ -262,16 +267,17 @@ angular.module('ng-token-auth', ['ngCookies'])
           # credentials until api auth callback page responds.
           authenticate: (provider, opts) ->
             unless @dfd?
-              @setConfigName(opts)
+              @setConfigName(opts.config)
               @initDfd()
               @openAuthWindow(provider, opts)
 
             @dfd.promise
 
 
-          setConfigName: (opts={}) ->
-            @persistData('currentConfigName', opts.config) if opts.config?
-
+          setConfigName: (configName) ->
+            console.log 'setting config name', configName
+            configName ?= defaultConfigName
+            @persistData('currentConfigName', configName, configName)
 
           # open external window to authentication provider
           openAuthWindow: (provider, opts) ->
@@ -355,6 +361,12 @@ angular.module('ng-token-auth', ['ngCookies'])
                   uid        = $location.search().uid
                   configName = $location.search().config
 
+                  # save configuration that was used in creating
+                  # the confirmation link
+                  console.log 'setting config name', configName
+                  console.log 'search params', $location.search()
+                  @setConfigName(configName)
+
                   # check if redirected from password reset link
                   @mustResetPassword = $location.search().reset_password
 
@@ -376,6 +388,7 @@ angular.module('ng-token-auth', ['ngCookies'])
                 # has refreshed the page.
                 else if @retrieveData('currentConfigName')
                   configName = @retrieveData('currentConfigName')
+
 
                 unless isEmpty(@retrieveData('auth_headers'))
                   @validateToken({config: configName})
@@ -518,8 +531,8 @@ angular.module('ng-token-auth', ['ngCookies'])
 
 
           # abstract persistent data store
-          persistData: (key, val) ->
-            switch @getConfig().storage
+          persistData: (key, val, configName) ->
+            switch @getConfig(configName).storage
               when 'localStorage'
                 $window.localStorage.setItem(key, JSON.stringify(val))
               else $cookieStore.put(key, val)
@@ -577,6 +590,17 @@ angular.module('ng-token-auth', ['ngCookies'])
 
           getConfig: (name) ->
             configs[@getCurrentConfigName(name)]
+
+
+
+          # if value is a method, call the method. otherwise return the
+          # argument itself
+          getResultOrValue: (arg) ->
+            if typeof(arg) == 'function'
+              arg()
+            else
+              arg
+
 
 
           # a config name will be return in the following order of precedence:

@@ -142,6 +142,13 @@ gulp.task('images', function () {
     //.pipe($.size());
 //});
 
+
+gulp.task('css', function() {
+  return gulp.src(appDir+'styles/**/*.css')
+    .pipe(gulp.dest(tmpDir+'/styles'))
+    .pipe($.size());
+});
+
 // Stylus
 gulp.task('stylus', function() {
   return gulp.src(appDir+'styles/main.styl')
@@ -178,6 +185,7 @@ gulp.task('transpile', [
   'coffee',
   'component-coffee',
   'js',
+  'css',
   'bowerjs',
   'bowercss',
   'bower-fonts'

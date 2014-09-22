@@ -42,8 +42,8 @@ angular.module('ngTokenAuthTestApp')
         $http.get($auth.apiUrl() + '/demo/members_only_group')
         $http.get($auth.apiUrl() + '/demo/members_only_group')
       ])
-        .then((resp) -> alert('Multiple requests to evil user routes succeeded'))
-        .catch((resp) -> alert('Multiple requests to evil user routes failed'))
+        .then((resp) -> alert('Multiple requests to member user routes succeeded'))
+        .catch((resp) -> alert('Multiple requests to member user routes failed'))
 
 
     # called on page change (ui-sref)

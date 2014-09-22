@@ -80,13 +80,14 @@ br
               code params
               = ' parameters:'
 
-            pre.
-              $auth.authenticate('github', {
-                config: 'evilUser',
-                params: {
-                  favorite_color: $scope.favoriteColor
-                }
-              });
+            pre
+              code.language-javascript.
+                $auth.authenticate('github', {
+                  config: 'evilUser',
+                  params: {
+                    favorite_color: $scope.favoriteColor
+                  }
+                });
 
   .col-sm-6
     .panel.panel-default
@@ -149,15 +150,16 @@ br
               code config
               = ' parameter '
 
-            pre.
-              $auth.submitRegistration({
-                email:                 $scope.email,
-                password:              $scope.password,
-                password_confirmation: $scope.passwordConfirmation,
-                favorite_color:        $scope.favoriteColor
-              }, {
-                config: 'evilUser'
-              });
+            pre
+              code.language-javascript.
+                $auth.submitRegistration({
+                  email:                 $scope.email,
+                  password:              $scope.password,
+                  password_confirmation: $scope.passwordConfirmation,
+                  favorite_color:        $scope.favoriteColor
+                }, {
+                  config: 'evilUser'
+                });
 
   .col-sm-6
     .panel.panel-default
@@ -203,10 +205,11 @@ br
               = 'Note the optional '
               code config
               = ' parameter '
-            pre.
-              $auth.submitLogin(loginForm, {
-                config: 'evilUser'
-              });
+            pre
+              code.language-javascript.
+                $auth.submitLogin(loginForm, {
+                  config: 'evilUser'
+                });
 
   .col-sm-6
     .panel.panel-default
@@ -224,12 +227,9 @@ br
         .panel.panel-info
           p.panel-heading Code sample:
           .panel-body
-            p
-              a(
-                href="https://github.com/lynndylanhurley/ng-token-auth#authsignout"
-              ) Documentation
-            pre.
-              $auth.signOut()
+            pre
+              code.language-javascript.
+                $auth.signOut()
 
   .col-sm-6
     .panel.panel-default
@@ -247,12 +247,9 @@ br
         .panel.panel-info
           p.panel-heading Code sample:
           .panel-body
-            p
-              a(
-                href="https://github.com/lynndylanhurley/ng-token-auth#authdestroyaccount"
-              ) Documentation
-            pre.
-              $auth.destroyAccount()
+            pre
+              code.language-javascript.
+                $auth.destroyAccount()
 
   div.col-sm-6
     .panel.panel-default
@@ -289,12 +286,13 @@ br
               code config
               = ' parameter '
 
-            pre.
-              $auth.requestPasswordReset({
-                email: $scope.passwordResetEmail
-              }, {
-                config: 'evilUser'
-              });
+            pre
+              code.language-javascript.
+                $auth.requestPasswordReset({
+                  email: $scope.passwordResetEmail
+                }, {
+                  config: 'evilUser'
+                });
 
   div.col-sm-6
     .panel.panel-default
@@ -317,15 +315,12 @@ br
         .panel.panel-info
           p.panel-heading Code sample:
           .panel-body
-            p
-              a(href="https://github.com/lynndylanhurley/ng-token-auth#authupdatepassword").
-                Documentation
-
-            pre.
-              $auth.updatePassword({
-                password: $scope.password,
-                password_confirmation: $scope.passwordConfirmation
-              });
+            pre
+              code.language-javascript.
+                $auth.updatePassword({
+                  password: $scope.password,
+                  password_confirmation: $scope.passwordConfirmation
+                });
 
   div.col-sm-6
     .panel.panel-default
@@ -355,14 +350,11 @@ br
         .panel.panel-info
           p.panel-heading Code sample:
           .panel-body
-            p
-              a(href="https://github.com/lynndylanhurley/ng-token-auth#authupdateaccount").
-                Documentation
-
-            pre.
-              $auth.updateAccount({
-                favorite_color: $scope.favoriteColor
-              });
+            pre
+              code.language-javascript.
+                $auth.updateAccount({
+                  favorite_color: $scope.favoriteColor
+                });
 
 .row
   .col-sm-12
@@ -449,34 +441,35 @@ br
       .panel-heading Code sample
       .panel-body
         p This page uses the following configuration:
-        pre.
-          $authProvider.configure([{
-            default: {
-              apiUrl:  CONFIG.apiUrl,
-              proxyIf: -> window.isOldIE(),
-              authProviderPaths: {
-                github:    '/auth/github',
-                facebook:  '/auth/facebook',
-                google:    '/auth/google_oauth2'
-              }
-          }, {
-            evilUser: {
-              apiUrl:                CONFIG.apiUrl,
-              proxyIf:               function() { window.isOldIE() },
-              signOutUrl:              '/evil_auth/sign_out',
-              emailSignInPath:         '/evil_auth/sign_in',
-              emailRegistrationPath:   '/evil_auth',
-              accountUpdatePath:       '/evil_auth',
-              accountDeletePath:       '/evil_auth',
-              passwordResetPath:       '/evil_auth/password',
-              passwordUpdatePath:      '/evil_auth/password',
-              tokenValidationPath:     '/evil_auth/validate_token',
-              authProviderPaths: {
-                github:    '/evil_auth/github',
-                facebook:  '/evil_auth/facebook',
-                google:    '/evil_auth/google_oauth2'
-              }
-          }])
+        pre
+          code.language-javascript.
+            $authProvider.configure([{
+              default: {
+                apiUrl:  CONFIG.apiUrl,
+                proxyIf: -> window.isOldIE(),
+                authProviderPaths: {
+                  github:    '/auth/github',
+                  facebook:  '/auth/facebook',
+                  google:    '/auth/google_oauth2'
+                }
+            }, {
+              evilUser: {
+                apiUrl:                CONFIG.apiUrl,
+                proxyIf:               function() { window.isOldIE() },
+                signOutUrl:              '/evil_auth/sign_out',
+                emailSignInPath:         '/evil_auth/sign_in',
+                emailRegistrationPath:   '/evil_auth',
+                accountUpdatePath:       '/evil_auth',
+                accountDeletePath:       '/evil_auth',
+                passwordResetPath:       '/evil_auth/password',
+                passwordUpdatePath:      '/evil_auth/password',
+                tokenValidationPath:     '/evil_auth/validate_token',
+                authProviderPaths: {
+                  github:    '/evil_auth/github',
+                  facebook:  '/evil_auth/facebook',
+                  google:    '/evil_auth/google_oauth2'
+                }
+            }])
 
   .col-sm-6
     h3 Server
@@ -490,59 +483,63 @@ br
           = ") uses the following configuration:"
 
         h5 Routes:
-        pre.
-          Rails.application.routes.draw do
-            mount_devise_token_auth_for 'User',    at: '/auth'
-            mount_devise_token_auth_for 'EvilUser', at: '/evil_auth'
+        pre
+          code.language-ruby.
+            Rails.application.routes.draw do
+              mount_devise_token_auth_for 'User',    at: '/auth'
+              mount_devise_token_auth_for 'EvilUser', at: '/evil_auth'
 
-            get 'demo/members_only',       to: 'demo_user#members_only'
-            get 'demo/members_only_evil',   to: 'demo_evil#members_only'
-            get 'demo/members_only_group', to: 'demo_group#members_only'
-          end
+              get 'demo/members_only',       to: 'demo_user#members_only'
+              get 'demo/members_only_evil',  to: 'demo_evil_user#members_only'
+              get 'demo/members_only_group', to: 'demo_group#members_only'
+            end
 
         h5 Users Restricted Controller:
-        pre.
-          class DemoUserController < ApplicationController
-            before_action :authenticate_user!
+        pre
+          code.language-ruby.
+            class DemoUserController < ApplicationController
+              before_action :authenticate_user!
 
-            def members_only
-              render json: {
-                data: {
-                  message: "Welcome \#{current_user.name}",
-                  user: @user
-                }
-              }, status: 200
+              def members_only
+                render json: {
+                  data: {
+                    message: "Welcome \#{current_user.name}",
+                    user: @user
+                  }
+                }, status: 200
+              end
             end
-          end
 
         h5 Evil Users Restricted Controller:
-        pre.
-          class DemoEvilUserController < ApplicationController
-            before_action :authenticate_evil_user!
+        pre
+          code.language-ruby.
+            class DemoEvilUserController < ApplicationController
+              before_action :authenticate_evil_user!
 
-            def members_only
-              render json: {
-                data: {
-                  message: "Welcome \#{current_evil_user.name}",
-                  user: @user
-                }
-              }, status: 200
+              def members_only
+                render json: {
+                  data: {
+                    message: "Welcome \#{current_evil_user.name}",
+                    user: @user
+                  }
+                }, status: 200
+              end
             end
-          end
 
 
         h5 Group Access Restricted Controller:
-        pre.
-          class DemoGroupController < ApplicationController
-            devise_token_auth_group :member, contains: [:user, :evil_user]
-            before_action :authenticate_member!
+        pre
+          code.language-ruby.
+            class DemoGroupController < ApplicationController
+              devise_token_auth_group :member, contains: [:user, :evil_user]
+              before_action :authenticate_member!
 
-            def members_only
-              render json: {
-                data: {
-                  message: "Welcome \#{current_member.name}",
-                  user: current_member
-                }
-              }, status: 200
+              def members_only
+                render json: {
+                  data: {
+                    message: "Welcome \#{current_member.name}",
+                    user: current_member
+                  }
+                }, status: 200
+              end
             end
-          end

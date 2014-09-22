@@ -8,10 +8,14 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
       emailRegistrationPath: '/auth',
       accountUpdatePath: '/auth',
       accountDeletePath: '/auth',
-      confirmationSuccessUrl: window.location.href,
+      confirmationSuccessUrl: function() {
+        return window.location.href;
+      },
       passwordResetPath: '/auth/password',
       passwordUpdatePath: '/auth/password',
-      passwordResetSuccessUrl: window.location.href,
+      passwordResetSuccessUrl: function() {
+        return window.location.href;
+      },
       tokenValidationPath: '/auth/validate_token',
       proxyIf: function() {
         return false;
@@ -147,12 +151,14 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
               }
             },
             submitRegistration: function(params, opts) {
+              var successUrl;
               if (opts == null) {
                 opts = {};
               }
+              successUrl = this.getResultOrValue(this.getConfig(opts.config).confirmationSuccessUrl);
               angular.extend(params, {
-                confirm_success_url: this.getConfig(opts.config).confirmationSuccessUrl,
-                config_name: this.getCurrentConfigName()
+                confirm_success_url: successUrl,
+                config_name: this.getCurrentConfigName(opts.config)
               });
               return $http.post(this.apiUrl(opts.config) + this.getConfig(opts.config).emailRegistrationPath, params).success(function(resp) {
                 return $rootScope.$broadcast('auth:registration-email-success', params);
@@ -168,7 +174,7 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
               $http.post(this.apiUrl(opts.config) + this.getConfig(opts.config).emailSignInPath, params).success((function(_this) {
                 return function(resp) {
                   var authData;
-                  _this.setConfigName(opts);
+                  _this.setConfigName(opts.config);
                   authData = _this.getConfig(opts.config).handleLoginResponse(resp);
                   _this.handleValidAuth(authData);
                   return $rootScope.$broadcast('auth:login-success', _this.user);
@@ -188,10 +194,12 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
               return this.retrieveData('auth_headers') && this.user.signedIn;
             },
             requestPasswordReset: function(params, opts) {
+              var successUrl;
               if (opts == null) {
                 opts = {};
               }
-              params.redirect_url = this.getConfig(opts.config).passwordResetSuccessUrl;
+              successUrl = this.getResultOrValue(this.getConfig(opts.config).passwordResetSuccessUrl);
+              params.redirect_url = successUrl;
               if (opts.config != null) {
                 params.config_name = opts.config;
               }
@@ -233,19 +241,18 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
             },
             authenticate: function(provider, opts) {
               if (this.dfd == null) {
-                this.setConfigName(opts);
+                this.setConfigName(opts.config);
                 this.initDfd();
                 this.openAuthWindow(provider, opts);
               }
               return this.dfd.promise;
             },
-            setConfigName: function(opts) {
-              if (opts == null) {
-                opts = {};
+            setConfigName: function(configName) {
+              console.log('setting config name', configName);
+              if (configName == null) {
+                configName = defaultConfigName;
               }
-              if (opts.config != null) {
-                return this.persistData('currentConfigName', opts.config);
-              }
+              return this.persistData('currentConfigName', configName, configName);
             },
             openAuthWindow: function(provider, opts) {
               var authUrl;
@@ -320,6 +327,9 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
                     clientId = $location.search().client_id;
                     uid = $location.search().uid;
                     configName = $location.search().config;
+                    console.log('setting config name', configName);
+                    console.log('search params', $location.search());
+                    this.setConfigName(configName);
                     this.mustResetPassword = $location.search().reset_password;
                     this.firstTimeLogin = $location.search().account_confirmation_success;
                     this.setAuthHeaders(this.buildAuthHeaders({
@@ -453,8 +463,8 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
               }
               return headers;
             },
-            persistData: function(key, val) {
-              switch (this.getConfig().storage) {
+            persistData: function(key, val, configName) {
+              switch (this.getConfig(configName).storage) {
                 case 'localStorage':
                   return $window.localStorage.setItem(key, JSON.stringify(val));
                 default:
@@ -508,6 +518,13 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
             },
             getConfig: function(name) {
               return configs[this.getCurrentConfigName(name)];
+            },
+            getResultOrValue: function(arg) {
+              if (typeof arg === 'function') {
+                return arg();
+              } else {
+                return arg;
+              }
             },
             getCurrentConfigName: function(name) {
               return name || this.getSavedConfig();

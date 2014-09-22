@@ -10,11 +10,16 @@ exports.config = {
     'e2e/*.coffee'
   ],
 
+  chromeOnly: true,
+
   capabilities: {
     'browserName': 'chrome',
     'name': 'ng e2e',
     'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER,
-    'build': process.env.TRAVIS_BUILD_NUMBER
+    'build': process.env.TRAVIS_BUILD_NUMBER,
+    'chromeOptions': {
+      'args': ['show-fps-counter=true']
+    }
   },
 
   baseUrl: 'http://'+os.hostname()+':7777/',
