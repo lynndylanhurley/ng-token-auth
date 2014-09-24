@@ -63,6 +63,7 @@ This project comes bundled with a test app. You can run the demo locally by foll
   * [`auth:account-destroy-error`](#authaccount-destroy-error)
 * [Using alternate response formats](#using-alternate-response-formats)
 * [Multiple user types](#using-multiple-user-types)
+* [File uploads](#file-uploads)
 * [Conceptual Diagrams](#conceptual)
   * [OAuth2 Authentication](#oauth2-authentication-flow)
   * [Token Validation](#token-validation-flow)
@@ -1000,6 +1001,26 @@ $auth.requestPasswordReset({
 }, {
   config: 'evilUser'
 });
+~~~
+
+## File uploads
+
+Some file upload libraries interfere with the authentication headers set by this module. Workarounds are documented below:
+
+### [angular-file-upload](https://github.com/danialfarid/angular-file-upload)#
+
+The `upload` method accepts a `headers` option. Manually pass the current auth headers to the `upload` method as follows:
+
+~~~javascript
+$scope.onFileSelect = function($files, $auth) {
+    var file = $files[0];
+    $scope.upload = $upload.upload({
+        url:     'api/users/update_image',
+        method:  'POST',
+        headers: $auth.retrieveData('auth_headers'),
+        file:    file
+    });
+}
 ~~~
 
 # Conceptual
