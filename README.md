@@ -1286,7 +1286,6 @@ Just send a pull request. You will be granted commit access if you send quality 
 ###[Satellizer](https://github.com/sahat/satellizer) 
 
 Satellizer occupies the same problem domain as ng-token-auth. Advantages of ng-token-auth (at the time of this writing) include:
-  * Support for [IE8+](#internet-explorer).
   * [Events](#events).
   * Seamless, out-of-the-box integration with the [devise token auth](https://github.com/lynndylanhurley/devise_token_auth) gem. This gem provides a high level of security with minimal configuration.
   * [Auth header customization](#using-alternate-header-formats).
