@@ -5,6 +5,7 @@ var httpProxy = require('http-proxy');
 var s3Policy  = require('./server/s3');
 var sm        = require('sitemap');
 var os        = require('os');
+var nock      = require('nock');
 
 var port    = process.env.PORT || 7777;
 var distDir = '/.tmp';
@@ -23,6 +24,18 @@ if (process.env.NODE_ENV && process.env.NODE_ENV != 'development' && process.env
   distDir = '/dist-'+process.env.NODE_ENV.toLowerCase();
 } else {
   app.use(require('connect-livereload')());
+}
+
+// use http mocks
+
+if (process.env.RECORD) {
+  console.log('@-->RECORDING', process.env.RECORD);
+
+  // capture input
+  nock.recorder.rec();
+
+  // write to file
+  // make filename from (method + path + params.qs | slugify | truncate: 40).js
 }
 
 // sitemap

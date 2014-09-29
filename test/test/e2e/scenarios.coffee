@@ -6,7 +6,6 @@ describe "ng-token-auth", ->
     browser.get '/'
     expect(browser.getTitle()).toEqual('Ng Token Auth Test')
 
-
   #describe "email registrations", ->
     #beforeEach ->
       #browser.get('#/')

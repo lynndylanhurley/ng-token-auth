@@ -4,23 +4,22 @@
 // node-config to the proper config files.
 process.env.NODE_CONFIG_DIR = './test/config'
 
-var gulp     = require('gulp');
-var wiredep  = require('wiredep').stream;
-//var sprite   = require('css-sprite').stream;
-var config   = require('config');
-var cached   = require('gulp-cached');
-var es       = require('event-stream');
-var seq      = require('run-sequence');
-var lazypipe = require('lazypipe');
-var nib      = require('nib');
+var gulp       = require('gulp');
+var wiredep    = require('wiredep').stream;
+var config     = require('config');
+var cached     = require('gulp-cached');
+var es         = require('event-stream');
+var seq        = require('run-sequence');
+var lazypipe   = require('lazypipe');
+var nib        = require('nib');
 var ngAnnotate = require('gulp-ng-annotate');
 
-var appDir = 'test/app/'
-var distDir = 'test/dist/'
-var tmpDir = 'test/.tmp/'
+var appDir  = 'test/app/';
+var distDir = 'test/dist/';
+var tmpDir  = 'test/.tmp/';
 
-var componentSrcDir  = 'src/'
-var componentDistDir = 'dist/'
+var componentSrcDir  = 'src/';
+var componentDistDir = 'dist/';
 
 // for deployment
 var env             = (process.env.NODE_ENV || 'development').toLowerCase();
@@ -353,22 +352,25 @@ gulp.task('push', $.shell.task([
 ]));
 
 
-// E2E Protractor tests
-gulp.task('protractor', function() {
-  require('coffee-script/register');
-  return gulp.src('test/e2e/**/*.coffee')
-    .pipe($.protractor.protractor({
-      configFile: 'protractor.conf.js'
-    }))
-    .on('error', function(e) {
-      $.util.log(e.toString());
-      this.emit('end');
-    });
+gulp.task('start-e2e-server', ['build-dev'], function() {
+  var nodemon = require('gulp-nodemon');
+
+  // start node server
+  $.nodemon({
+    script: 'test/app.js',
+    ext:    'html js',
+    env:    {'RECORD': process.env.record, 'PORT': '8888'},
+    ignore: [],
+    watch:  []
+  });
 });
 
-gulp.task('test:e2e', ['protractor'], function() {
-  gulp.watch('test/e2e/**/*.coffee', ['protractor']);
+
+gulp.task('test:e2e', ['start-e2e-server'], function() {
+  //require('coffee-script/register');
+  $.shell.task(['protractor test/test/protractor.conf.js']);
 });
+
 
 // Watch
 gulp.task('watch', function () {
@@ -378,9 +380,9 @@ gulp.task('watch', function () {
   // start node server
   $.nodemon({
     script: 'test/app.js',
-    ext: 'html js',
+    ext:    'html js',
     ignore: [],
-    watch: []
+    watch:  []
   })
     .on('restart', function() {
       console.log('restarted');

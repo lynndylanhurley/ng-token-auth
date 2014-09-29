@@ -20,7 +20,7 @@ angular.module('ngTokenAuthTestApp', [
     $authProvider.configure([
       default:
         apiUrl:  CONFIG.apiUrl
-        proxyIf: -> window.isOldIE()
+        proxyIf: -> true
         authProviderPaths:
           github:    '/auth/github'
           facebook:  '/auth/facebook'
@@ -29,7 +29,7 @@ angular.module('ngTokenAuthTestApp', [
     ,
       evilUser:
         apiUrl:                CONFIG.apiUrl
-        proxyIf:               -> window.isOldIE()
+        proxyIf:               -> true
         signOutUrl:              '/mangs/sign_out'
         emailSignInPath:         '/mangs/sign_in'
         emailRegistrationPath:   '/mangs'

@@ -22,7 +22,7 @@ exports.config = {
     }
   },
 
-  baseUrl: 'http://'+os.hostname()+':7777/',
+  baseUrl: 'http://'+os.hostname()+':8888/',
 
   framework: 'jasmine',
 
