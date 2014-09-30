@@ -456,7 +456,7 @@ This method broadcasts the following events:
 angular.module('ngTokenAuthTestApp')
   .controller('IndexCtrl', function($auth) {
     $scope.handlePwdResetBtnClick = function() {
-      $auth.resetPasswordReset($scope.pwdResetForm)
+      $auth.requestPasswordReset($scope.pwdResetForm)
         .then(function(resp) { 
           // handle success response
         })
