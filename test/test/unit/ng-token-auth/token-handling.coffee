@@ -120,9 +120,10 @@ suite 'token handling', ->
     setup ->
       $cookieStore.put('auth_header', expiredHeaders)
 
-    test 'promise should be rejected without making request', (done) ->
+    test.only 'promise should be rejected without making request', ->
+      caught = false
       $auth.validateUser().catch(->
-        assert true
-        done()
+        caught = true
       )
       $timeout.flush()
+      assert caught
