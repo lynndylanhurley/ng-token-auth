@@ -31,45 +31,11 @@ This project comes bundled with a test app. You can run the demo locally by foll
 * [Installation](#installation)
 * [Configuration](#configuration)
 * [API](#api)
-  * [`$auth.authenticate`](#authauthenticate)
-  * [`$auth.validateUser`](#authvalidateuser)
-  * [`$auth.submitRegistration`](#authsubmitregistration)
-  * [`$auth.submitLogin`](#authsubmitlogin)
-  * [`$auth.signOut`](#authsignout)
-  * [`$auth.requestPasswordReset`](#authrequestpasswordreset)
-  * [`$auth.updatePassword`](#authupdatepassword)
-  * [`$auth.updateAccount`](#authupdateaccount)
-  * [`$auth.destroyAccount`](#authdestroyaccount)
 * [Events](#events)
-  * [`auth:login-success`](#authlogin-success)
-  * [`auth:login-error`](#authlogin-error)
-  * [`auth:validation-success`](#authvalidation-success)
-  * [`auth:validation-error`](#authvalidation-error)
-  * [`auth:logout-success`](#authlogout-success)
-  * [`auth:logout-error`](#authlogout-error)
-  * [`auth:registration-email-success`](#authregistration-email-success)
-  * [`auth:registration-email-error`](#authregistration-email-error)
-  * [`auth:email-confirmation-success`](#authemail-confirmation-success)
-  * [`auth:email-confirmation-error`](#authemail-confirmation-error)
-  * [`auth:password-reset-request-success`](#authpassword-reset-request-success)
-  * [`auth:password-reset-request-error`](#authpassword-reset-request-error)
-  * [`auth:password-reset-confirm-success`](#authpassword-reset-confirm-success)
-  * [`auth:password-reset-confirm-error`](#authpassword-reset-confirm-error)
-  * [`auth:password-change-success`](#authpassword-change-success)
-  * [`auth:password-change-error`](#authpassword-change-error)
-  * [`auth:account-update-success`](#authaccount-update-success)
-  * [`auth:account-update-error`](#authaccount-update-error)
-  * [`auth:account-destroy-success`](#authaccount-destroy-success)
-  * [`auth:account-destroy-error`](#authaccount-destroy-error)
 * [Using alternate response formats](#using-alternate-response-formats)
 * [Multiple user types](#using-multiple-user-types)
 * [File uploads](#file-uploads)
 * [Conceptual Diagrams](#conceptual)
-  * [OAuth2 Authentication](#oauth2-authentication-flow)
-  * [Token Validation](#token-validation-flow)
-  * [Email Registration](#email-registration-flow)
-  * [Email Sign In](#email-sign-in-flow)
-  * [Password Reset Request](#password-reset-flow)
 * [Notes on Token Management](#about-token-management)
 * [Notes on Batch Requests](#about-batch-requests)
 * [Notes on Token Formatting](#identifying-users-on-the-server)
@@ -212,6 +178,17 @@ angular.module('myApp', ['ng-token-auth'])
 
 The `$auth` module is available for dependency injection during your app's run phase (for controllers, directives, filters, etc.). Each API method returns a [$q deferred promise](https://docs.angularjs.org/api/ng/service/$q) that will be resolved on success, 
 
+#### API index
+
+* [`$auth.authenticate`](#authauthenticate)
+* [`$auth.validateUser`](#authvalidateuser)
+* [`$auth.submitRegistration`](#authsubmitregistration)
+* [`$auth.submitLogin`](#authsubmitlogin)
+* [`$auth.signOut`](#authsignout)
+* [`$auth.requestPasswordReset`](#authrequestpasswordreset)
+* [`$auth.updatePassword`](#authupdatepassword)
+* [`$auth.updateAccount`](#authupdateaccount)
+* [`$auth.destroyAccount`](#authdestroyaccount)
 
 ###$auth.authenticate
 Initiate an OAuth2 authentication. This method accepts 2 arguments:
@@ -601,6 +578,29 @@ angular.module('ngTokenAuthTestApp')
 This module broadcasts events after the success or failure of each API method. Using these events to build your app can result in more flexibility while reducing code spaghetti. 
 
 For example, any template can initiate an authentication, and any controller can subscribe to the `auth:login-success` event to provide success notifications, redirects, etc.
+
+#### Events index
+
+* [`auth:login-success`](#authlogin-success)
+* [`auth:login-error`](#authlogin-error)
+* [`auth:validation-success`](#authvalidation-success)
+* [`auth:validation-error`](#authvalidation-error)
+* [`auth:logout-success`](#authlogout-success)
+* [`auth:logout-error`](#authlogout-error)
+* [`auth:registration-email-success`](#authregistration-email-success)
+* [`auth:registration-email-error`](#authregistration-email-error)
+* [`auth:email-confirmation-success`](#authemail-confirmation-success)
+* [`auth:email-confirmation-error`](#authemail-confirmation-error)
+* [`auth:password-reset-request-success`](#authpassword-reset-request-success)
+* [`auth:password-reset-request-error`](#authpassword-reset-request-error)
+* [`auth:password-reset-confirm-success`](#authpassword-reset-confirm-success)
+* [`auth:password-reset-confirm-error`](#authpassword-reset-confirm-error)
+* [`auth:password-change-success`](#authpassword-change-success)
+* [`auth:password-change-error`](#authpassword-change-error)
+* [`auth:account-update-success`](#authaccount-update-success)
+* [`auth:account-update-error`](#authaccount-update-error)
+* [`auth:account-destroy-success`](#authaccount-destroy-success)
+* [`auth:account-destroy-error`](#authaccount-destroy-error)
 
 ###auth:login-success
 Broadcast after successful user authentication. Event message contains the user object. This event is broadcast by the following methods:
@@ -1026,6 +1026,14 @@ $scope.onFileSelect = function($files, $auth) {
 # Conceptual
 
 The following is a high-level overview of this module's implementation.
+
+#### Diagram index
+
+* [OAuth2 Authentication](#oauth2-authentication-flow)
+* [Token Validation](#token-validation-flow)
+* [Email Registration](#email-registration-flow)
+* [Email Sign In](#email-sign-in-flow)
+* [Password Reset Request](#password-reset-flow)
 
 ## Oauth2 authentication flow
 
