@@ -41,26 +41,30 @@ suite 'oauth2 login', ->
           signedIn:   true
           configName: "default"
 
-        test 'user should be authenticated, promise is resolved', (done)->
+        setup ->
+          # mock pm response
+          $window.postMessage(angular.extend({message: 'deliverCredentials'}, expectedUser), '*')
+
+
+        test 'user should be authenticated, promise is resolved', (done) ->
           called = false
           dfd.then(=>
             called = true
           )
 
-          # fake response from api redirect
-          $window.postMessage(angular.extend({message: 'deliverCredentials'}, expectedUser), '*')
-
-          setTimeout((->
+          setTimeout ->
             $timeout.flush()
-
-            debugger
-
             assert.deepEqual($rootScope.user, expectedUser)
-
-            assert(true, called)
-
+            assert(called)
             done()
-          ))
+
+
+        test 'expiry is set', (done) ->
+          setTimeout ->
+            $timeout.flush()
+            assert.equal(validExpiry * 1000, $auth.getConfig().parseExpiry($auth.retrieveData('auth_headers')))
+            done()
+
 
       suite 'directive access', ->
         args = 'github'

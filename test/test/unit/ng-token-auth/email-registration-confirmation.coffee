@@ -24,6 +24,9 @@ suite 'email registration confirmation', ->
     test '$rootScope broadcast email confirmation success event', ->
       assert $rootScope.$broadcast.calledWith('auth:email-confirmation-success')
 
+    test 'token expiry is set', ->
+      assert.equal(validExpiry * 1000, $auth.getConfig().parseExpiry($auth.retrieveData('auth_headers')))
+
     test 'promise is resolved', ->
       resolved = false
       dfd.then(-> resolved = true)

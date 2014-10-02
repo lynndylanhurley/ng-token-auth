@@ -70,9 +70,10 @@ teardown ->
 ### helper methods ###
 
 setValidAuthQS = ->
-  $location.search('token', validToken)
+  $location.search('token',     validToken)
   $location.search('client_id', validClient)
-  $location.search('uid', validUid)
+  $location.search('uid',       validUid)
+  $location.search('expiry',    validExpiry)
 
 setValidEmailConfirmQS = ->
   setValidAuthQS()
