@@ -103,6 +103,7 @@ angular.module('ng-token-auth', ['ngCookies'])
 
           initializeListeners: ->
             @listener = @handlePostMessage.bind(@)
+
             if $window.addEventListener
               $window.addEventListener("message", @listener, false)
 
@@ -351,13 +352,20 @@ angular.module('ng-token-auth', ['ngCookies'])
             unless @dfd?
               @initDfd()
 
-              unless @userIsAuthenticated()
+              # save trip to API if possible. assume that user is still signed
+              # in if auth headers are present and token has not expired.
+              if @userIsAuthenticated()
+                  # user is still presumably logged in
+                  @resolveDfd()
+
+              else
                 # token querystring is present. user most likely just came from
                 # registration email link.
                 if $location.search().token != undefined
                   token      = $location.search().token
                   clientId   = $location.search().client_id
                   uid        = $location.search().uid
+                  expiry     = $location.search().expiry
                   configName = $location.search().config
 
                   # use the configuration that was used in creating
@@ -375,6 +383,7 @@ angular.module('ng-token-auth', ['ngCookies'])
                     token:    token
                     clientId: clientId
                     uid:      uid
+                    expiry:   expiry
                   }))
 
                   # strip qs from url to prevent re-use of these params
@@ -387,7 +396,18 @@ angular.module('ng-token-auth', ['ngCookies'])
                   configName = @retrieveData('currentConfigName')
 
                 unless isEmpty(@retrieveData('auth_headers'))
-                  @validateToken({config: configName})
+                  # if token has expired, do not verify token with API
+                  if @tokenHasExpired()
+                    $rootScope.$broadcast('auth:session-expired')
+                    @rejectDfd({
+                      reason: 'unauthorized'
+                      errors: ['Session expired.']
+                    })
+
+                  else
+                    # token has been saved in session var, token has not
+                    # expired. must be verified with API.
+                    @validateToken({config: configName})
 
                 # new user session. will redirect to login
                 else
@@ -397,9 +417,6 @@ angular.module('ng-token-auth', ['ngCookies'])
                   })
                   $rootScope.$broadcast('auth:invalid')
 
-              else
-                # user is already logged in
-                @resolveDfd()
 
             @dfd.promise
 
@@ -443,16 +460,12 @@ angular.module('ng-token-auth', ['ngCookies'])
               })
 
 
-          # don't bother checking known expired headers
+          # ensure token has not expired
           tokenHasExpired: ->
             expiry = @getExpiry()
+            now    = new Date().getTime()
 
-            now = new Date().getTime()
-
-            if @retrieveData('auth_headers') and expiry
-              return (expiry and expiry < now)
-            else
-              return null
+            return (expiry and expiry < now)
 
 
           # get expiry by method provided in config
@@ -510,6 +523,7 @@ angular.module('ng-token-auth', ['ngCookies'])
                 token:    @user.auth_token
                 clientId: @user.client_id
                 uid:      @user.uid
+                expiry:   @user.expiry
               }))
 
             # fulfill promise

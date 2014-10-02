@@ -1,5 +1,9 @@
 angular.module('ngTokenAuthTestApp')
   .controller 'MainCtrl', ($rootScope, $scope, $location, $state, $stateParams, usSpinnerService, $timeout, $auth, $modal, $http, $q) ->
+
+    # test validate user
+    window.validateUser = -> $auth.validateUser()
+
     # cache element selectors
     $body = $('body')
 

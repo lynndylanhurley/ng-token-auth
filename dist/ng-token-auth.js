@@ -319,18 +319,21 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
               })(this)), 0);
             },
             validateUser: function(opts) {
-              var clientId, configName, token, uid;
+              var clientId, configName, expiry, token, uid;
               if (opts == null) {
                 opts = {};
               }
               configName = opts.config;
               if (this.dfd == null) {
                 this.initDfd();
-                if (!this.userIsAuthenticated()) {
+                if (this.userIsAuthenticated()) {
+                  this.resolveDfd();
+                } else {
                   if ($location.search().token !== void 0) {
                     token = $location.search().token;
                     clientId = $location.search().client_id;
                     uid = $location.search().uid;
+                    expiry = $location.search().expiry;
                     configName = $location.search().config;
                     this.setConfigName(configName);
                     this.mustResetPassword = $location.search().reset_password;
@@ -338,16 +341,25 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
                     this.setAuthHeaders(this.buildAuthHeaders({
                       token: token,
                       clientId: clientId,
-                      uid: uid
+                      uid: uid,
+                      expiry: expiry
                     }));
                     $location.url($location.path() || '/');
                   } else if (this.retrieveData('currentConfigName')) {
                     configName = this.retrieveData('currentConfigName');
                   }
                   if (!isEmpty(this.retrieveData('auth_headers'))) {
-                    this.validateToken({
-                      config: configName
-                    });
+                    if (this.tokenHasExpired()) {
+                      $rootScope.$broadcast('auth:session-expired');
+                      this.rejectDfd({
+                        reason: 'unauthorized',
+                        errors: ['Session expired.']
+                      });
+                    } else {
+                      this.validateToken({
+                        config: configName
+                      });
+                    }
                   } else {
                     this.rejectDfd({
                       reason: 'unauthorized',
@@ -355,8 +367,6 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
                     });
                     $rootScope.$broadcast('auth:invalid');
                   }
-                } else {
-                  this.resolveDfd();
                 }
               }
               return this.dfd.promise;
@@ -405,11 +415,7 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
               var expiry, now;
               expiry = this.getExpiry();
               now = new Date().getTime();
-              if (this.retrieveData('auth_headers') && expiry) {
-                return expiry && expiry < now;
-              } else {
-                return null;
-              }
+              return expiry && expiry < now;
             },
             getExpiry: function() {
               return this.getConfig().parseExpiry(this.retrieveData('auth_headers'));
@@ -451,7 +457,8 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
                 this.setAuthHeaders(this.buildAuthHeaders({
                   token: this.user.auth_token,
                   clientId: this.user.client_id,
-                  uid: this.user.uid
+                  uid: this.user.uid,
+                  expiry: this.user.expiry
                 }));
               }
               return this.resolveDfd();

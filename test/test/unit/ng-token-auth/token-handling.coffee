@@ -118,11 +118,22 @@ suite 'token handling', ->
     }
 
     setup ->
-      $cookieStore.put('auth_header', expiredHeaders)
+      $auth.persistData('auth_headers', expiredHeaders)
 
-    test 'promise should be rejected without making request', (done) ->
+    test 'promise should be rejected without making request', ->
+      caught = false
       $auth.validateUser().catch(->
-        assert true
-        done()
+        caught = true
       )
       $timeout.flush()
+      assert caught
+
+    test 'expired session event should be broadcast', ->
+      $auth.validateUser()
+      $timeout.flush()
+      assert $rootScope.$broadcast.calledWith('auth:session-expired')
+
+    test 'tokens are invalidated', ->
+      $auth.validateUser()
+      $timeout.flush()
+      assert.equal(null, $auth.retrieveData('auth_headers'))
