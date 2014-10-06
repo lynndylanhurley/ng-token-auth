@@ -191,7 +191,7 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
               return this.dfd.promise;
             },
             userIsAuthenticated: function() {
-              return this.retrieveData('auth_headers') && this.user.signedIn;
+              return this.retrieveData('auth_headers') && this.user.signedIn && !this.tokenHasExpired();
             },
             requestPasswordReset: function(params, opts) {
               var successUrl;

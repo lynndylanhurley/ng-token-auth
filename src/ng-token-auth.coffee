@@ -207,7 +207,7 @@ angular.module('ng-token-auth', ['ngCookies'])
 
           # check if user is authenticated
           userIsAuthenticated: ->
-            @retrieveData('auth_headers') and @user.signedIn
+            @retrieveData('auth_headers') and @user.signedIn and not @tokenHasExpired()
 
 
           # request password reset from API
