@@ -119,6 +119,7 @@ suite 'token handling', ->
 
     setup ->
       $auth.persistData('auth_headers', expiredHeaders)
+      $auth.user.signedIn = true
 
     test 'promise should be rejected without making request', ->
       caught = false
