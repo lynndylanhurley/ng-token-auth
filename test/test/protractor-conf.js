@@ -7,7 +7,7 @@ exports.config = {
   sauceKey: process.env.SAUCE_ACCESS_KEY,
 
   specs: [
-    'e2e/*.coffee'
+    'e2e/ng-token-auth/*.coffee'
   ],
 
   chromeOnly: true,
