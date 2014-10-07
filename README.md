@@ -77,6 +77,7 @@ This project comes bundled with a test app. You can run the demo locally by foll
 * [Development](#development)
 * [Contribution Guidelines](#contributing)
 * [Alteratives to This Module](#alternatives)
+* [Callouts](#callouts)
 
 # About this module
 
@@ -1295,6 +1296,10 @@ Satellizer occupies the same problem domain as ng-token-auth. Advantages of ng-t
   * Supports [account updates](#authupdateaccount) and [account deletion](#authdestroyaccount).
   * Supports [changing tokens with each request](#about-token-management).
   * Supports [multiple user types](#using-multiple-user-types).
+
+# Callouts
+
+This module has been featured by [http://angular-js.in](http://angular-js.in/).
 
 # License
 
