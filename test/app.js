@@ -84,6 +84,11 @@ app.get('/alive', function(req, resp) {
   }));
 })
 
+app.get('/kill', function() {
+  console.log("\nGracefully shutting down server from /kill route.");
+  process.exit();
+})
+
 // provide s3 policy for direct uploads
 app.get('/policy/:fname', function(req, res) {
   var fname       = req.params.fname;

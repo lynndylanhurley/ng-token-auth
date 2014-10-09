@@ -21,6 +21,7 @@
     "gulp": "~3.8.0",
     "gulp-autoprefixer": "~0.0.7",
     "gulp-awspublish": "0.0.16",
+    "gulp-bg": "0.0.5",
     "gulp-bower-files": "~0.2.5",
     "gulp-cache": "~0.1.7",
     "gulp-cached": "0.0.3",

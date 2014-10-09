@@ -15,6 +15,7 @@ var nib        = require('nib');
 var ngAnnotate = require('gulp-ng-annotate');
 var request    = require('request');
 var Q          = require('q');
+var spawn      = require('child_process').spawn;
 
 var appDir  = 'test/app/';
 var distDir = 'test/dist/';
@@ -28,6 +29,10 @@ var env             = (process.env.NODE_ENV || 'development').toLowerCase();
 var tag             = env + '-' + new Date().getTime();
 var DIST_DIR        = distDir;
 var LIVERELOAD_PORT = 35729;
+
+// spawned processes
+var protractorSpawn = null;
+var testServerSpawn = null;
 
 if (process.env.NODE_ENV) {
   DIST_DIR = 'test/dist-'+process.env.NODE_ENV.toLowerCase();
@@ -370,7 +375,6 @@ var pingTestServer = function(dfd) {
         pingTestServer(dfd);
       }, 100);
     } else {
-      console.log('test server is running bitch!!!');
       dfd.resolve()
     }
   });
@@ -379,44 +383,54 @@ var pingTestServer = function(dfd) {
 };
 
 
-gulp.task('start-e2e-server', function(cb) {
-  // start node server
-  $.nodemon({
-    script: 'test/app.js',
-    ext:    'html js css',
-    env:    {'NOCK_MODE': process.env.NOCK_MODE, 'PORT': '8888'},
-    ignore: [],
-    watch:  []
-  });
-
-  pingTestServer().then(function() {
-    console.log('promise resolved, calling cb');
-    seq('run-e2e-tests', cb)
-  });
+gulp.task('kill-test-server', function(cb) {
+  request('http://localhost:8888/kill');
 });
 
 
-gulp.task('run-e2e-tests', function() {
+gulp.task('start-e2e-server', function() {
+  env = process.env;
+  env.PORT = 8888;
+
+  testServerSpawn = spawn('node', ['test/app.js'], {env: env});
+});
+
+
+gulp.task('kill-e2e-server', function() {
+  console.log('killing e2e server...');
+  testServerSpawn.kill('SIGHUP');
+})
+
+
+gulp.task('verify-e2e-server', function(cb) {
+  pingTestServer().then(function() { cb(); });
+});
+
+
+gulp.task('run-e2e-tests', function(cb) {
   console.log('@-->running e2e tests!!!');
 
-  gulp.src('test/test/e2e/**/*.coffee')
-    //.pipe($.coffee({bare: true}))
-    .on('error', function(e) {
-      $.util.log(e.toString());
-      this.emit('end');
-    })
-    .pipe($.protractor.protractor({
-      configFile: 'test/test/protractor-conf.js'
-    }))
-    .on('error', function(e) {
-      $.util.log(e.toString());
-      this.emit('end');
-    });
+  protractorSpawn = spawn('protractor', ['test/test/protractor-conf.js']);
+
+  protractorSpawn.stdout.pipe(process.stdout);
+  protractorSpawn.stderr.pipe(process.stderr);
+
+  protractorSpawn.on('exit', function() {
+    protractorSpawn.kill('SIGHUP');
+    cb();
+  });
 });
 
 
 gulp.task('test:e2e', function(cb) {
-  seq('build-dev', 'start-e2e-server', cb)
+  seq(
+    'build-dev',
+    'start-e2e-server',
+    'verify-e2e-server',
+    'run-e2e-tests',
+    'kill-e2e-server',
+    cb
+  );
 });
 
 
