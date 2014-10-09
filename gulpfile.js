@@ -15,9 +15,10 @@ var lazypipe = require('lazypipe');
 var nib      = require('nib');
 var ngAnnotate = require('gulp-ng-annotate');
 
-var appDir = 'test/app/'
+var appDir  = 'test/app/'
 var distDir = 'test/dist/'
-var tmpDir = 'test/.tmp/'
+var tmpDir  = 'test/.tmp/'
+var testDir = 'test/test/'
 
 var componentSrcDir  = 'src/'
 var componentDistDir = 'dist/'
@@ -208,7 +209,40 @@ var injectGlobals = lazypipe()
     }
   ]);
 
-console.log('@-->config', config);
+
+gulp.task('inject-test-js', ['build-dev'], function() {
+  return gulp.src([
+    testDir+'karma.conf.coffee',
+    testDir+'karma-ci.conf.coffee'
+  ])
+    .pipe($.inject($.bowerFiles({
+      paths: {bowerJson: "test/bower.json"},
+      read: false
+    }), {
+      ignorePath: [testDir],
+      starttag: '# bower:js',
+      endtag: '# endbower',
+      transform: function(filepath, file, i, length) {
+        return '"'+filepath.substr(1)+'"';
+      }
+    }))
+    .pipe($.inject(gulp.src(
+      [
+        tmpDir+'/views/**/*.js',
+        tmpDir+'/scripts/**/*.js'
+      ],
+      {read: false}
+    ), {
+      ignorePath: [testDir],
+      starttag: '# inject:js',
+      endtag: '# endinject',
+      transform: function(filepath, file, i, length) {
+        return '"'+filepath.substr(1)+'"';
+      }
+    }))
+    .pipe(gulp.dest(testDir))
+    .pipe($.size());
+});
 
 // Jade to HTML
 gulp.task('base-tmpl', function() {

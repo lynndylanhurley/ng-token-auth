@@ -1,8 +1,14 @@
+# global config
+CONFIG =
+  apiUrl: '/api'
+
+
 # global injectors
 $locationProvider = null
 $authProvider     = null
 $cookieStore      = null
 $httpBackend      = null
+$controller       = null
 $rootScope        = null
 $location         = null
 $provider         = null
@@ -37,7 +43,7 @@ validUser =
 
 # run before each test
 setup ->
-  module 'ng-token-auth', (_$authProvider_, _$locationProvider_, $provide) ->
+  module 'ngTokenAuthTestApp', (_$authProvider_, _$locationProvider_, $provide) ->
     $authProvider     = _$authProvider_
     $locationProvider = _$locationProvider_
     $authProvider.configure({
@@ -49,6 +55,7 @@ setup ->
     $httpBackend = $injector.get('$httpBackend')
     $cookieStore = $injector.get('$cookieStore')
     $rootScope   = $injector.get('$rootScope')
+    $controller  = $injector.get('$controller')
     $location    = $injector.get('$location')
     $timeout     = $injector.get('$timeout')
     $window      = $injector.get('$window')
