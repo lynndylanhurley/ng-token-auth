@@ -85,8 +85,10 @@ module.exports = (config) ->
       # endinject
 
       'src/*.coffee'
+      'test/app/scripts/**/*.coffee'
       'test/test/unit/test-helper.coffee'
       'test/test/unit/ng-token-auth/**/*.coffee'
+      'test/test/unit/demo-site/**/*.coffee'
     ]
 
     autoWatch: true

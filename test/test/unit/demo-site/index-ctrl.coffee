@@ -11,7 +11,7 @@ suite 'IndexCtrl', ->
       })
 
 
-  test.only 'sanity', ->
+  test 'sanity', ->
     ctrl = createController()
     assert(ctrl)
     assert.equal('bang', scope.test())
