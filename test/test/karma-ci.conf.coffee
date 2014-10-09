@@ -39,6 +39,7 @@ module.exports = (config) ->
     preprocessors:
       'src/*.coffee': ['coverage']
       'test/test/**/*.coffee': ['coffee']
+      'test/app/scripts/**/*.coffee': ['coffee']
 
     files : [
       # bower:js
