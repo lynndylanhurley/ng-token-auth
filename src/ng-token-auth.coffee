@@ -64,7 +64,7 @@ angular.module('ng-token-auth', ['ngCookies'])
             fullConfig[label] = angular.extend(defaults, conf[label])
             angular.extend(configs, fullConfig)
 
-          # remove existng default config
+          # remove existing default config
           delete configs["default"] unless defaultConfigName == "default"
 
         # user is extending the single default config
