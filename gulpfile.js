@@ -13,6 +13,8 @@ var seq        = require('run-sequence');
 var lazypipe   = require('lazypipe');
 var nib        = require('nib');
 var ngAnnotate = require('gulp-ng-annotate');
+var request    = require('request');
+var Q          = require('q');
 
 var appDir  = 'test/app/';
 var distDir = 'test/dist/';
@@ -352,30 +354,75 @@ gulp.task('push', $.shell.task([
 ]));
 
 
-gulp.task('start-e2e-server', ['build-dev'], function() {
-  var nodemon = require('gulp-nodemon');
+// recursively try until test server is ready. return promise.
+var pingTestServer = function(dfd) {
+  // first run, init promise, start server
+  if (!dfd) {
+    var dfd = Q.defer();
+    seq('start-e2e-server');
+  }
 
+  // poll dev server until it response, then resolve promise.
+  request('http://localhost:8888/alive', function(err) {
+    if (err) {
+      setTimeout(function() {
+        console.log('test server failed, checking again in 100ms');
+        pingTestServer(dfd);
+      }, 100);
+    } else {
+      console.log('test server is running bitch!!!');
+      dfd.resolve()
+    }
+  });
+
+  return dfd.promise;
+};
+
+
+gulp.task('start-e2e-server', function(cb) {
   // start node server
   $.nodemon({
     script: 'test/app.js',
-    ext:    'html js',
-    env:    {'RECORD': process.env.record, 'PORT': '8888'},
+    ext:    'html js css',
+    env:    {'NOCK_MODE': process.env.NOCK_MODE, 'PORT': '8888'},
     ignore: [],
     watch:  []
+  });
+
+  pingTestServer().then(function() {
+    console.log('promise resolved, calling cb');
+    seq('run-e2e-tests', cb)
   });
 });
 
 
-gulp.task('test:e2e', ['start-e2e-server'], function() {
-  //require('coffee-script/register');
-  $.shell.task(['protractor test/test/protractor.conf.js']);
+gulp.task('run-e2e-tests', function() {
+  console.log('@-->running e2e tests!!!');
+
+  gulp.src('test/test/e2e/**/*.coffee')
+    //.pipe($.coffee({bare: true}))
+    .on('error', function(e) {
+      $.util.log(e.toString());
+      this.emit('end');
+    })
+    .pipe($.protractor.protractor({
+      configFile: 'test/test/protractor-conf.js'
+    }))
+    .on('error', function(e) {
+      $.util.log(e.toString());
+      this.emit('end');
+    });
+});
+
+
+gulp.task('test:e2e', function(cb) {
+  seq('build-dev', 'start-e2e-server', cb)
 });
 
 
 // Watch
 gulp.task('watch', function () {
   var lr      = require('tiny-lr')();
-  var nodemon = require('gulp-nodemon');
 
   // start node server
   $.nodemon({

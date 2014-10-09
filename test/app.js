@@ -28,14 +28,14 @@ if (process.env.NODE_ENV && process.env.NODE_ENV != 'development' && process.env
 
 // use http mocks
 
-if (process.env.RECORD) {
-  console.log('@-->RECORDING', process.env.RECORD);
+switch (process.env.NOCK_MODE) {
+  case 'record':
+    nock.recorder.rec();
+    // write to file
+    // make filename from (iii + path | truncate:40).js
 
-  // capture input
-  nock.recorder.rec();
-
-  // write to file
-  // make filename from (method + path + params.qs | slugify | truncate: 40).js
+  case 'playback':
+    nock.recorder.playback();
 }
 
 // sitemap
@@ -76,6 +76,13 @@ app.all('/proxy/*', function(req, res, next) {
   // pipe request to remote API
   req.pipe(r).pipe(res);
 });
+
+// lets e2e tests know when the server is ready for use.
+app.get('/alive', function(req, resp) {
+  resp.end(JSON.stringify({
+    success: true
+  }));
+})
 
 // provide s3 policy for direct uploads
 app.get('/policy/:fname', function(req, res) {
