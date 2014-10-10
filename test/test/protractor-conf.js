@@ -2,7 +2,6 @@ require('coffee-script/register');
 var os = require('os');
 
 exports.config = {
-  //allScriptsTimeout: 30000,
   sauceUser: process.env.SAUCE_USERNAME,
   sauceKey: process.env.SAUCE_KEY,
   framework: 'jasmine',
