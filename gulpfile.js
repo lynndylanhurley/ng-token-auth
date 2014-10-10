@@ -35,6 +35,7 @@ var LIVERELOAD_PORT = 35729;
 var protractorSpawn = null;
 var testServerSpawn = null;
 var scSpawn         = null;
+var exitCode        = null;
 
 if (process.env.NODE_ENV) {
   DIST_DIR = 'test/dist-'+process.env.NODE_ENV.toLowerCase();
@@ -428,6 +429,12 @@ gulp.task('verify-e2e-server', function(cb) {
 });
 
 
+gulp.task('die', function() {
+  console.log('@-->exiting with code', exitCode);
+  process.kill(exitCode);
+});
+
+
 gulp.task('run-e2e-tests', function(cb) {
   console.log('@-->running e2e tests!!!');
 
@@ -436,8 +443,10 @@ gulp.task('run-e2e-tests', function(cb) {
   protractorSpawn.stdout.pipe(process.stdout);
   protractorSpawn.stderr.pipe(process.stderr);
 
-  protractorSpawn.on('exit', function() {
+  protractorSpawn.on('exit', function(code, signal) {
     console.log('killing protractor spawn...');
+    exitCode = code;
+
     protractorSpawn.kill('SIGHUP');
     if (scSpawn) {
       scSpawn.close(function() {
@@ -459,6 +468,7 @@ gulp.task('test:e2e', function(cb) {
     'verify-e2e-server',
     'run-e2e-tests',
     'kill-e2e-server',
+    'die',
     cb
   );
 });
