@@ -3,7 +3,7 @@ var os = require('os');
 
 exports.config = {
   sauceUser: process.env.SAUCE_USERNAME,
-  sauceKey: process.env.SAUCE_KEY,
+  sauceKey:  process.env.SAUCE_ACCESS_KEY,
   framework: 'jasmine',
 
   specs: [
@@ -13,10 +13,10 @@ exports.config = {
   //chromeOnly: true,
 
   capabilities: {
-    'browserName': 'chrome',
-    'name': 'ngTokenAuth e2e',
-    'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER,
-    'build': process.env.TRAVIS_BUILD_NUMBER
+    name:                'ngTokenAuth e2e',
+    build:               process.env.TRAVIS_BUILD_NUMBER,
+    browserName:         'chrome',
+    'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
   },
 
   baseUrl: 'http://localhost:8888',
