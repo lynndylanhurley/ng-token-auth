@@ -8,9 +8,6 @@ env:
   - secure: HTn8l3v3goXUtFzz4CfXsHxPx8lKWwNGyJ2VPmrDaPypdm0X5epAj31g239gZjaAsy/DcaH3IEzTc6zxWlJz6r95DuX40cDFqU96dTf+pzUN95FOOIFD9z4f8B6mFpD9IodnBYP7dC1r+SFY+wsepgE3PQ6UQvcOhWDsnxf8+3M=
   - NODE_ENV=travis
 
-addons:
-  sauce_connect: true
-
 cache:
   directories:
     - node_modules
