@@ -394,7 +394,8 @@ gulp.task('start-sauce-connect', function(cb) {
     username:         process.env.SAUCE_USERNAME,
     accessKey:        process.env.SAUCE_ACCESS_KEY,
     verbose:          true,
-    tunnelIdentifier: process.env.TRAVIS_BUILD_NUMBER
+    tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER,
+    build:            process.env.TRAVIS_BUILD_NUMBER
   }, function(err, scProcess) {
     if (err) {
       console.log('@-->sc err');
