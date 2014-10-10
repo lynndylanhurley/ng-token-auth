@@ -1,6 +1,6 @@
 describe "ng-token-auth", ->
   it 'should be sane', ->
-    expect(true).toBe false
+    expect(true).toBe true
 
   it 'should have a title', ->
     browser.get '/'

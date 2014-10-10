@@ -70,6 +70,7 @@
     "protractor": "^1.3.1",
     "q": "^1.0.1",
     "run-sequence": "~0.3.6",
+    "sauce-connect-launcher": "^0.6.1",
     "shelljs": "^0.2.6",
     "sinon": "^1.10.3",
     "tiny-lr": "0.0.7",

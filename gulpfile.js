@@ -16,6 +16,7 @@ var ngAnnotate = require('gulp-ng-annotate');
 var request    = require('request');
 var Q          = require('q');
 var spawn      = require('child_process').spawn;
+var sc         = require('sauce-connect-launcher');
 
 var appDir  = 'test/app/';
 var distDir = 'test/dist/';
@@ -33,6 +34,7 @@ var LIVERELOAD_PORT = 35729;
 // spawned processes
 var protractorSpawn = null;
 var testServerSpawn = null;
+var scSpawn         = null;
 
 if (process.env.NODE_ENV) {
   DIST_DIR = 'test/dist-'+process.env.NODE_ENV.toLowerCase();
@@ -387,6 +389,24 @@ gulp.task('kill-test-server', function(cb) {
   request('http://localhost:8888/kill');
 });
 
+gulp.task('start-sauce-connect', function(cb) {
+  sc({
+    username:         process.env.SAUCE_USERNAME,
+    accessKey:        process.env.SAUCE_ACCESS_KEY,
+    verbose:          true,
+    tunnelIdentifier: process.env.TRAVIS_BUILD_NUMBER
+  }, function(err, scProcess) {
+    if (err) {
+      console.log('@-->sc err');
+      throw err.message;
+    }
+
+    console.log('@-->Sauce Connect ready...');
+    scSpawn = scProcess;
+    cb();
+  });
+});
+
 
 gulp.task('start-e2e-server', function() {
   env = process.env;
@@ -416,8 +436,16 @@ gulp.task('run-e2e-tests', function(cb) {
   protractorSpawn.stderr.pipe(process.stderr);
 
   protractorSpawn.on('exit', function() {
+    console.log('killing protractor spawn...');
     protractorSpawn.kill('SIGHUP');
-    cb();
+    if (scSpawn) {
+      scSpawn.close(function() {
+        console.log('@-->Closed Sauce Connect process.');
+        cb();
+      });
+    } else {
+      cb();
+    }
   });
 });
 
@@ -425,6 +453,7 @@ gulp.task('run-e2e-tests', function(cb) {
 gulp.task('test:e2e', function(cb) {
   seq(
     'build-dev',
+    'start-sauce-connect',
     'start-e2e-server',
     'verify-e2e-server',
     'run-e2e-tests',
