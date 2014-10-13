@@ -16,6 +16,7 @@ var ngAnnotate = require('gulp-ng-annotate');
 var request    = require('request');
 var Q          = require('q');
 var spawn      = require('child_process').spawn;
+var exec       = require('child_process').exec;
 var sc         = require('sauce-connect-launcher');
 
 var appDir  = 'test/app/';
@@ -367,7 +368,6 @@ var pingTestServer = function(dfd) {
   // first run, init promise, start server
   if (!dfd) {
     var dfd = Q.defer();
-    seq('start-e2e-server');
   }
 
   // poll dev server until it response, then resolve promise.
@@ -411,6 +411,8 @@ gulp.task('start-e2e-server', function() {
   env.PORT = 8888;
 
   testServerSpawn = spawn('node', ['test/app.js'], {env: env});
+  testServerSpawn.stdout.pipe(process.stdout);
+  testServerSpawn.stderr.pipe(process.stderr);
 });
 
 
@@ -418,9 +420,10 @@ gulp.task('kill-e2e-server', function(cb) {
   console.log('killing e2e server...');
   testServerSpawn.on('close', function(code, signal) {
     console.log('e2e server is dead.');
+    cb();
   });
   testServerSpawn.kill('SIGTERM');
-})
+});
 
 
 gulp.task('verify-e2e-server', function(cb) {
@@ -431,22 +434,19 @@ gulp.task('verify-e2e-server', function(cb) {
 gulp.task('run-e2e-tests', function(cb) {
   console.log('@-->running e2e tests!!!');
 
-  protractorSpawn = spawn('protractor', ['test/test/protractor-conf.js'], {
-    stdio: 'inherit',
-    stderr: 'inherit'
-  });
+  protractorSpawn = spawn('protractor', ['test/test/protractor-conf.js']);
 
   // pipe output to this process
-  //protractorSpawn.stdout.pipe(process.stdout);
-  //protractorSpawn.stderr.pipe(process.stderr);
+  protractorSpawn.stdout.pipe(process.stdout);
+  protractorSpawn.stderr.pipe(process.stderr);
 
   protractorSpawn.on('exit', function(code, signal) {
     console.log('killing protractor spawn, code =', code);
     exitCode = code;
 
-    protractorSpawn.kill('SIGTERM');
+    protractorSpawn.kill(0);
     protractorSpawn.on('close', function(code, signal) {
-      console.log('protractor spawn is dead. exiting with code', code);
+      console.log('protractor spawn is dead.');
       cb();
     });
   });
@@ -482,7 +482,7 @@ gulp.task('test:e2e', function(cb) {
     'run-e2e-tests',
     'kill-e2e-server',
     'kill-sc-spawn',
-    'report-exit-code',
+    //'report-exit-code',
     cb
   );
 });
@@ -586,4 +586,11 @@ gulp.task('deploy', function(cb) {
     throw 'Error: you forgot to set NODE_ENV'
   }
   seq('build-prod', 'push', cb);
+});
+
+process.on('exit', function () {
+  console.log('@-->exiting with code', exitCode);
+  process.nextTick(function () {
+    process.exit(exitCode);
+  });
 });
