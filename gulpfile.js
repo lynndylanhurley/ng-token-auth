@@ -590,7 +590,8 @@ gulp.task('deploy', function(cb) {
 
 process.on('exit', function () {
   console.log('@-->exiting with code', exitCode);
-  process.nextTick(function () {
-    process.exit(exitCode);
-  });
+  process.exit(exitCode);
+  //process.nextTick(function () {
+    //process.exit(exitCode);
+  //});
 });
