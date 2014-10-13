@@ -447,9 +447,6 @@ gulp.task('run-e2e-tests', function(cb) {
     protractorSpawn.kill('SIGTERM');
     protractorSpawn.on('close', function(code, signal) {
       console.log('protractor spawn is dead. exiting with code', code);
-      if (exitCode !== 0) {
-        process.kill(exitCode);
-      }
       cb();
     });
   });
