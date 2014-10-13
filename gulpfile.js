@@ -35,7 +35,7 @@ var LIVERELOAD_PORT = 35729;
 var protractorSpawn = null;
 var testServerSpawn = null;
 var scSpawn         = null;
-var exitCode        = null;
+var exitCode        = 0;
 
 if (process.env.NODE_ENV) {
   DIST_DIR = 'test/dist-'+process.env.NODE_ENV.toLowerCase();
@@ -386,10 +386,6 @@ var pingTestServer = function(dfd) {
 };
 
 
-gulp.task('kill-test-server', function(cb) {
-  request('http://localhost:8888/kill');
-});
-
 gulp.task('start-sauce-connect', function(cb) {
   sc({
     username:         process.env.SAUCE_USERNAME,
@@ -418,9 +414,12 @@ gulp.task('start-e2e-server', function() {
 });
 
 
-gulp.task('kill-e2e-server', function() {
+gulp.task('kill-e2e-server', function(cb) {
   console.log('killing e2e server...');
-  testServerSpawn.kill('SIGHUP');
+  testServerSpawn.on('close', function(code, signal) {
+    console.log('e2e server is dead.');
+  });
+  testServerSpawn.kill();
 })
 
 
@@ -429,38 +428,52 @@ gulp.task('verify-e2e-server', function(cb) {
 });
 
 
-gulp.task('die', function() {
-  console.log('@-->exiting with code', exitCode);
-  process.kill(exitCode);
-});
-
-
 gulp.task('run-e2e-tests', function(cb) {
   console.log('@-->running e2e tests!!!');
 
-  protractorSpawn = spawn('protractor', ['test/test/protractor-conf.js']);
+  protractorSpawn = spawn('protractor', ['test/test/protractor-conf.js'], {
+    stdio: 'inherit',
+    stderr: 'inherit'
+  });
 
-  protractorSpawn.stdout.pipe(process.stdout);
-  protractorSpawn.stderr.pipe(process.stderr);
+  // pipe output to this process
+  //protractorSpawn.stdout.pipe(process.stdout);
+  //protractorSpawn.stderr.pipe(process.stderr);
 
   protractorSpawn.on('exit', function(code, signal) {
-    console.log('killing protractor spawn...');
+    console.log('killing protractor spawn, code =', code);
     exitCode = code;
 
-    protractorSpawn.kill('SIGHUP');
-    if (scSpawn) {
-      scSpawn.close(function() {
-        console.log('@-->Closed Sauce Connect process.');
-        cb();
-      });
-    } else {
+    protractorSpawn.kill();
+    protractorSpawn.on('close', function(code, signal) {
+      console.log('protractor spawn is dead.');
       cb();
-    }
+    });
   });
 });
 
 
+gulp.task('kill-sc-spawn', function(cb) {
+  if (scSpawn) {
+    console.log('@-->Closing Sauce Connect process.');
+    scSpawn.close(function() {
+      console.log('@-->Sauce Connect is dead.');
+      cb();
+    });
+    scSpawn.kill();
+  } else {
+    console.log('@-->No Sauce Connect to kill.');
+    cb();
+  }
+});
+
+
 gulp.task('test:e2e', function(cb) {
+  process.on('end', function() {
+    console.log('@-->finished, exiting with code', exitCode);
+    process.exit(exitCode);
+  });
+
   seq(
     'build-dev',
     //'start-sauce-connect',
@@ -468,7 +481,7 @@ gulp.task('test:e2e', function(cb) {
     'verify-e2e-server',
     'run-e2e-tests',
     'kill-e2e-server',
-    'die',
+    'kill-sc-spawn',
     cb
   );
 });
