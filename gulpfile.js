@@ -447,7 +447,9 @@ gulp.task('run-e2e-tests', function(cb) {
     protractorSpawn.kill('SIGTERM');
     protractorSpawn.on('close', function(code, signal) {
       console.log('protractor spawn is dead. exiting with code', code);
-      process.kill(exitCode);
+      if (exitCode !== 0) {
+        process.kill(exitCode);
+      }
       cb();
     });
   });
@@ -481,9 +483,9 @@ gulp.task('test:e2e', function(cb) {
     'start-e2e-server',
     'verify-e2e-server',
     'run-e2e-tests',
-    //'kill-e2e-server',
-    //'kill-sc-spawn',
-    //'report-exit-code',
+    'kill-e2e-server',
+    'kill-sc-spawn',
+    'report-exit-code',
     cb
   );
 });
