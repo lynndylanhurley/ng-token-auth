@@ -4,6 +4,8 @@
 [![Build Status](https://travis-ci.org/lynndylanhurley/ng-token-auth.svg?branch=master)](https://travis-ci.org/lynndylanhurley/ng-token-auth)
 [![Test Coverage](https://codeclimate.com/github/lynndylanhurley/ng-token-auth/coverage.png)](https://codeclimate.com/github/lynndylanhurley/ng-token-auth)
 
+[![Sauce Test Status](https://saucelabs.com/browser-matrix/lynndylanhurley.svg)](https://saucelabs.com/u/lynndylanhurley)
+
 # Simple, secure authentication for AngularJS.
 
 This module provides the following features:

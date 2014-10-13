@@ -434,7 +434,7 @@ gulp.task('verify-e2e-server', function(cb) {
 gulp.task('run-e2e-tests', function(cb) {
   console.log('@-->running e2e tests!!!');
 
-  protractorSpawn = spawn('protractor', ['test/test/protractor-conf.js']);
+  protractorSpawn = spawn('protractor', ['test/test/protractor-ci-conf.js']);
 
   // pipe output to this process
   protractorSpawn.stdout.pipe(process.stdout);
@@ -467,11 +467,6 @@ gulp.task('kill-sc-spawn', function(cb) {
   }
 });
 
-gulp.task('report-exit-code', function(cb) {
-  console.log('@-->finished, exiting with code', exitCode);
-  process.kill(exitCode);
-})
-
 
 gulp.task('test:e2e', function(cb) {
   seq(
@@ -482,7 +477,6 @@ gulp.task('test:e2e', function(cb) {
     'run-e2e-tests',
     'kill-e2e-server',
     'kill-sc-spawn',
-    //'report-exit-code',
     cb
   );
 });
