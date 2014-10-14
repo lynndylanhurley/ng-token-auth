@@ -560,7 +560,19 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
   };
 }).config([
   '$httpProvider', function($httpProvider) {
-    var httpMethods;
+    var httpMethods, updateHeadersFromResponse;
+    updateHeadersFromResponse = function($auth, resp) {
+      var key, newHeaders, val, _ref;
+      newHeaders = {};
+      _ref = $auth.getConfig().tokenFormat;
+      for (key in _ref) {
+        val = _ref[key];
+        if (resp.headers(key)) {
+          newHeaders[key] = resp.headers(key);
+        }
+      }
+      return $auth.setAuthHeaders(newHeaders);
+    };
     $httpProvider.interceptors.push([
       '$injector', function($injector) {
         return {
@@ -584,20 +596,27 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
           response: function(resp) {
             $injector.invoke([
               '$http', '$auth', function($http, $auth) {
-                var key, newHeaders, val, _ref;
                 if (resp.config.url.match($auth.apiUrl())) {
-                  newHeaders = {};
-                  _ref = $auth.getConfig().tokenFormat;
-                  for (key in _ref) {
-                    val = _ref[key];
-                    if (resp.headers(key)) {
-                      newHeaders[key] = resp.headers(key);
-                    }
-                  }
-                  return $auth.setAuthHeaders(newHeaders);
+                  return updateHeadersFromResponse($auth, resp);
                 }
               }
             ]);
+            return resp;
+          },
+          responseError: function(resp) {
+            var shouldReject;
+            shouldReject = false;
+            $injector.invoke([
+              '$http', '$auth', function($http, $auth) {
+                if (resp.config.url.match($auth.apiUrl())) {
+                  updateHeadersFromResponse($auth, resp);
+                  return shouldReject = true;
+                }
+              }
+            ]);
+            if (shouldReject) {
+              return $injector.get('$q').reject(resp);
+            }
             return resp;
           }
         };

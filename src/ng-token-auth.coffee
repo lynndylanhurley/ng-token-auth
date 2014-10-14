@@ -647,6 +647,16 @@ angular.module('ng-token-auth', ['ngCookies'])
   # each response will contain auth headers that have been updated by
   # the server. copy those headers for use in the next request.
   .config(['$httpProvider', ($httpProvider) ->
+    
+
+    # uniform handling of response headers for success or error conditions
+    updateHeadersFromResponse = ($auth, resp) ->
+      newHeaders = {}
+      for key, val of $auth.getConfig().tokenFormat
+        if resp.headers(key)
+          newHeaders[key] = resp.headers(key)
+      $auth.setAuthHeaders(newHeaders)
+
     # this is ugly...
     # we need to configure an interceptor (must be done in the configuration
     # phase), but we need access to the $http service, which is only available
@@ -666,14 +676,21 @@ angular.module('ng-token-auth', ['ngCookies'])
       response: (resp) ->
         $injector.invoke ['$http', '$auth', ($http, $auth) ->
           if resp.config.url.match($auth.apiUrl())
-            newHeaders = {}
-
-            for key, val of $auth.getConfig().tokenFormat
-              if resp.headers(key)
-                newHeaders[key] = resp.headers(key)
-
-            $auth.setAuthHeaders(newHeaders)
+            return updateHeadersFromResponse($auth, resp)
         ]
+
+        return resp
+
+      responseError: (resp) ->
+        shouldReject = false
+        $injector.invoke ['$http', '$auth', ($http, $auth) ->
+          if resp.config.url.match($auth.apiUrl())
+            updateHeadersFromResponse($auth, resp)
+            shouldReject = true
+        ]
+
+        if shouldReject
+          return $injector.get('$q').reject(resp)
 
         return resp
     ]
