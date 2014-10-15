@@ -685,7 +685,6 @@ angular.module('ng-token-auth', ['ngCookies'])
         $injector.invoke ['$http', '$auth', ($http, $auth) ->
           if resp.config.url.match($auth.apiUrl())
             updateHeadersFromResponse($auth, resp)
-            shouldReject = true
         ]
 
         return $injector.get('$q').reject(resp)
