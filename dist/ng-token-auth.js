@@ -604,20 +604,16 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
             return resp;
           },
           responseError: function(resp) {
-            var shouldReject;
-            shouldReject = false;
             $injector.invoke([
               '$http', '$auth', function($http, $auth) {
+                var shouldReject;
                 if (resp.config.url.match($auth.apiUrl())) {
                   updateHeadersFromResponse($auth, resp);
                   return shouldReject = true;
                 }
               }
             ]);
-            if (shouldReject) {
-              return $injector.get('$q').reject(resp);
-            }
-            return resp;
+            return $injector.get('$q').reject(resp);
           }
         };
       }

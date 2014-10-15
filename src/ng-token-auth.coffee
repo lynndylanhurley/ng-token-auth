@@ -682,17 +682,13 @@ angular.module('ng-token-auth', ['ngCookies'])
         return resp
 
       responseError: (resp) ->
-        shouldReject = false
         $injector.invoke ['$http', '$auth', ($http, $auth) ->
           if resp.config.url.match($auth.apiUrl())
             updateHeadersFromResponse($auth, resp)
             shouldReject = true
         ]
 
-        if shouldReject
-          return $injector.get('$q').reject(resp)
-
-        return resp
+        return $injector.get('$q').reject(resp)
     ]
 
     # define http methods that may need to carry auth headers
