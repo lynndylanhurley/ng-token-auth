@@ -7,4 +7,5 @@ test/app/bower_components
 test/app/bower_components
 test/config/development.yml
 test/config/production.yml
+test/config/sauce.json
 coverage

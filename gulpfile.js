@@ -33,7 +33,6 @@ var DIST_DIR        = distDir;
 var LIVERELOAD_PORT = 35729;
 
 // spawned processes
-var protractorSpawn = null;
 var testServerSpawn = null;
 var scSpawn         = null;
 var exitCode        = 0;
@@ -370,6 +369,8 @@ var pingTestServer = function(dfd) {
     var dfd = Q.defer();
   }
 
+  console.log('sending request');
+
   // poll dev server until it response, then resolve promise.
   request('http://localhost:8888/alive', function(err) {
     if (err) {
@@ -427,14 +428,18 @@ gulp.task('kill-e2e-server', function(cb) {
 
 
 gulp.task('verify-e2e-server', function(cb) {
+  console.log('pinging server');
   pingTestServer().then(function() { cb(); });
 });
 
 
-gulp.task('run-e2e-tests', function(cb) {
-  console.log('@-->running e2e tests!!!');
+var runE2ETest = function(conf, browser) {
+  var dfd = Q.defer();
+  var env = JSON.parse(JSON.stringify(process.env));
 
-  protractorSpawn = spawn('protractor', ['test/test/protractor-ci-conf.js']);
+  env.CAPABILITIES = JSON.stringify(browser);
+
+  var protractorSpawn = spawn('protractor', [conf], {env: env});
 
   // pipe output to this process
   protractorSpawn.stdout.pipe(process.stdout);
@@ -442,14 +447,80 @@ gulp.task('run-e2e-tests', function(cb) {
 
   protractorSpawn.on('exit', function(code, signal) {
     console.log('killing protractor spawn, code =', code);
-    exitCode = code;
+    if (code !== 0) {
+      console.log('@-->setting exit code to', code);
+      protractorSpawn = null;
+      exitCode = code;
+    }
 
     protractorSpawn.kill(0);
     protractorSpawn.on('close', function(code, signal) {
       console.log('protractor spawn is dead.');
-      cb();
+      dfd.resolve();
     });
   });
+
+  return dfd.promise;
+}
+
+
+gulp.task('run-e2e-tests', function(cb) {
+  var conf = 'test/test/protractor-ci-conf.js';
+
+  var browsers = [{
+    browserName:         'chrome',
+    build:               process.env.TRAVIS_BUILD_NUMBER,
+    'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
+  }, {
+    browserName:         'firefox',
+    build:               process.env.TRAVIS_BUILD_NUMBER,
+    'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
+  }, {
+    browserName:         'safari',
+    build:               process.env.TRAVIS_BUILD_NUMBER,
+    'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
+  }, {
+    browserName:         'internet explorer',
+    version:             11,
+    build:               process.env.TRAVIS_BUILD_NUMBER,
+    'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
+  }, {
+    browserName:         'internet explorer',
+    version:             10,
+    maxInstances:        1,
+    build:               process.env.TRAVIS_BUILD_NUMBER,
+    'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
+  }, {
+    browserName:         'internet explorer',
+    version:             9,
+    maxInstances:        1,
+    build:               process.env.TRAVIS_BUILD_NUMBER,
+    'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
+  }, {
+    browserName:         'internet explorer',
+    version:             8,
+    maxInstances:        1,
+    build:               process.env.TRAVIS_BUILD_NUMBER,
+    'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
+  }];
+
+  var tests = browsers.map(function(b) {
+    return function(prev) {
+      return runE2ETest(conf, b);
+    }
+  });
+
+  console.log('tests', tests);
+
+  tests.reduce(Q.when, Q());
+
+  //browsers.reduceRight(function(next, browser) {
+    //return function(prev) {
+      //return runE2ETest(conf, browser).then(function(res) {
+        //return next();
+      //})
+    //}
+  //})();
 });
 
 
@@ -469,13 +540,14 @@ gulp.task('kill-sc-spawn', function(cb) {
 
 
 gulp.task('test:e2e', function(cb) {
+  console.log('@-->test:e2e')
   seq(
-    'build-dev',
+    //'build-dev',
     //'start-sauce-connect',
-    'start-e2e-server',
+    //'start-e2e-server',
     'verify-e2e-server',
     'run-e2e-tests',
-    'kill-e2e-server',
+    //'kill-e2e-server',
     'kill-sc-spawn',
     cb
   );

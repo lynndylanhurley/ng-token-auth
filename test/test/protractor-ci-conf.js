@@ -1,9 +1,13 @@
 require('coffee-script/register');
-var os = require('os');
+var os    = require('os');
+var creds = require('../config/sauce.json') || process.env;
+
+console.log('@-->sauce username', creds.SAUCE_USERNAME);
+console.log('@-->capabilities', process.env.CAPABILITIES);
 
 exports.config = {
-  sauceUser: process.env.SAUCE_USERNAME,
-  sauceKey:  process.env.SAUCE_ACCESS_KEY,
+  sauceUser: creds.SAUCE_USERNAME,
+  sauceKey:  creds.SAUCE_ACCESS_KEY,
   framework: 'jasmine',
 
   specs: [
@@ -12,51 +16,49 @@ exports.config = {
 
   //chromeOnly: true,
 
-  multiCapabilities: [{
-    browserName:         'chrome',
-    maxInstances:        1,
-    build:               process.env.TRAVIS_BUILD_NUMBER,
-    'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
-  }, {
-    browserName:         'firefox',
-    maxInstances:        1,
-    build:               process.env.TRAVIS_BUILD_NUMBER,
-    'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
-  }, {
-    browserName:         'safari',
-    maxInstances:        1,
-    build:               process.env.TRAVIS_BUILD_NUMBER,
-    'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
-  }, {
-    browserName:         'internet explorer',
-    version:             11,
-    maxInstances:        1,
-    build:               process.env.TRAVIS_BUILD_NUMBER,
-    'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
-  }, {
-    browserName:         'internet explorer',
-    version:             10,
-    maxInstances:        1,
-    build:               process.env.TRAVIS_BUILD_NUMBER,
-    'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
-  }, {
-    browserName:         'internet explorer',
-    version:             9,
-    maxInstances:        1,
-    build:               process.env.TRAVIS_BUILD_NUMBER,
-    'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
-  }, {
-    browserName:         'internet explorer',
-    version:             8,
-    maxInstances:        1,
-    build:               process.env.TRAVIS_BUILD_NUMBER,
-    'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
-  }],
+  capabilities: JSON.parse(process.env.CAPABILITIES),
+
+  //multiCapabilities: [{
+    //browserName:         'chrome',
+    //build:               process.env.TRAVIS_BUILD_NUMBER,
+    //'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
+  //}, {
+    //browserName:         'firefox',
+    //build:               process.env.TRAVIS_BUILD_NUMBER,
+    //'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
+  //}, {
+    //browserName:         'safari',
+    //build:               process.env.TRAVIS_BUILD_NUMBER,
+    //'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
+  //}, {
+    //browserName:         'internet explorer',
+    //version:             11,
+    //build:               process.env.TRAVIS_BUILD_NUMBER,
+    //'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
+  //}, {
+    //browserName:         'internet explorer',
+    //version:             10,
+    //maxInstances:        1,
+    //build:               process.env.TRAVIS_BUILD_NUMBER,
+    //'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
+  //}, {
+    //browserName:         'internet explorer',
+    //version:             9,
+    //maxInstances:        1,
+    //build:               process.env.TRAVIS_BUILD_NUMBER,
+    //'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
+  //}, {
+    //browserName:         'internet explorer',
+    //version:             8,
+    //maxInstances:        1,
+    //build:               process.env.TRAVIS_BUILD_NUMBER,
+    //'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
+  //}],
 
   baseUrl: 'http://localhost:8888',
 
   jasmineNodeOpts: {
     showColors: true,
-    defaultTimeoutInterval: 30000
+    defaultTimeoutInterval: 300000
   }
 };
