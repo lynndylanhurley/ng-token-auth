@@ -94,7 +94,7 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
               return this.addScopeMethods();
             },
             initializeListeners: function() {
-              this.listener = this.handlePostMessage.bind(this);
+              this.listener = angular.bind(this, this.handlePostMessage);
               if ($window.addEventListener) {
                 return $window.addEventListener("message", this.listener, false);
               }
@@ -136,14 +136,14 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
             },
             addScopeMethods: function() {
               $rootScope.user = this.user;
-              $rootScope.authenticate = this.authenticate.bind(this);
-              $rootScope.signOut = this.signOut.bind(this);
-              $rootScope.destroyAccount = this.destroyAccount.bind(this);
-              $rootScope.submitRegistration = this.submitRegistration.bind(this);
-              $rootScope.submitLogin = this.submitLogin.bind(this);
-              $rootScope.requestPasswordReset = this.requestPasswordReset.bind(this);
-              $rootScope.updatePassword = this.updatePassword.bind(this);
-              $rootScope.updateAccount = this.updateAccount.bind(this);
+              $rootScope.authenticate = angular.bind(this, this.authenticate);
+              $rootScope.signOut = angular.bind(this, this.signOut);
+              $rootScope.destroyAccount = angular.bind(this, this.destroyAccount);
+              $rootScope.submitRegistration = angular.bind(this, this.submitRegistration);
+              $rootScope.submitLogin = angular.bind(this, this.submitLogin);
+              $rootScope.requestPasswordReset = angular.bind(this, this.requestPasswordReset);
+              $rootScope.updatePassword = angular.bind(this, this.updatePassword);
+              $rootScope.updateAccount = angular.bind(this, this.updateAccount);
               if (this.getConfig().validateOnPageLoad) {
                 return this.validateUser({
                   config: this.getSavedConfig()
