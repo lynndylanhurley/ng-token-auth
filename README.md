@@ -1301,6 +1301,8 @@ Satellizer occupies the same problem domain as ng-token-auth. Advantages of ng-t
 
 This module has been featured by [http://angular-js.in](http://angular-js.in/).
 
+Special thanks to @jasonswett for [this helpful guide](https://www.airpair.com/ruby-on-rails-4/posts/authentication-with-angularjs-and-ruby-on-rails)!
+
 # License
 
 This project uses the WTFPL
