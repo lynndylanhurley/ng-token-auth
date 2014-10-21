@@ -553,12 +553,12 @@ gulp.task('kill-sc-spawn', function(cb) {
 gulp.task('test:e2e', function(cb) {
   console.log('@-->test:e2e')
   seq(
-    //'build-dev',
-    //'start-sauce-connect',
-    //'start-e2e-server',
-    //'verify-e2e-server',
+    'build-dev',
+    'start-sauce-connect',
+    'start-e2e-server',
+    'verify-e2e-server',
     'run-e2e-tests',
-    //'kill-e2e-server',
+    'kill-e2e-server',
     'kill-sc-spawn',
     cb
   );
