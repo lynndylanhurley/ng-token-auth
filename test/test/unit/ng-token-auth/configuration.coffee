@@ -33,8 +33,6 @@ suite 'configuration', ->
 
       $httpBackend
         .expectGET('/proxy/auth/validate_token', (headers) ->
-          console.log 'validAuthHeader', validAuthHeader['access-token']
-          console.log 'cur', headers['access-token']
           assert.equal(validAuthHeader['access-token'], headers['access-token'])
           headers
         )

@@ -1,3 +1,3 @@
 angular.module('ngTokenAuthTestApp')
   .controller 'IndexCtrl', ($scope, $auth, $http, $q) ->
-    Prism.highlightAll() if Prism?
+    #Prism.highlightAll() if Prism?

@@ -362,6 +362,8 @@ gulp.task('push', $.shell.task([
 ]));
 
 
+//================= EXTRACT INTO GULP PLUGIN =================//
+
 // recursively try until test server is ready. return promise.
 var pingTestServer = function(dfd) {
   // first run, init promise, start server
@@ -387,7 +389,29 @@ var pingTestServer = function(dfd) {
 };
 
 
+var setSauceCreds = function() {
+  var sauceConfig = require('./test/config/sauce.json')
+
+  if (!process.env.SAUCE_USERNAME) {
+    if (sauceConfig.SAUCE_USERNAME) {
+      process.env.SAUCE_USERNAME = sauceConfig.SAUCE_USERNAME;
+    } else {
+      throw "Cannot find SAUCE_USERNAME value in env or test/config/sauce.json";
+    }
+    }
+
+  if (!process.env.SAUCE_ACCESS_KEY) {
+    if (sauceConfig.SAUCE_ACCESS_KEY) {
+      process.env.SAUCE_ACCESS_KEY = sauceConfig.SAUCE_ACCESS_KEY;
+    } else {
+      throw "Cannot find SAUCE_ACCESS_KEY value in env or test/config/sauce.json";
+    }
+  }
+}
+
 gulp.task('start-sauce-connect', function(cb) {
+  setSauceCreds();
+
   sc({
     username:         process.env.SAUCE_USERNAME,
     accessKey:        process.env.SAUCE_ACCESS_KEY,
@@ -487,19 +511,16 @@ gulp.task('run-e2e-tests', function(cb) {
   }, {
     browserName:         'internet explorer',
     version:             10,
-    maxInstances:        1,
     build:               process.env.TRAVIS_BUILD_NUMBER,
     'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
   }, {
     browserName:         'internet explorer',
     version:             9,
-    maxInstances:        1,
     build:               process.env.TRAVIS_BUILD_NUMBER,
     'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
   }, {
     browserName:         'internet explorer',
     version:             8,
-    maxInstances:        1,
     build:               process.env.TRAVIS_BUILD_NUMBER,
     'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
   }];
@@ -510,17 +531,7 @@ gulp.task('run-e2e-tests', function(cb) {
     }
   });
 
-  console.log('tests', tests);
-
   tests.reduce(Q.when, Q());
-
-  //browsers.reduceRight(function(next, browser) {
-    //return function(prev) {
-      //return runE2ETest(conf, browser).then(function(res) {
-        //return next();
-      //})
-    //}
-  //})();
 });
 
 
@@ -545,7 +556,7 @@ gulp.task('test:e2e', function(cb) {
     //'build-dev',
     //'start-sauce-connect',
     //'start-e2e-server',
-    'verify-e2e-server',
+    //'verify-e2e-server',
     'run-e2e-tests',
     //'kill-e2e-server',
     'kill-sc-spawn',
@@ -553,6 +564,7 @@ gulp.task('test:e2e', function(cb) {
   );
 });
 
+//================= END GULP PLUGIN =================//
 
 // Watch
 gulp.task('watch', function () {
