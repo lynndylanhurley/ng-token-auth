@@ -443,11 +443,7 @@ gulp.task('start-e2e-server', function() {
 
 gulp.task('kill-e2e-server', function(cb) {
   console.log('killing e2e server...');
-  testServerSpawn.on('close', function(code, signal) {
-    console.log('e2e server is dead.');
-    cb();
-  });
-  testServerSpawn.kill('SIGTERM');
+  killE2EServer().then(function() { cb(); });
 });
 
 
@@ -455,6 +451,25 @@ gulp.task('verify-e2e-server', function(cb) {
   console.log('pinging server');
   pingTestServer().then(function() { cb(); });
 });
+
+
+var killE2EServer = function() {
+  var dfd = Q.defer();
+
+  console.log('killing e2e server');
+
+  if (testServerSpawn) {
+    testServerSpawn.on('close', function(code, signal) {
+      console.log('e2e server is dead.');
+      dfd.resolve();
+    });
+    testServerSpawn.kill('SIGTERM');
+  } else {
+    dfd.resolve();
+  }
+
+  return dfd.promise;
+}
 
 
 var runE2ETest = function(conf, browser) {
@@ -465,6 +480,8 @@ var runE2ETest = function(conf, browser) {
 
   var protractorSpawn = spawn('protractor', [conf], {env: env});
 
+  $.util.log('@-->starting e2e test for', browser.browserName, browser.version);
+
   // pipe output to this process
   protractorSpawn.stdout.pipe(process.stdout);
   protractorSpawn.stderr.pipe(process.stderr);
@@ -473,15 +490,15 @@ var runE2ETest = function(conf, browser) {
     console.log('killing protractor spawn, code =', code);
     if (code !== 0) {
       console.log('@-->setting exit code to', code);
-      protractorSpawn = null;
       exitCode = code;
     }
 
     protractorSpawn.kill(0);
-    protractorSpawn.on('close', function(code, signal) {
-      console.log('protractor spawn is dead.');
-      dfd.resolve();
-    });
+    dfd.resolve();
+  });
+
+  protractorSpawn.on('close', function(code, signal) {
+    console.log('protractor spawn is dead.');
   });
 
   return dfd.promise;
@@ -529,6 +546,10 @@ gulp.task('run-e2e-tests', function(cb) {
     return function(prev) {
       return runE2ETest(conf, b);
     }
+  });
+
+  tests.push(function() {
+    cb();
   });
 
   tests.reduce(Q.when, Q());
@@ -668,5 +689,5 @@ gulp.task('deploy', function(cb) {
 
 process.on('exit', function () {
   console.log('@-->exiting with code', exitCode);
-  process.exit(exitCode);
+  killE2EServer().then(function() { process.exit(exitCode); });
 });

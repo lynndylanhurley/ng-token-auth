@@ -27,8 +27,11 @@ exports.config = {
 
   baseUrl: 'http://localhost:8888',
 
+  getPageTimeout: 50000,
+  allScriptsTimeout: 50000,
+
   jasmineNodeOpts: {
     showColors: true,
-    defaultTimeoutInterval: 30000
+    defaultTimeoutInterval: 50000
   }
 };
