@@ -390,7 +390,10 @@ var pingTestServer = function(dfd) {
 
 
 var setSauceCreds = function() {
-  var sauceConfig = require('./test/config/sauce.json')
+  var sauceConfig = {};
+  try {
+    var sauceConfig = require('./test/config/sauce.json')
+  } catch (ex) {}
 
   if (!process.env.SAUCE_USERNAME) {
     if (sauceConfig.SAUCE_USERNAME) {

@@ -1,6 +1,12 @@
 require('coffee-script/register');
 var os    = require('os');
-var creds = require('../config/sauce.json') || process.env;
+var creds = {};
+
+try {
+  creds = require('./test/config/sauce.json');
+} catch (ex) {
+  creds = process.env;
+}
 
 if (!creds.SAUCE_USERNAME) {
   throw "@-->ERROR: SAUCE_USERNAME not found in test/config/sauce.json or ENV.";
