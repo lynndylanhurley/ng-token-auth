@@ -364,12 +364,30 @@ gulp.task('start-sauce-connect', function(cb) {
 });
 
 
-gulp.task('test:e2e', function(cb) {
+gulp.task('test:e2e:dev', function(cb) {
+  var opts = {
+    nodeApp:   null,
+    nodeHost:  'localhost',
+    nodePort:  7777,
+    e2EConfig: 'test/test/protractor-ci-conf.js',
+    specs: [
+      'e2e/ng-token-auth/*.coffee'
+    ]
+  };
+
+  pXor.testE2E(opts).then(function() { cb(); });
+});
+
+
+gulp.task('test:e2e:ci', function(cb) {
   var opts = {
     nodeApp:   'test/app.js',
     nodeHost:  'localhost',
     nodePort:  8888,
     e2EConfig: 'test/test/protractor-ci-conf.js',
+    specs: [
+      'e2e/ng-token-auth/*.coffee'
+    ],
     browsers: [{
       browserName:         'chrome',
       build:               process.env.TRAVIS_BUILD_NUMBER,
@@ -465,6 +483,9 @@ gulp.task('watch', function () {
 
   // Watch bower files
   gulp.watch(appDir+'bower_components/*', ['bowerjs', 'bowercss']);
+
+  // Watch test files
+  gulp.watch('test/test/e2e/**/*.coffee', ['test:e2e:dev']);
 });
 
 // Composite tasks

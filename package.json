@@ -74,6 +74,7 @@
     "shelljs": "^0.2.6",
     "sinon": "^1.10.3",
     "tiny-lr": "0.0.7",
+    "tracer": "^0.7.3",
     "wiredep": "~1.8.1"
   },
   "scripts": {

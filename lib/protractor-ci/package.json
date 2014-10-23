@@ -16,7 +16,8 @@
   "dependencies": {
     "q": "^1.0.1",
     "sauce-connect-launcher": "^0.6.1",
-    "request": "~2.36.0"
+    "request": "~2.36.0",
+    "gulp-util": "~3.0.1"
   },
   "devDependencies": {},
   "repository": {
