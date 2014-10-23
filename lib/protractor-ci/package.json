@@ -1,0 +1,41 @@
+{
+  "name": "protractor-ci",
+  "version": "0.0.1",
+  "main": "./protractor-ci.js",
+  "description": "Just run the fucking tests.",
+  "author": {
+    "name": "Lynn Dylan Hurley",
+    "email": "lynn.dylan.hurley@gmail.com"
+  },
+  "homepage": "http://github.com/lynndylanhurley/protractor-ci",
+  "directories": {
+  },
+  "licenses": [
+    "MIT"
+  ],
+  "dependencies": {
+    "q": "^1.0.1",
+    "sauce-connect-launcher": "^0.6.1",
+    "request": "~2.36.0"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/lynndylanhurley/protractor-ci.git"
+  },
+  "engines": {
+    "node": ">0.4.x"
+  },
+  "scripts": {
+    "test": "./node_modules/vows/bin/vows test/*.js --spec"
+  },
+  "bugs": {
+    "url": "http://github.com/lynndylanhurley/protractor-ci/issues"
+  },
+  "maintainers": [
+    {
+      "name": "lynndylanhurley",
+      "email": "lynndylanhurley@gmail.com"
+    }
+  ]
+}

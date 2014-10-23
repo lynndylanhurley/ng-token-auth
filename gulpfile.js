@@ -18,6 +18,7 @@ var Q          = require('q');
 var spawn      = require('child_process').spawn;
 var exec       = require('child_process').exec;
 var sc         = require('sauce-connect-launcher');
+var pXor       = require('./lib/protractor-ci/protractor-ci.js');
 
 var appDir  = 'test/app/';
 var distDir = 'test/dist/';
@@ -32,10 +33,6 @@ var tag             = env + '-' + new Date().getTime();
 var DIST_DIR        = distDir;
 var LIVERELOAD_PORT = 35729;
 
-// spawned processes
-var testServerSpawn = null;
-var scSpawn         = null;
-var exitCode        = 0;
 
 if (process.env.NODE_ENV) {
   DIST_DIR = 'test/dist-'+process.env.NODE_ENV.toLowerCase();
@@ -362,233 +359,55 @@ gulp.task('push', $.shell.task([
 ]));
 
 
-//================= EXTRACT INTO GULP PLUGIN =================//
-
-// recursively try until test server is ready. return promise.
-var pingTestServer = function(dfd) {
-  // first run, init promise, start server
-  if (!dfd) {
-    var dfd = Q.defer();
-  }
-
-  console.log('sending request');
-
-  // poll dev server until it response, then resolve promise.
-  request('http://localhost:8888/alive', function(err) {
-    if (err) {
-      setTimeout(function() {
-        console.log('test server failed, checking again in 100ms');
-        pingTestServer(dfd);
-      }, 100);
-    } else {
-      dfd.resolve()
-    }
-  });
-
-  return dfd.promise;
-};
-
-
-var setSauceCreds = function() {
-  var sauceConfig = {};
-  try {
-    var sauceConfig = require('./test/config/sauce.json')
-  } catch (ex) {}
-
-  if (!process.env.SAUCE_USERNAME) {
-    if (sauceConfig.SAUCE_USERNAME) {
-      process.env.SAUCE_USERNAME = sauceConfig.SAUCE_USERNAME;
-    } else {
-      throw "Cannot find SAUCE_USERNAME value in env or test/config/sauce.json";
-    }
-    }
-
-  if (!process.env.SAUCE_ACCESS_KEY) {
-    if (sauceConfig.SAUCE_ACCESS_KEY) {
-      process.env.SAUCE_ACCESS_KEY = sauceConfig.SAUCE_ACCESS_KEY;
-    } else {
-      throw "Cannot find SAUCE_ACCESS_KEY value in env or test/config/sauce.json";
-    }
-  }
-}
-
 gulp.task('start-sauce-connect', function(cb) {
-  setSauceCreds();
-
-  sc({
-    username:         process.env.SAUCE_USERNAME,
-    accessKey:        process.env.SAUCE_ACCESS_KEY,
-    verbose:          true,
-    tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER,
-    build:            process.env.TRAVIS_BUILD_NUMBER
-  }, function(err, scProcess) {
-    if (err) {
-      console.log('@-->sc err');
-      throw err.message;
-    }
-
-    console.log('@-->Sauce Connect ready...');
-    scSpawn = scProcess;
-    cb();
-  });
-});
-
-
-gulp.task('start-e2e-server', function() {
-  env = process.env;
-  env.PORT = 8888;
-
-  testServerSpawn = spawn('node', ['test/app.js'], {env: env});
-  testServerSpawn.stdout.pipe(process.stdout);
-  testServerSpawn.stderr.pipe(process.stderr);
-});
-
-
-gulp.task('kill-e2e-server', function(cb) {
-  console.log('killing e2e server...');
-  killE2EServer().then(function() { cb(); });
-});
-
-
-gulp.task('verify-e2e-server', function(cb) {
-  console.log('pinging server');
-  pingTestServer().then(function() { cb(); });
-});
-
-
-var killE2EServer = function() {
-  var dfd = Q.defer();
-
-  console.log('killing e2e server');
-
-  if (testServerSpawn) {
-    testServerSpawn.on('close', function(code, signal) {
-      console.log('e2e server is dead.');
-      dfd.resolve();
-    });
-    testServerSpawn.kill('SIGTERM');
-  } else {
-    dfd.resolve();
-  }
-
-  return dfd.promise;
-}
-
-
-var runE2ETest = function(conf, browser) {
-  var dfd = Q.defer();
-  var env = JSON.parse(JSON.stringify(process.env));
-
-  env.CAPABILITIES = JSON.stringify(browser);
-
-  var protractorSpawn = spawn('protractor', [conf], {env: env});
-
-  $.util.log('@-->starting e2e test for', browser.browserName, browser.version);
-
-  // pipe output to this process
-  protractorSpawn.stdout.pipe(process.stdout);
-  protractorSpawn.stderr.pipe(process.stderr);
-
-  protractorSpawn.on('exit', function(code, signal) {
-    console.log('killing protractor spawn, code =', code);
-    if (code !== 0) {
-      console.log('@-->setting exit code to', code);
-      exitCode = code;
-    }
-
-    protractorSpawn.kill(0);
-    dfd.resolve();
-  });
-
-  protractorSpawn.on('close', function(code, signal) {
-    console.log('protractor spawn is dead.');
-  });
-
-  return dfd.promise;
-}
-
-
-gulp.task('run-e2e-tests', function(cb) {
-  var conf = 'test/test/protractor-ci-conf.js';
-
-  var browsers = [{
-    browserName:         'chrome',
-    build:               process.env.TRAVIS_BUILD_NUMBER,
-    'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
-  }, {
-    browserName:         'firefox',
-    build:               process.env.TRAVIS_BUILD_NUMBER,
-    'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
-  }, {
-    browserName:         'safari',
-    build:               process.env.TRAVIS_BUILD_NUMBER,
-    'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
-  }, {
-    browserName:         'internet explorer',
-    version:             11,
-    build:               process.env.TRAVIS_BUILD_NUMBER,
-    'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
-  }, {
-    browserName:         'internet explorer',
-    version:             10,
-    build:               process.env.TRAVIS_BUILD_NUMBER,
-    'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
-  }, {
-    browserName:         'internet explorer',
-    version:             9,
-    build:               process.env.TRAVIS_BUILD_NUMBER,
-    'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
-  }, {
-    browserName:         'internet explorer',
-    version:             8,
-    build:               process.env.TRAVIS_BUILD_NUMBER,
-    'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
-  }];
-
-  var tests = browsers.map(function(b) {
-    return function(prev) {
-      return runE2ETest(conf, b);
-    }
-  });
-
-  tests.push(function() {
-    cb();
-  });
-
-  tests.reduce(Q.when, Q());
-});
-
-
-gulp.task('kill-sc-spawn', function(cb) {
-  if (scSpawn) {
-    console.log('@-->Closing Sauce Connect process.');
-    scSpawn.close(function() {
-      console.log('@-->Sauce Connect is dead.');
-      cb();
-    });
-    scSpawn.kill('SIGTERM');
-  } else {
-    console.log('@-->No Sauce Connect to kill.');
-    cb();
-  }
+  pXor.startSauceConnect().then(function() { cb(); });
 });
 
 
 gulp.task('test:e2e', function(cb) {
-  console.log('@-->test:e2e')
-  seq(
-    'build-dev',
-    //'start-sauce-connect',
-    'start-e2e-server',
-    'verify-e2e-server',
-    'run-e2e-tests',
-    'kill-e2e-server',
-    'kill-sc-spawn',
-    cb
-  );
+  var opts = {
+    nodeApp:   'test/app.js',
+    nodeHost:  'localhost',
+    nodePort:  8888,
+    e2EConfig: 'test/test/protractor-ci-conf.js',
+    browsers: [{
+      browserName:         'chrome',
+      build:               process.env.TRAVIS_BUILD_NUMBER,
+      'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
+    }, {
+      browserName:         'firefox',
+      build:               process.env.TRAVIS_BUILD_NUMBER,
+      'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
+    }, {
+      browserName:         'safari',
+      build:               process.env.TRAVIS_BUILD_NUMBER,
+      'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
+    }, {
+      browserName:         'internet explorer',
+      version:             11,
+      build:               process.env.TRAVIS_BUILD_NUMBER,
+      'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
+    }, {
+      browserName:         'internet explorer',
+      version:             10,
+      build:               process.env.TRAVIS_BUILD_NUMBER,
+      'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
+    }, {
+      browserName:         'internet explorer',
+      version:             9,
+      build:               process.env.TRAVIS_BUILD_NUMBER,
+      'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
+    }, {
+      browserName:         'internet explorer',
+      version:             8,
+      build:               process.env.TRAVIS_BUILD_NUMBER,
+      'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
+    }]
+  };
+
+  pXor.testE2E(opts).then(function() { cb() });
 });
 
-//================= END GULP PLUGIN =================//
 
 // Watch
 gulp.task('watch', function () {
@@ -688,9 +507,4 @@ gulp.task('deploy', function(cb) {
     throw 'Error: you forgot to set NODE_ENV'
   }
   seq('build-prod', 'push', cb);
-});
-
-process.on('exit', function () {
-  console.log('@-->exiting with code', exitCode);
-  killE2EServer().then(function() { process.exit(exitCode); });
 });
