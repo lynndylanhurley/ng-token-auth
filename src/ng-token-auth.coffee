@@ -102,7 +102,8 @@ angular.module('ng-token-auth', ['ngCookies'])
 
 
           initializeListeners: ->
-            @listener = @handlePostMessage.bind(@)
+            #@listener = @handlePostMessage.bind(@)
+            @listener = angular.bind(@, @handlePostMessage)
 
             if $window.addEventListener
               $window.addEventListener("message", @listener, false)
@@ -151,16 +152,16 @@ angular.module('ng-token-auth', ['ngCookies'])
             $rootScope.user = @user
 
             # template access to authentication method
-            $rootScope.authenticate  = @authenticate.bind(@)
+            $rootScope.authenticate  = angular.bind(@, @authenticate)
 
             # template access to view actions
-            $rootScope.signOut              = @signOut.bind(@)
-            $rootScope.destroyAccount       = @destroyAccount.bind(@)
-            $rootScope.submitRegistration   = @submitRegistration.bind(@)
-            $rootScope.submitLogin          = @submitLogin.bind(@)
-            $rootScope.requestPasswordReset = @requestPasswordReset.bind(@)
-            $rootScope.updatePassword       = @updatePassword.bind(@)
-            $rootScope.updateAccount        = @updateAccount.bind(@)
+            $rootScope.signOut              = angular.bind(@, @signOut)
+            $rootScope.destroyAccount       = angular.bind(@, @destroyAccount)
+            $rootScope.submitRegistration   = angular.bind(@, @submitRegistration)
+            $rootScope.submitLogin          = angular.bind(@, @submitLogin)
+            $rootScope.requestPasswordReset = angular.bind(@, @requestPasswordReset)
+            $rootScope.updatePassword       = angular.bind(@, @updatePassword)
+            $rootScope.updateAccount        = angular.bind(@, @updateAccount)
 
             # check to see if user is returning user
             if @getConfig().validateOnPageLoad
@@ -647,7 +648,7 @@ angular.module('ng-token-auth', ['ngCookies'])
   # each response will contain auth headers that have been updated by
   # the server. copy those headers for use in the next request.
   .config(['$httpProvider', ($httpProvider) ->
-    
+
 
     # uniform handling of response headers for success or error conditions
     updateHeadersFromResponse = ($auth, resp) ->
