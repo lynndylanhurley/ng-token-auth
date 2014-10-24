@@ -1,11 +1,10 @@
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 var express   = require('express');
 var request   = require('request');
 var httpProxy = require('http-proxy');
 var s3Policy  = require('./server/s3');
 var sm        = require('sitemap');
 var os        = require('os');
-var nock      = require('nock');
+var pXor      = require('../lib/protractor-ci/protractor-ci.js');
 
 var port    = process.env.PORT || 7777;
 var distDir = '/.tmp';
@@ -18,6 +17,8 @@ var CONFIG = require('config');
 console.log('@-->API URL', CONFIG.API_URL);
 console.log('@-->NODE_ENV', process.env.NODE_ENV);
 
+pXor.initRecorder();
+
 // env setup
 // TODO: comment this better
 if (process.env.NODE_ENV && process.env.NODE_ENV != 'development' && process.env.NODE_ENV != 'travis') {
@@ -26,17 +27,6 @@ if (process.env.NODE_ENV && process.env.NODE_ENV != 'development' && process.env
   app.use(require('connect-livereload')());
 }
 
-// use http mocks
-
-switch (process.env.NOCK_MODE) {
-  case 'record':
-    nock.recorder.rec();
-    // write to file
-    // make filename from (iii + path | truncate:40).js
-
-  case 'playback':
-    nock.recorder.playback();
-}
 
 // sitemap
 sitemap = sm.createSitemap({
@@ -60,6 +50,8 @@ app.all('/proxy/*', function(req, res, next) {
   // transform request URL into remote URL
   var apiUrl = 'http:'+CONFIG.API_URL+'/'+req.params[0];
   var r = null;
+
+  console.log('caught proxy request to', apiUrl);
 
   // preserve GET params
   if (req._parsedUrl.search) {

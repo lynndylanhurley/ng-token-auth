@@ -6,62 +6,61 @@ describe "ng-token-auth", ->
     browser.get '/'
     expect(browser.getTitle()).toEqual('Ng Token Auth Test')
 
+  describe "email registrations", ->
+    beforeEach ->
+      browser.get('#/')
+      @demoPage = require('../pages/demo-page')
 
-  #describe "email registrations", ->
-    #beforeEach ->
-      #browser.get('#/')
-      #@demoPage = require('../pages/demo-page')
+      @newUserEmail    = 'test+'+(new Date().getTime())+'@test.com'
+      @newUserPassword = 'secret123'
 
-      #@newUserEmail    = 'test+'+(new Date().getTime())+'@test.com'
-      #@newUserPassword = 'secret123'
+      @duplicateUserEmail    = 'dupe+'+(new Date().getTime())+'@test.com'
+      @duplicateUserPassword = @newUserPassword
 
-      #@duplicateUserEmail    = 'test-dup+'+(new Date().getTime())+'@test.com'
-      #@duplicateUserPassword = 'secret123'
+    it "should broadcast event when user registers by email", ->
+      @demoPage.fillRegEmailForm({
+        email:           @newUserEmail
+        password:        @newUserPassword
+        passwordConfirm: @newUserPassword
+        submit:          true
+      })
 
-    #it "should broadcast event when user registers by email", ->
-      #@demoPage.fillRegEmailForm({
-        #email:           @newUserEmail
-        #password:        @newUserPassword
-        #passwordConfirm: @newUserPassword
-        #submit:          true
-      #})
-
-      ## should show "email sent" alert
-      #expect(element(`by`.id('alert-registration-email-sent')).isPresent()).toBe(true)
+      # should show "email sent" alert
+      expect(element(`by`.id('alert-registration-email-sent')).isPresent()).toBe(true)
 
 
-    #it "should show an error if user already exists", ->
-      #@demoPage.fillRegEmailForm({
-        #email:           @duplicateUserEmail
-        #password:        @duplicateUserPassword
-        #passwordConfirm: @duplicateUserPassword
-        #submit:          true
-      #})
+    xit "should show an error if user already exists", ->
+      @demoPage.fillRegEmailForm({
+        email:           @duplicateUserEmail
+        password:        @duplicateUserPassword
+        passwordConfirm: @duplicateUserPassword
+        submit:          true
+      })
 
-      ## should show "email sent" alert
-      #expect(@demoPage.alertEmailSuccess().isPresent()).toBe(true)
+      # should show "email sent" alert
+      expect(@demoPage.alertEmailSuccess().isPresent()).toBe(true)
 
-      ## close modal so form is accessible
-      #@demoPage.dismissModal()
+      # close modal so form is accessible
+      @demoPage.dismissModal()
 
-      ## submit same information as earlier - should fail this time
-      #@demoPage.fillRegEmailForm({
-        #email:           @duplicateUserEmail
-        #password:        @duplicateUserPassword
-        #passwordConfirm: @duplicateUserPassword
-        #submit:          true
-      #})
+      # submit same information as earlier - should fail this time
+      @demoPage.fillRegEmailForm({
+        email:           @duplicateUserEmail
+        password:        @duplicateUserPassword
+        passwordConfirm: @duplicateUserPassword
+        submit:          true
+      })
 
-      ## should show "email failed" alert
-      #expect(@demoPage.alertEmailFailed().isPresent()).toBe(true)
+      # should show "email failed" alert
+      expect(@demoPage.alertEmailFailed().isPresent()).toBe(true)
 
-    #it "should show an error if passwords don't match", ->
-      #@demoPage.fillRegEmailForm({
-        #email:           @duplicateUserEmail
-        #password:        @duplicateUserPassword
-        #passwordConfirm: 'bogus'
-        #submit:          true
-      #})
+    it "should show an error if passwords don't match", ->
+      @demoPage.fillRegEmailForm({
+        email:           @duplicateUserEmail
+        password:        @duplicateUserPassword
+        passwordConfirm: 'bogus'
+        submit:          true
+      })
 
-      ## should show "email sent" alert
-      #expect(@demoPage.alertEmailFailed().isPresent()).toBe(true)
+      # should show "email sent" alert
+      expect(@demoPage.alertEmailFailed().isPresent()).toBe(true)

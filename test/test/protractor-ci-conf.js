@@ -51,5 +51,9 @@ exports.config = {
   jasmineNodeOpts: {
     showColors: true,
     defaultTimeoutInterval: 50000
+  },
+
+  onPrepare: function() {
+    global.RECORDING_ID = new Date().getTime();
   }
 };
