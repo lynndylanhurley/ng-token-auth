@@ -84,6 +84,32 @@ suite 'token handling', ->
       $timeout.flush()
 
 
+  suite 'error response containing tokens', ->
+    setup ->
+      $httpBackend
+        .expectGET('/api/err')
+        .respond(401, errorResp, newAuthHeader)
+
+      $cookieStore.put('auth_headers', validAuthHeader)
+      dfd = $http.get('/api/err')
+      $httpBackend.flush()
+
+    test 'headers should be updated', ->
+      assert.deepEqual(newAuthHeader, $auth.retrieveData('auth_headers'))
+
+    test 'header is included with the next request to the api', ->
+      $httpBackend
+        .expectGET('/api/test', (headers) ->
+          assert.equal(newAuthHeader['access-token'], headers['access-token'])
+          headers
+        )
+        .respond(201, successResp, {'access-token', 'whatever'})
+
+      $http.get('/api/test')
+
+      $httpBackend.flush()
+
+
   suite 'invalid headers', ->
     setup ->
       $httpBackend
