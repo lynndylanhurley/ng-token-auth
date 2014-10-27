@@ -418,7 +418,7 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
               return expiry && expiry < now;
             },
             getExpiry: function() {
-              return this.getConfig().parseExpiry(this.retrieveData('auth_headers'));
+              return this.getConfig().parseExpiry(this.retrieveData('auth_headers') || {});
             },
             invalidateTokens: function() {
               var key, val, _ref;
@@ -560,7 +560,13 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
   };
 }).config([
   '$httpProvider', function($httpProvider) {
-    var httpMethods, updateHeadersFromResponse;
+    var httpMethods, tokenIsCurrent, updateHeadersFromResponse;
+    tokenIsCurrent = function($auth, headers) {
+      var newTokenExpiry, oldTokenExpiry;
+      oldTokenExpiry = Number($auth.getExpiry());
+      newTokenExpiry = Number($auth.getConfig().parseExpiry(headers || {}));
+      return newTokenExpiry >= oldTokenExpiry;
+    };
     updateHeadersFromResponse = function($auth, resp) {
       var key, newHeaders, val, _ref;
       newHeaders = {};
@@ -571,7 +577,9 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
           newHeaders[key] = resp.headers(key);
         }
       }
-      return $auth.setAuthHeaders(newHeaders);
+      if (tokenIsCurrent($auth, newHeaders)) {
+        return $auth.setAuthHeaders(newHeaders);
+      }
     };
     $httpProvider.interceptors.push([
       '$injector', function($injector) {

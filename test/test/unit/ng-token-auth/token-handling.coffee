@@ -133,6 +133,51 @@ suite 'token handling', ->
       assert $rootScope.$broadcast.calledWithMatch('auth:validation-error', errorResp)
       $timeout.flush()
 
+  suite 'outdated headers', ->
+    outdatedExpiry  = (new Date().getTime() / 1000) - 500 | 0
+    outdatedHeaders = {
+      "access-token": "(x_x)"
+      "token-type":   'Bearer'
+      client:         validClient
+      expiry:         outdatedExpiry
+      uid:            validUid
+    }
+
+    currentHeaders = {
+      "access-token": "(^_^)"
+      "token-type":   'Bearer'
+      client:         validClient
+      expiry:         validExpiry
+      uid:            validUid.toString()
+    }
+
+    setup ->
+      $auth.persistData('auth_headers', currentHeaders)
+      $auth.user.signedIn = true
+      $httpBackend
+        .expectGET('/api/test')
+        .respond(201, successResp, outdatedHeaders)
+
+      $http.get('/api/test')
+
+      $httpBackend.flush()
+
+    test 'user is still authenticated', ->
+      passed = false
+      $auth.validateUser().then(->
+        passed = true
+      )
+      $timeout.flush()
+      assert passed
+
+    test 'header was not updated', ->
+      assert($auth.retrieveData('auth_headers')['access-token'])
+      assert.equal(
+        currentHeaders['access-token'],
+        $auth.retrieveData('auth_headers')['access-token']
+      )
+
+
   suite 'expired headers', ->
     expiredExpiry  = (new Date().getTime() / 1000) - 500 | 0
     expiredHeaders = {

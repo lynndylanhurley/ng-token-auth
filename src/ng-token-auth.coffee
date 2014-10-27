@@ -471,7 +471,7 @@ angular.module('ng-token-auth', ['ngCookies'])
 
           # get expiry by method provided in config
           getExpiry: ->
-            @getConfig().parseExpiry(@retrieveData('auth_headers'))
+            @getConfig().parseExpiry(@retrieveData('auth_headers') || {})
 
 
           # this service attempts to cache auth tokens, but sometimes we
@@ -649,6 +649,14 @@ angular.module('ng-token-auth', ['ngCookies'])
   # the server. copy those headers for use in the next request.
   .config(['$httpProvider', ($httpProvider) ->
 
+    # responses are sometimes returned out of order. check that response is
+    # current before saving the auth data.
+    tokenIsCurrent = ($auth, headers) ->
+      oldTokenExpiry = Number($auth.getExpiry())
+      newTokenExpiry = Number($auth.getConfig().parseExpiry(headers || {}))
+
+      return newTokenExpiry >= oldTokenExpiry
+
 
     # uniform handling of response headers for success or error conditions
     updateHeadersFromResponse = ($auth, resp) ->
@@ -656,7 +664,9 @@ angular.module('ng-token-auth', ['ngCookies'])
       for key, val of $auth.getConfig().tokenFormat
         if resp.headers(key)
           newHeaders[key] = resp.headers(key)
-      $auth.setAuthHeaders(newHeaders)
+
+      if tokenIsCurrent($auth, newHeaders)
+        $auth.setAuthHeaders(newHeaders)
 
     # this is ugly...
     # we need to configure an interceptor (must be done in the configuration
