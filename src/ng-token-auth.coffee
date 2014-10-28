@@ -624,7 +624,7 @@ angular.module('ng-token-auth', ['ngCookies'])
 
           # can't rely on retrieveData because it will cause a recursive loop
           # if config hasn't been initialized. instead find first available
-          # value of 'defaultConfigName' searches the following places in
+          # value of 'defaultConfigName'. searches the following places in
           # this priority:
           # 1. localStorage
           # 2. cookies
