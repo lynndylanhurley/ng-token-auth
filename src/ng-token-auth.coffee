@@ -187,9 +187,9 @@ angular.module('ng-token-auth', ['ngCookies'])
 
 
           # capture input from user, authenticate serverside
-          submitLogin: (params, opts={}) ->
+          submitLogin: (params, opts={}, httpConfig) ->
             @initDfd()
-            $http.post(@apiUrl(opts.config) + @getConfig(opts.config).emailSignInPath, params)
+            $http.post(@apiUrl(opts.config) + @getConfig(opts.config).emailSignInPath, params, httpConfig)
               .success((resp) =>
                 @setConfigName(opts.config)
                 authData = @getConfig(opts.config).handleLoginResponse(resp)
