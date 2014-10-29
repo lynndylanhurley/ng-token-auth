@@ -767,7 +767,7 @@ Broadcast when requests resulting from the [`$auth.updatePassword`](#authupdatep
 
 ##### Example:
 ~~~javascript
-$scope.$on('auth:registration-change-error', function(ev, reason) {
+$scope.$on('auth:password-change-error', function(ev, reason) {
   alert("Registration failed: " + reason.errors[0]);
 });
 ~~~
