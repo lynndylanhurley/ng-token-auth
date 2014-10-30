@@ -82,12 +82,12 @@ angular.module('ng-token-auth', ['ngCookies'])
         '$http'
         '$q'
         '$location'
-        '$cookieStore'
+        'ipCookie'
         '$window'
         '$timeout'
         '$rootScope'
         '$interpolate'
-        ($http, $q, $location, $cookieStore, $window, $timeout, $rootScope, $interpolate) =>
+        ($http, $q, $location, ipCookie, $window, $timeout, $rootScope, $interpolate) =>
           header:            null
           dfd:               null
           user:              {}
@@ -546,7 +546,7 @@ angular.module('ng-token-auth', ['ngCookies'])
             switch @getConfig(configName).storage
               when 'localStorage'
                 $window.localStorage.setItem(key, JSON.stringify(val))
-              else $cookieStore.put(key, val)
+              else ipCookie(key, val, { path: '/' })
 
 
           # abstract persistent data retrieval
@@ -554,7 +554,7 @@ angular.module('ng-token-auth', ['ngCookies'])
             switch @getConfig().storage
               when 'localStorage'
                 JSON.parse($window.localStorage.getItem(key))
-              else $cookieStore.get(key)
+              else ipCookie(key)
 
 
           # abstract persistent data removal
@@ -562,7 +562,7 @@ angular.module('ng-token-auth', ['ngCookies'])
             switch @getConfig().storage
               when 'localStorage'
                 $window.localStorage.removeItem(key)
-              else $cookieStore.remove(key)
+              else ipCookie.remove(key)
 
 
           # persist authentication token, client id, uid
@@ -636,7 +636,7 @@ angular.module('ng-token-auth', ['ngCookies'])
             if $window.localStorage
               c ?= JSON.parse($window.localStorage.getItem(key))
 
-            c ?= $cookieStore.get(key)
+            c ?= ipCookie(key)
 
             c ?= defaultConfigName
 
