@@ -89,6 +89,7 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
             user: {},
             mustResetPassword: false,
             listener: null,
+            configs: configs,
             initialize: function() {
               this.initializeListeners();
               return this.addScopeMethods();
@@ -175,7 +176,7 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
                 return function(resp) {
                   var authData;
                   _this.setConfigName(opts.config);
-                  authData = _this.getConfig(opts.config).handleLoginResponse(resp);
+                  authData = _this.getConfig(opts.config).handleLoginResponse(resp, _this);
                   _this.handleValidAuth(authData);
                   return $rootScope.$broadcast('auth:login-success', _this.user);
                 };

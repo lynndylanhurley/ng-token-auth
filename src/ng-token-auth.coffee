@@ -93,6 +93,7 @@ angular.module('ng-token-auth', ['ngCookies'])
           user:              {}
           mustResetPassword: false
           listener:          null
+          configs:           configs
 
 
           # called once at startup
@@ -192,7 +193,7 @@ angular.module('ng-token-auth', ['ngCookies'])
             $http.post(@apiUrl(opts.config) + @getConfig(opts.config).emailSignInPath, params)
               .success((resp) =>
                 @setConfigName(opts.config)
-                authData = @getConfig(opts.config).handleLoginResponse(resp)
+                authData = @getConfig(opts.config).handleLoginResponse(resp, @)
                 @handleValidAuth(authData)
                 $rootScope.$broadcast('auth:login-success', @user)
               )
@@ -695,7 +696,7 @@ angular.module('ng-token-auth', ['ngCookies'])
       responseError: (resp) ->
         $injector.invoke ['$http', '$auth', ($http, $auth) ->
           if resp.config.url.match($auth.apiUrl())
-            updateHeadersFromResponse($auth, resp)
+            return updateHeadersFromResponse($auth, resp)
         ]
 
         return $injector.get('$q').reject(resp)
