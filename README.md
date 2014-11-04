@@ -99,11 +99,11 @@ This module was designed to work out of the box with the outstanding [devise tok
   bower install ng-token-auth --save
   ~~~
   
-* Ensure that [angularjs](https://github.com/angular/angular.js), [ng-cookies](https://docs.angularjs.org/api/ngCookies), and ng-token-auth are included on your page: 
+* Ensure that [angularjs](https://github.com/angular/angular.js), [angular-cookie](https://github.com/ivpusic/angular-cookie), and ng-token-auth are included on your page: 
   ~~~html
   <!-- in your index.html file -->
   <script src="/js/angular/angular.js"></script>
-  <script src="/js/angular-cookies/angular-cookies.js"></script>
+  <script src="/js/angular-cookie/angular-cookie.js"></script>
   <script src="/js/ng-token-auth/dist/ng-token-auth.js"></script>
   ~~~
   

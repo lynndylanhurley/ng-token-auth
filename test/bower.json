@@ -14,7 +14,7 @@
     "bootstrap-additions": "~0.2.2",
     "font-awesome": "~4.0.3",
     "angular-sanitize": "~1.2.15",
-    "angular-cookies": "~1.2.16",
+    "angular-cookie": "~4.0.6",
     "angular-resource": "~1.2.16",
     "angular-mocks": "~1.2.16",
     "matchmedia-ng": "~1.0.2",

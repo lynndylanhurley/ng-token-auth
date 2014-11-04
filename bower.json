@@ -1,6 +1,6 @@
 {
   "name": "ng-token-auth",
-  "version": "0.0.24-beta4",
+  "version": "0.0.24-beta5",
   "authors": [
     "Lynn Dylan Hurley <lynn.dylan.hurley@gmail.com>"
   ],
@@ -26,7 +26,7 @@
   ],
   "dependencies": {
     "angular": ">=1.2.0",
-    "angular-cookies": ">=1.2.0"
+    "angular-cookie": ">=4.0.6"
   },
   "resolutions": {
     "angular": "1.2.25"
