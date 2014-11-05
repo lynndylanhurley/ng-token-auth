@@ -1,4 +1,4 @@
-angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
+angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
   var configs, defaultConfigName;
   configs = {
     "default": {
@@ -81,15 +81,14 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
       return configs;
     },
     $get: [
-      '$http', '$q', '$location', '$cookieStore', '$window', '$timeout', '$rootScope', '$interpolate', (function(_this) {
-        return function($http, $q, $location, $cookieStore, $window, $timeout, $rootScope, $interpolate) {
+      '$http', '$q', '$location', 'ipCookie', '$window', '$timeout', '$rootScope', '$interpolate', (function(_this) {
+        return function($http, $q, $location, ipCookie, $window, $timeout, $rootScope, $interpolate) {
           return {
             header: null,
             dfd: null,
             user: {},
             mustResetPassword: false,
             listener: null,
-            configs: configs,
             initialize: function() {
               this.initializeListeners();
               return this.addScopeMethods();
@@ -479,7 +478,9 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
                 case 'localStorage':
                   return $window.localStorage.setItem(key, JSON.stringify(val));
                 default:
-                  return $cookieStore.put(key, val);
+                  return ipCookie(key, val, {
+                    path: '/'
+                  });
               }
             },
             retrieveData: function(key) {
@@ -487,7 +488,7 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
                 case 'localStorage':
                   return JSON.parse($window.localStorage.getItem(key));
                 default:
-                  return $cookieStore.get(key);
+                  return ipCookie(key);
               }
             },
             deleteData: function(key) {
@@ -495,7 +496,9 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
                 case 'localStorage':
                   return $window.localStorage.removeItem(key);
                 default:
-                  return $cookieStore.remove(key);
+                  return ipCookie.remove(key, {
+                    path: '/'
+                  });
               }
             },
             setAuthHeaders: function(h) {
@@ -550,9 +553,9 @@ angular.module('ng-token-auth', ['ngCookies']).provider('$auth', function() {
                 }
               }
               if (c == null) {
-                c = $cookieStore.get(key);
+                c = ipCookie(key);
               }
-              return c != null ? c : c = defaultConfigName;
+              return c || defaultConfigName;
             }
           };
         };

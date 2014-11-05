@@ -1,7 +1,6 @@
 suite 'multiple concurrent auth configurations', ->
   successResp = validUser
 
-
   suite 'single unnamed config', ->
     defaultConfig =
       signOutUrl:              '/vega/sign_out'
@@ -61,7 +60,7 @@ suite 'multiple concurrent auth configurations', ->
         .expectGET('/api/vega/validate_token')
         .respond(201, successResp, validAuthHeader)
 
-      $cookieStore.put('auth_headers', validAuthHeader)
+      ipCookie('auth_headers', validAuthHeader, {path: '/'})
       $auth.validateUser()
       $httpBackend.flush()
 
@@ -235,7 +234,7 @@ suite 'multiple concurrent auth configurations', ->
           .expectGET('/api/cygni/validate_token')
           .respond(201, successResp, validAuthHeader)
 
-        $cookieStore.put('auth_headers', validAuthHeader)
+        ipCookie('auth_headers', validAuthHeader, {path: '/'})
         $auth.validateUser()
         $httpBackend.flush()
 
@@ -245,7 +244,7 @@ suite 'multiple concurrent auth configurations', ->
           .expectGET('/api/rigel/validate_token')
           .respond(201, successResp, validAuthHeader)
 
-        $cookieStore.put('auth_headers', validAuthHeader)
+        ipCookie('auth_headers', validAuthHeader, {path: '/'})
         $auth.validateUser()
         $httpBackend.flush()
 
@@ -255,7 +254,7 @@ suite 'multiple concurrent auth configurations', ->
           .expectGET('/api/rigel/validate_token')
           .respond(201, successResp, validAuthHeader)
 
-        $cookieStore.put('auth_headers', validAuthHeader)
+        ipCookie('auth_headers', validAuthHeader, {path: '/'})
         $auth.validateUser('admin')
         $httpBackend.flush()
 

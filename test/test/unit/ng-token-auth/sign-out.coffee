@@ -15,7 +15,7 @@ suite 'sign out', ->
         .expectDELETE('/api/auth/sign_out')
         .respond(201, successResp)
 
-      $cookieStore.put('auth_headers', validAuthHeader)
+      ipCookie('auth_headers', validAuthHeader, {path: '/'})
 
       dfd = $auth.signOut()
 
@@ -27,7 +27,7 @@ suite 'sign out', ->
 
 
     test 'cookie should no longer be present', ->
-      assert($cookieStore.get('auth_headers') == undefined)
+      assert(ipCookie('auth_headers') == undefined)
 
 
     test 'promise is resolved', ->
@@ -56,7 +56,7 @@ suite 'sign out', ->
         .expectDELETE('/api/auth/sign_out')
         .respond(401, errorResp)
 
-      $cookieStore.put('auth_headers', validAuthHeader)
+      ipCookie('auth_headers', validAuthHeader, {path: '/'})
 
       dfd = $auth.signOut()
 
@@ -68,7 +68,7 @@ suite 'sign out', ->
 
 
     test 'cookie should no longer be present', ->
-      assert($cookieStore.get('auth_headers') == undefined)
+      assert(ipCookie('auth_headers') == undefined)
 
 
     test 'promise is rejected', ->

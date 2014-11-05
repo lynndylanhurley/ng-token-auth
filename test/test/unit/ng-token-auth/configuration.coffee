@@ -29,12 +29,10 @@ suite 'configuration', ->
         success: true
         data: validUser
 
-      $cookieStore.put('auth_headers', validAuthHeader)
+      ipCookie('auth_headers', validAuthHeader, {path: '/'})
 
       $httpBackend
         .expectGET('/proxy/auth/validate_token', (headers) ->
-          console.log 'validAuthHeader', validAuthHeader['access-token']
-          console.log 'cur', headers['access-token']
           assert.equal(validAuthHeader['access-token'], headers['access-token'])
           headers
         )
@@ -137,7 +135,7 @@ suite 'configuration', ->
         .expectGET('/api/auth/validate_token')
         .respond(201, successResp, newAuthHeader)
 
-      $cookieStore.put('auth_headers', validAuthHeader)
+      ipCookie('auth_headers', validAuthHeader, {path: '/'})
 
       $auth.validateUser()
 

@@ -1,7 +1,7 @@
 # global injectors
 $locationProvider = null
 $authProvider     = null
-$cookieStore      = null
+ipCookie          = null
 $httpBackend      = null
 $rootScope        = null
 $location         = null
@@ -47,7 +47,7 @@ setup ->
 
   inject ($injector) ->
     $httpBackend = $injector.get('$httpBackend')
-    $cookieStore = $injector.get('$cookieStore')
+    ipCookie     = $injector.get('ipCookie')
     $rootScope   = $injector.get('$rootScope')
     $location    = $injector.get('$location')
     $timeout     = $injector.get('$timeout')
@@ -64,6 +64,8 @@ setup ->
 teardown ->
   $httpBackend.verifyNoOutstandingExpectation()
   $httpBackend.verifyNoOutstandingRequest()
+  $auth.deleteData('auth_headers')
+  $auth.deleteData('currentConfigName')
   $auth.destroy()
 
 

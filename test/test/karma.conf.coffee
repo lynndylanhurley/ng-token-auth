@@ -8,7 +8,7 @@ module.exports = (config) ->
 
     files : [
       'test/app/bower_components/angular/angular.js'
-      'test/app/bower_components/angular-cookies/angular-cookies.js'
+      'test/app/bower_components/angular-cookie/angular-cookie.js'
       'test/app/bower_components/angular-mocks/angular-mocks.js'
       'src/*.coffee'
       'test/test/unit/test-helper.coffee'

@@ -22,7 +22,7 @@ suite 'token handling', ->
         .expectGET('/api/auth/validate_token')
         .respond(201, successResp, newAuthHeader)
 
-      $cookieStore.put('auth_headers', validAuthHeader)
+      ipCookie('auth_headers', validAuthHeader, {path: '/'})
 
       dfd = $auth.validateUser()
 
@@ -75,13 +75,19 @@ suite 'token handling', ->
 
   suite 'undefined headers', ->
     test 'validateUser should not make requests if no token is present', ->
-      $auth.validateUser().catch(-> assert true)
+      caught = false
+
+      $auth.validateUser().catch(-> caught = true)
       $timeout.flush()
+      assert(caught)
+
 
     test 'validation request should not be made if headers are empty', ->
-      $cookieStore.put('auth_headers', {})
-      $auth.validateUser().catch(-> assert true)
+      ipCookie('auth_headers', {}, {path: '/'})
+      caught = false
+      $auth.validateUser().catch(-> caught = true)
       $timeout.flush()
+      assert(caught)
 
 
   suite 'error response containing tokens', ->
@@ -90,7 +96,7 @@ suite 'token handling', ->
         .expectGET('/api/err')
         .respond(401, errorResp, newAuthHeader)
 
-      $cookieStore.put('auth_headers', validAuthHeader)
+      ipCookie('auth_headers', validAuthHeader, {path: '/'})
       dfd = $http.get('/api/err')
       $httpBackend.flush()
 
@@ -116,7 +122,7 @@ suite 'token handling', ->
         .expectGET('/api/auth/validate_token')
         .respond(401, errorResp)
 
-      $cookieStore.put('auth_headers', {'access-token': '(-_-)'})
+      ipCookie('auth_headers', {'access-token': '(-_-)'}, {path: '/'})
 
       dfd = $auth.validateUser()
 

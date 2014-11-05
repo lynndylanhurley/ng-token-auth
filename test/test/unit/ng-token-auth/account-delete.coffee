@@ -2,7 +2,7 @@ suite 'account delete', ->
   dfd = null
   setup ->
     angular.extend($rootScope.user, validUser)
-    $cookieStore.put('auth_headers', validAuthHeader)
+    ipCookie('auth_headers', validAuthHeader, {path: '/'})
 
   suite 'successful deletion', ->
     successResp =

@@ -1086,7 +1086,7 @@ Rails example: [controller](https://github.com/lynndylanhurley/ng-token-auth-api
 
 ## Token validation flow
 
-The client's tokens are stored in cookies using the ngCookie module. This is done so that users won't need to re-authenticate each time they return to the site or refresh the page.
+The client's tokens are stored in cookies using the ipCookie module. This is done so that users won't need to re-authenticate each time they return to the site or refresh the page.
 
 ![validation flow](https://github.com/lynndylanhurley/ng-token-auth/raw/master/test/app/images/flow/validation-flow.jpg)
 

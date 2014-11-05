@@ -208,8 +208,6 @@ var injectGlobals = lazypipe()
     }
   ]);
 
-console.log('@-->config', config);
-
 // Jade to HTML
 gulp.task('base-tmpl', function() {
   return gulp.src(appDir+'index.jade')
