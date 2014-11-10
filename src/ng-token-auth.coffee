@@ -244,7 +244,21 @@ angular.module('ng-token-auth', ['ipCookie'])
           updateAccount: (params) ->
             $http.put(@apiUrl() + @getConfig().accountUpdatePath, params)
               .success((resp) =>
-                angular.extend @user, @getConfig().handleAccountUpdateResponse(resp)
+
+                updateResponse = @getConfig().handleAccountUpdateResponse(resp)
+                curHeaders = @retrieveData('auth_headers')
+
+                angular.extend @user, updateResponse
+
+                # ensure any critical headers (uid + ?) that are returned in
+                # the update response are updated appropriately in storage
+                if curHeaders
+                  newHeaders = {}
+                  for key, val of @getConfig().tokenFormat
+                    if curHeaders[key] && updateResponse[key]
+                      newHeaders[key] = updateResponse[key]
+                  @setAuthHeaders(newHeaders)
+
                 $rootScope.$broadcast('auth:account-update-success', resp)
               )
               .error((resp) ->

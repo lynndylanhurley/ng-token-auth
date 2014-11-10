@@ -222,7 +222,21 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
             updateAccount: function(params) {
               return $http.put(this.apiUrl() + this.getConfig().accountUpdatePath, params).success((function(_this) {
                 return function(resp) {
-                  angular.extend(_this.user, _this.getConfig().handleAccountUpdateResponse(resp));
+                  var curHeaders, key, newHeaders, updateResponse, val, _ref;
+                  updateResponse = _this.getConfig().handleAccountUpdateResponse(resp);
+                  curHeaders = _this.retrieveData('auth_headers');
+                  angular.extend(_this.user, updateResponse);
+                  if (curHeaders) {
+                    newHeaders = {};
+                    _ref = _this.getConfig().tokenFormat;
+                    for (key in _ref) {
+                      val = _ref[key];
+                      if (curHeaders[key] && updateResponse[key]) {
+                        newHeaders[key] = updateResponse[key];
+                      }
+                    }
+                    _this.setAuthHeaders(newHeaders);
+                  }
                   return $rootScope.$broadcast('auth:account-update-success', resp);
                 };
               })(this)).error(function(resp) {

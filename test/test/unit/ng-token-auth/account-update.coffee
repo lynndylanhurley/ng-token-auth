@@ -1,15 +1,19 @@
 suite 'account update', ->
   dfd = null
   suite 'successful update', ->
-    updatedUser = angular.copy(validUser, {operating_thetan: 123})
+    updatedUser = angular.extend(validUser, {operating_thetan: 123, uid: 'updated_uid'})
     successResp =
       success: true
       data: updatedUser
 
     setup ->
+
       $httpBackend
         .expectPUT('/api/auth')
         .respond(201, successResp)
+
+      sinon.stub($auth, 'retrieveData').returns({uid: validUser.uid})
+      sinon.spy($auth, 'setAuthHeaders')
 
       dfd = $auth.updateAccount({
         operating_thetan: 123
@@ -22,6 +26,9 @@ suite 'account update', ->
 
     test 'user object is updated', ->
       assert.deepEqual($rootScope.user, updatedUser)
+
+    test 'auth_headers is updated with new uid', ->
+      assert $auth.setAuthHeaders.calledWith({uid: 'updated_uid'})
 
     test 'promise is resolved', ->
       resolved = false
