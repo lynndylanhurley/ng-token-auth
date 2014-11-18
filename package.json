@@ -1,6 +1,6 @@
 {
     "name": "ng-token-auth",
-    "version": "0.0.24-beta7",
+    "version": "0.0.24",
     "dependencies": {
         "config": "~0.4.35",
         "crypto": "0.0.3",
