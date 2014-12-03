@@ -43,6 +43,7 @@ This project comes bundled with a test app. You can run the demo locally by foll
 * [Events](#events)
   * [`auth:login-success`](#authlogin-success)
   * [`auth:login-error`](#authlogin-error)
+  * [`auth:invalid`](#authinvalid)
   * [`auth:validation-success`](#authvalidation-success)
   * [`auth:validation-error`](#authvalidation-error)
   * [`auth:logout-success`](#authlogout-success)
@@ -633,7 +634,10 @@ $rootScope.$on('auth:login-error', function(ev, reason) {
 Broadcast when a user's token is successfully verified using the [`$auth.validateUser`](#authvalidateuser) method.
 
 ###auth:validation-error
-Broadcast when a user's token fails validation using the [`$auth.validateUser`](#authvalidateuser) method.
+Broadcast when the [`$auth.validateUser`](#authvalidateuser) method fails (network error, etc). Note that this does not indicate an invalid token, but an error in the validation process. See the [`auth:invalid`](#authinvalid) event for invalid token notification.
+
+###auth:invalid
+Broadcast when a user's token fails validation using the [`$auth.validateUser`](#authvalidateuser) method. This is different from the [`auth:validation-error`](#authvalidation-error) in that it indicates an invalid token, whereas the [`auth:validation-error`](#authvalidation-error) event indicates an error in the validation process.
 
 ###auth:logout-success
 Broadcast after user is successfully logged out using the [`$auth.signOut`](#authsignout) method. This event does not contain a message.
