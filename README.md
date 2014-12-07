@@ -147,9 +147,9 @@ angular.module('myApp', ['ng-token-auth'])
       accountUpdatePath:       '/auth',
       accountDeletePath:       '/auth',
       confirmationSuccessUrl:  window.location.href,
-      passwordResetPath:       '/auth/password'
-      passwordUpdatePath:      '/auth/password'
-      passwordResetSuccessUrl: window.location.href
+      passwordResetPath:       '/auth/password',
+      passwordUpdatePath:      '/auth/password',
+      passwordResetSuccessUrl: window.location.href,
       emailSignInPath:         '/auth/sign_in',
       storage:                 'cookies',
       proxyIf:                 function() { return false; },
