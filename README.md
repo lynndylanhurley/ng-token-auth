@@ -240,7 +240,7 @@ This method emits the following events:
 #### Example use in a controller
 ~~~javascript
 angular.module('ngTokenAuthTestApp')
-  .controller('IndexCtrl', function($auth) {
+  .controller('IndexCtrl', function($scope, $auth) {
     $scope.handleBtnClick = function() {
       $auth.authenticate('github')
         .then(function(resp) { 
@@ -334,7 +334,7 @@ This method broadcasts the following events:
 ##### Example use in a controller:
 ~~~javascript
 angular.module('ngTokenAuthTestApp')
-  .controller('IndexCtrl', function($auth) {
+  .controller('IndexCtrl', function($scope, $auth) {
     $scope.handleRegBtnClick = function() {
       $auth.submitRegistration($scope.registrationForm)
         .then(function(resp) { 
@@ -384,7 +384,7 @@ This method broadcasts the following events:
 ##### Example use in a controller:
 ~~~javascript
 angular.module('ngTokenAuthTestApp')
-  .controller('IndexCtrl', function($auth) {
+  .controller('IndexCtrl', function($scope, $auth) {
     $scope.handleLoginBtnClick = function() {
       $auth.submitLogin($scope.loginForm)
         .then(function(resp) { 
@@ -425,7 +425,7 @@ This method broadcasts the following events:
 ##### Example use in a controller:
 ~~~javascript
 angular.module('ngTokenAuthTestApp')
-  .controller('IndexCtrl', function($auth) {
+  .controller('IndexCtrl', function($scope, $auth) {
     $scope.handleSignOutBtnClick = function() {
       $auth.signOut()
         .then(function(resp) { 
@@ -456,7 +456,7 @@ This method broadcasts the following events:
 ##### Example use in a controller:
 ~~~javascript
 angular.module('ngTokenAuthTestApp')
-  .controller('IndexCtrl', function($auth) {
+  .controller('IndexCtrl', function($scope, $auth) {
     $scope.handlePwdResetBtnClick = function() {
       $auth.requestPasswordReset($scope.pwdResetForm)
         .then(function(resp) { 
@@ -497,7 +497,7 @@ This method broadcasts the following events:
 ##### Example use in a controller:
 ~~~javascript
 angular.module('ngTokenAuthTestApp')
-  .controller('IndexCtrl', function($auth) {
+  .controller('IndexCtrl', function($scope, $auth) {
     $scope.handleUpdatePasswordBtnClick = function() {
       $auth.updatePassword($scope.updatePasswordForm)
         .then(function(resp) { 
@@ -552,7 +552,7 @@ This method broadcasts the following events:
 ##### Example use in a controller:
 ~~~javascript
 angular.module('ngTokenAuthTestApp')
-  .controller('IndexCtrl', function($auth) {
+  .controller('IndexCtrl', function($scope, $auth) {
     $scope.handleUpdateAccountBtnClick = function() {
       $auth.updateAccount($scope.updateAccountForm)
         .then(function(resp) { 
@@ -578,7 +578,7 @@ This method broadcasts the following events:
 ##### Example use in a controller:
 ~~~javascript
 angular.module('ngTokenAuthTestApp')
-  .controller('IndexCtrl', function($auth) {
+  .controller('IndexCtrl', function($scope, $auth) {
     $scope.handleDestroyAccountBtnClick = function() {
       $auth.destroyAccount()
         .then(function(resp) { 
