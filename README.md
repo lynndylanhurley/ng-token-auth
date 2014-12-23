@@ -240,7 +240,7 @@ This method emits the following events:
 #### Example use in a controller
 ~~~javascript
 angular.module('ngTokenAuthTestApp')
-  .controller('IndexCtrl', function($auth) {
+  .controller('IndexCtrl', function($scope, $auth) {
     $scope.handleBtnClick = function() {
       $auth.authenticate('github')
         .then(function(resp) { 
