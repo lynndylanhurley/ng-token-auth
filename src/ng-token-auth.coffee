@@ -229,8 +229,8 @@ angular.module('ng-token-auth', ['ipCookie'])
 
 
           # update user password
-          updatePassword: (params) ->
-            $http.put(@apiUrl() + @getConfig().passwordUpdatePath, params)
+          updatePassword: (params, requestParams = {}) ->
+            $http.put(@apiUrl() + @getConfig().passwordUpdatePath, params, requestParams)
               .success((resp) =>
                 $rootScope.$broadcast('auth:password-change-success', resp)
                 @mustResetPassword = false
@@ -241,8 +241,8 @@ angular.module('ng-token-auth', ['ipCookie'])
 
 
           # update user account info
-          updateAccount: (params) ->
-            $http.put(@apiUrl() + @getConfig().accountUpdatePath, params)
+          updateAccount: (params, requestParams = {}) ->
+            $http.put(@apiUrl() + @getConfig().accountUpdatePath, params, requestParams)
               .success((resp) =>
 
                 updateResponse = @getConfig().handleAccountUpdateResponse(resp)
