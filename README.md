@@ -43,6 +43,7 @@ This project comes bundled with a test app. You can run the demo locally by foll
 * [Events](#events)
   * [`auth:login-success`](#authlogin-success)
   * [`auth:login-error`](#authlogin-error)
+  * [`auth:invalid`](#authinvalid)
   * [`auth:validation-success`](#authvalidation-success)
   * [`auth:validation-error`](#authvalidation-error)
   * [`auth:logout-success`](#authlogout-success)
@@ -147,9 +148,9 @@ angular.module('myApp', ['ng-token-auth'])
       accountUpdatePath:       '/auth',
       accountDeletePath:       '/auth',
       confirmationSuccessUrl:  window.location.href,
-      passwordResetPath:       '/auth/password'
-      passwordUpdatePath:      '/auth/password'
-      passwordResetSuccessUrl: window.location.href
+      passwordResetPath:       '/auth/password',
+      passwordUpdatePath:      '/auth/password',
+      passwordResetSuccessUrl: window.location.href,
       emailSignInPath:         '/auth/sign_in',
       storage:                 'cookies',
       proxyIf:                 function() { return false; },
@@ -240,7 +241,7 @@ This method emits the following events:
 #### Example use in a controller
 ~~~javascript
 angular.module('ngTokenAuthTestApp')
-  .controller('IndexCtrl', function($auth) {
+  .controller('IndexCtrl', function($scope, $auth) {
     $scope.handleBtnClick = function() {
       $auth.authenticate('github')
         .then(function(resp) { 
@@ -334,7 +335,7 @@ This method broadcasts the following events:
 ##### Example use in a controller:
 ~~~javascript
 angular.module('ngTokenAuthTestApp')
-  .controller('IndexCtrl', function($auth) {
+  .controller('IndexCtrl', function($scope, $auth) {
     $scope.handleRegBtnClick = function() {
       $auth.submitRegistration($scope.registrationForm)
         .then(function(resp) { 
@@ -384,7 +385,7 @@ This method broadcasts the following events:
 ##### Example use in a controller:
 ~~~javascript
 angular.module('ngTokenAuthTestApp')
-  .controller('IndexCtrl', function($auth) {
+  .controller('IndexCtrl', function($scope, $auth) {
     $scope.handleLoginBtnClick = function() {
       $auth.submitLogin($scope.loginForm)
         .then(function(resp) { 
@@ -425,7 +426,7 @@ This method broadcasts the following events:
 ##### Example use in a controller:
 ~~~javascript
 angular.module('ngTokenAuthTestApp')
-  .controller('IndexCtrl', function($auth) {
+  .controller('IndexCtrl', function($scope, $auth) {
     $scope.handleSignOutBtnClick = function() {
       $auth.signOut()
         .then(function(resp) { 
@@ -456,7 +457,7 @@ This method broadcasts the following events:
 ##### Example use in a controller:
 ~~~javascript
 angular.module('ngTokenAuthTestApp')
-  .controller('IndexCtrl', function($auth) {
+  .controller('IndexCtrl', function($scope, $auth) {
     $scope.handlePwdResetBtnClick = function() {
       $auth.requestPasswordReset($scope.pwdResetForm)
         .then(function(resp) { 
@@ -497,7 +498,7 @@ This method broadcasts the following events:
 ##### Example use in a controller:
 ~~~javascript
 angular.module('ngTokenAuthTestApp')
-  .controller('IndexCtrl', function($auth) {
+  .controller('IndexCtrl', function($scope, $auth) {
     $scope.handleUpdatePasswordBtnClick = function() {
       $auth.updatePassword($scope.updatePasswordForm)
         .then(function(resp) { 
@@ -552,7 +553,7 @@ This method broadcasts the following events:
 ##### Example use in a controller:
 ~~~javascript
 angular.module('ngTokenAuthTestApp')
-  .controller('IndexCtrl', function($auth) {
+  .controller('IndexCtrl', function($scope, $auth) {
     $scope.handleUpdateAccountBtnClick = function() {
       $auth.updateAccount($scope.updateAccountForm)
         .then(function(resp) { 
@@ -578,7 +579,7 @@ This method broadcasts the following events:
 ##### Example use in a controller:
 ~~~javascript
 angular.module('ngTokenAuthTestApp')
-  .controller('IndexCtrl', function($auth) {
+  .controller('IndexCtrl', function($scope, $auth) {
     $scope.handleDestroyAccountBtnClick = function() {
       $auth.destroyAccount()
         .then(function(resp) { 
@@ -634,7 +635,10 @@ $rootScope.$on('auth:login-error', function(ev, reason) {
 Broadcast when a user's token is successfully verified using the [`$auth.validateUser`](#authvalidateuser) method.
 
 ###auth:validation-error
-Broadcast when a user's token fails validation using the [`$auth.validateUser`](#authvalidateuser) method.
+Broadcast when the [`$auth.validateUser`](#authvalidateuser) method fails (network error, etc). Note that this does not indicate an invalid token, but an error in the validation process. See the [`auth:invalid`](#authinvalid) event for invalid token notification.
+
+###auth:invalid
+Broadcast when a user's token fails validation using the [`$auth.validateUser`](#authvalidateuser) method. This is different from the [`auth:validation-error`](#authvalidation-error) in that it indicates an invalid token, whereas the [`auth:validation-error`](#authvalidation-error) event indicates an error in the validation process.
 
 ###auth:logout-success
 Broadcast after user is successfully logged out using the [`$auth.signOut`](#authsignout) method. This event does not contain a message.
