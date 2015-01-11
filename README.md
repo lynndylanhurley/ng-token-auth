@@ -74,6 +74,7 @@ This project comes bundled with a test app. You can run the demo locally by foll
 * [Notes on Batch Requests](#about-batch-requests)
 * [Notes on Token Formatting](#identifying-users-on-the-server)
 * [Internet Explorer Caveats](#internet-explorer)
+* [FAQ](#faq)
 * [Development](#development)
 * [Contribution Guidelines](#contributing)
 * [Alteratives to This Module](#alternatives)
@@ -1247,6 +1248,16 @@ These steps are taken automatically when using this module with IE8+.
 
 ---
 
+# FAQ
+
+### Why does this module use `ipCookies` instead of `ngCookies`?
+
+It's impossible to control cookies' path values using `ngCookies`. This results in the creation of multiple auth tokens, and it becomes impossible to send the correct token to send to the API.
+
+The only options were to re-implement cookie storage from scratch, or to use the [ipCookie module](https://github.com/ivpusic/angular-cookie). The ipCookie module seemed like the better choice, and it's been working well so far.
+
+Please direct complaints regarding this problem to [this angualar issue](https://github.com/angular/angular.js/issues/1786).
+
 # Development
 
 ### Running the dev server
@@ -1306,6 +1317,7 @@ Thanks to the following contributors:
 * [@jasonswett](https://github.com/jasonswett)
 * [@m2omou](https://github.com/m2omou)
 * [@smarquez1](https://github.com/smarquez1)
+* [@jartek](https://github.com/jartek)
 
 Special thanks to [@jasonswett](https://github.com/jasonswett) for [this helpful guide](https://www.airpair.com/ruby-on-rails-4/posts/authentication-with-angularjs-and-ruby-on-rails)!
 
