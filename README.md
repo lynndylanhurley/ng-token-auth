@@ -1256,7 +1256,7 @@ These steps are taken automatically when using this module with IE8+.
 
 ### Why does this module use `ipCookies` instead of `ngCookies`?
 
-It's impossible to control cookies' path values using `ngCookies`. This results in the creation of multiple auth tokens, and it becomes impossible to send the correct token to send to the API.
+It's impossible to control cookies' path values using `ngCookies`. This results in the creation of multiple auth tokens, and it becomes impossible to send the correct token to the API.
 
 The only options were to re-implement cookie storage from scratch, or to use the [ipCookie module](https://github.com/ivpusic/angular-cookie). The ipCookie module seemed like the better choice, and it's been working well so far.
 
