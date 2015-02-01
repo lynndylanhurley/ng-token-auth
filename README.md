@@ -336,8 +336,8 @@ This method broadcasts the following events:
 ~~~javascript
 angular.module('ngTokenAuthTestApp')
   .controller('IndexCtrl', function($scope, $auth) {
-    $scope.handleRegBtnClick = function() {
-      $auth.submitRegistration($scope.registrationForm)
+    $scope.submitRegistration = function(registrationForm) {
+      $auth.submitRegistration(registrationForm)
         .then(function(resp) { 
           // handle success response
         })
@@ -386,8 +386,8 @@ This method broadcasts the following events:
 ~~~javascript
 angular.module('ngTokenAuthTestApp')
   .controller('IndexCtrl', function($scope, $auth) {
-    $scope.handleLoginBtnClick = function() {
-      $auth.submitLogin($scope.loginForm)
+    $scope.submitLogin = function(loginForm) {
+      $auth.submitLogin(loginForm)
         .then(function(resp) { 
           // handle success response
         })
@@ -427,7 +427,7 @@ This method broadcasts the following events:
 ~~~javascript
 angular.module('ngTokenAuthTestApp')
   .controller('IndexCtrl', function($scope, $auth) {
-    $scope.handleSignOutBtnClick = function() {
+    $scope.signOut = function() {
       $auth.signOut()
         .then(function(resp) { 
           // handle success response
@@ -458,8 +458,8 @@ This method broadcasts the following events:
 ~~~javascript
 angular.module('ngTokenAuthTestApp')
   .controller('IndexCtrl', function($scope, $auth) {
-    $scope.handlePwdResetBtnClick = function() {
-      $auth.requestPasswordReset($scope.pwdResetForm)
+    $scope.requestPasswordReset = function(passwordResetForm) {
+      $auth.requestPasswordReset(passwordResetForm)
         .then(function(resp) { 
           // handle success response
         })
@@ -499,8 +499,8 @@ This method broadcasts the following events:
 ~~~javascript
 angular.module('ngTokenAuthTestApp')
   .controller('IndexCtrl', function($scope, $auth) {
-    $scope.handleUpdatePasswordBtnClick = function() {
-      $auth.updatePassword($scope.updatePasswordForm)
+    $scope.updatePassword = function(changePasswordForm) {
+      $auth.updatePassword(changePasswordForm)
         .then(function(resp) { 
           // handle success response
         })
@@ -554,8 +554,8 @@ This method broadcasts the following events:
 ~~~javascript
 angular.module('ngTokenAuthTestApp')
   .controller('IndexCtrl', function($scope, $auth) {
-    $scope.handleUpdateAccountBtnClick = function() {
-      $auth.updateAccount($scope.updateAccountForm)
+    $scope.updateAccount = function(updateAccountForm) {
+      $auth.updateAccount(updateAccountForm)
         .then(function(resp) { 
           // handle success response
         })
@@ -580,7 +580,7 @@ This method broadcasts the following events:
 ~~~javascript
 angular.module('ngTokenAuthTestApp')
   .controller('IndexCtrl', function($scope, $auth) {
-    $scope.handleDestroyAccountBtnClick = function() {
+    $scope.destroyAccount = function() {
       $auth.destroyAccount()
         .then(function(resp) { 
           // handle success response
