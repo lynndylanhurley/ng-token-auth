@@ -20,6 +20,9 @@ br
             label user email
             p {{ user.email || "n/a" }}
 
+            label nickname
+            p {{ user.nickname || "n/a" }}
+
             label favorite color (optional)
             p {{ user.favorite_color || "n/a" }}
 
@@ -109,6 +112,20 @@ br
               )
 
             .form-group
+              label nickname (optional)
+              input.form-control(
+                type='text'
+                name='nickname'
+                ng-model='registrationForm.nickname'
+              )
+
+              p.help-block
+                | This value can also be used for authentication. See
+                a(href="https://github.com/plataformatec/devise/wiki/How-To:-Allow-users-to-sign-in-using-their-username-or-email-address#tell-devise-to-use-username-in-the-authentication_keys")= ' here '
+                | for more info.
+
+
+            .form-group
               label favorite color (optional)
               input.form-control(
                 type='text'
@@ -150,8 +167,20 @@ br
                 type='email'
                 name='email'
                 ng-model='loginForm.email'
-                required
               )
+
+            .form-group
+              label nickname
+              input.form-control(
+                type='text'
+                name='nickname'
+                ng-model='loginForm.nickname'
+              )
+
+              p.help-block
+                | Users can use alternate authentication keys. See
+                a(href="https://github.com/plataformatec/devise/wiki/How-To:-Allow-users-to-sign-in-using-their-username-or-email-address#tell-devise-to-use-username-in-the-authentication_keys")= ' here '
+                | for more info.
 
             .form-group
               label password
@@ -265,6 +294,19 @@ br
           ng-init='updateAccountForm = {favorite_color: null}'
         )
           fieldset(ng-disabled='!user.signedIn')
+            .form-group
+              label nickname (optional)
+              input.form-control(
+                type='text'
+                name='nickname'
+                ng-model='registrationForm.nickname'
+              )
+
+              p.help-block
+                | This value can also be used for authentication. See
+                a(href="https://github.com/plataformatec/devise/wiki/How-To:-Allow-users-to-sign-in-using-their-username-or-email-address#tell-devise-to-use-username-in-the-authentication_keys")= ' here '
+                | for more info.
+
             .form-group
               label favorite color
               input.form-control(
