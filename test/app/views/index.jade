@@ -291,7 +291,7 @@ br
         form(
           ng-submit='updateAccount(updateAccountForm)'
           role='form'
-          ng-init='updateAccountForm = {favorite_color: null}'
+          ng-init='updateAccountForm = {favorite_color: null, nickname: null}'
         )
           fieldset(ng-disabled='!user.signedIn')
             .form-group
@@ -299,7 +299,7 @@ br
               input.form-control(
                 type='text'
                 name='nickname'
-                ng-model='registrationForm.nickname'
+                ng-model='updateAccountForm.nickname'
               )
 
               p.help-block
