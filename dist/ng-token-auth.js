@@ -209,8 +209,11 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
                 return $rootScope.$broadcast('auth:password-reset-request-error', resp);
               });
             },
-            updatePassword: function(params) {
-              return $http.put(this.apiUrl() + this.getConfig().passwordUpdatePath, params).success((function(_this) {
+            updatePassword: function(params, requestParams) {
+              if (requestParams == null) {
+                requestParams = {};
+              }
+              return $http.put(this.apiUrl() + this.getConfig().passwordUpdatePath, params, requestParams).success((function(_this) {
                 return function(resp) {
                   $rootScope.$broadcast('auth:password-change-success', resp);
                   return _this.mustResetPassword = false;
@@ -219,8 +222,11 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
                 return $rootScope.$broadcast('auth:password-change-error', resp);
               });
             },
-            updateAccount: function(params) {
-              return $http.put(this.apiUrl() + this.getConfig().accountUpdatePath, params).success((function(_this) {
+            updateAccount: function(params, requestParams) {
+              if (requestParams == null) {
+                requestParams = {};
+              }
+              return $http.put(this.apiUrl() + this.getConfig().accountUpdatePath, params, requestParams).success((function(_this) {
                 return function(resp) {
                   var curHeaders, key, newHeaders, updateResponse, val, _ref;
                   updateResponse = _this.getConfig().handleAccountUpdateResponse(resp);
