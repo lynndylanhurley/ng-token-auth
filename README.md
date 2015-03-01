@@ -695,7 +695,7 @@ $scope.$on('auth:email-confirmation-success', function(ev, user) {
 ~~~
 
 ###auth:email-confirmation-error
-Broadcast when a user arrives from a link contained in a password-reset email, but the confirmation token fails to validate.
+Broadcast when a user arrives from a link contained in a confirmation email, but the confirmation token fails to validate.
 
 This event is broadcast by the [`$auth.validateUser`](#authvalidateuser) method.
 
