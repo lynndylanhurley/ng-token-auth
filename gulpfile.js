@@ -107,40 +107,21 @@ gulp.task('component-coffee', function() {
       $.util.log(e.toString());
       this.emit('end');
     })
-    //.pipe($.uglify())
     .pipe(ngAnnotate())
     .pipe(gulp.dest(componentDistDir))
     .pipe(gulp.dest(tmpDir + 'scripts/'))
+    .pipe($.uglify())
+    .pipe($.rename('ng-token-auth.min.js'))
+    .pipe(gulp.dest(componentDistDir))
     .pipe($.size());
 });
 
 // Images
 gulp.task('images', function () {
   return gulp.src(appDir+'images/**/*')
-    //.pipe($.cache($.imagemin({
-      //optimizationLevel: 3,
-      //progressive: true,
-      //interlaced: true
-    //})))
     .pipe(gulp.dest(tmpDir+'/images'))
     .pipe($.size());
 });
-
-
-// Sprites
-//gulp.task('sprites', function() {
-  //return gulp.src(appDir+'images/sprites/**/*.png')
-    //.pipe(sprite({
-      //name:      'sprite.png',
-      //style:     'sprite.styl',
-      //cssPath:   '/images',
-      //processor: 'stylus',
-      //retina:    true
-    //}))
-    //.pipe($.if('*.png', gulp.dest(tmpDir+'/images')))
-    //.pipe($.if('*.styl', gulp.dest(tmpDir+'/styles')))
-    //.pipe($.size());
-//});
 
 
 gulp.task('css', function() {
