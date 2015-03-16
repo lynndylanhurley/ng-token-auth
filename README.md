@@ -62,6 +62,7 @@ This project comes bundled with a test app. You can run the demo locally by foll
   * [`auth:account-update-error`](#authaccount-update-error)
   * [`auth:account-destroy-success`](#authaccount-destroy-success)
   * [`auth:account-destroy-error`](#authaccount-destroy-error)
+  * [`auth:session-expired`](#authsession-expired)
 * [Using alternate response formats](#using-alternate-response-formats)
 * [Multiple user types](#using-multiple-user-types)
 * [File uploads](#file-uploads)
@@ -271,6 +272,7 @@ This method will broadcast the following events:
 * On page load:
   * [`auth:validation-success`](#authvalidation-success)
   * [`auth:validation-error`](#authvalidation-error)
+  * [`auth:session-expired`](#authsession-expired)
 * When visiting email confirmation links:
   * [`auth:email-confirmation-success`](#authemail-confirmation-success)
   * [`auth:email-confirmation-error`](#authemail-confirmation-error)
@@ -814,6 +816,16 @@ Broadcast when requests resulting from the [`$auth.destroyAccount`](#authdestroy
 ~~~javascript
 $scope.$on('auth:account-destroy-error', function(ev, reason) {
   alert("Account deletion failed: " + reason.errors[0]);
+});
+~~~
+
+###auth:session-expired
+Broadcast when the [`$auth.validateUser`](#authvalidateuser) method fails because a user's token has expired.
+
+##### Example:
+~~~javascript
+$scope.$on('auth:session-expired', function(ev) {
+  alert('Session has expired');
 });
 ~~~
 
