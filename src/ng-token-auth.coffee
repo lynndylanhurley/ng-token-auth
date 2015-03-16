@@ -1,3 +1,6 @@
+if typeof module != 'undefined' and typeof exports != 'undefined' and module.exports == exports
+  module.exports = 'ng-token-auth'
+
 angular.module('ng-token-auth', ['ipCookie'])
   .provider('$auth', ->
     configs =

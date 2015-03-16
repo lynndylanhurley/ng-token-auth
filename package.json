@@ -11,6 +11,7 @@
     "request": "~2.36.0",
     "sitemap": "~0.7.3"
   },
+  "main": "dist/ng-token-auth.js",
   "npmName": "ng-token-auth",
   "npmFileMap": [
     {
