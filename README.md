@@ -1334,6 +1334,7 @@ Thanks to the following contributors:
 * [@m2omou](https://github.com/m2omou)
 * [@smarquez1](https://github.com/smarquez1)
 * [@jartek](https://github.com/jartek)
+* [@flaviogranero](https://github.com/flaviogranero)
 
 Special thanks to [@jasonswett](https://github.com/jasonswett) for [this helpful guide](https://www.airpair.com/ruby-on-rails-4/posts/authentication-with-angularjs-and-ruby-on-rails)!
 
