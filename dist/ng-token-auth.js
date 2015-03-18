@@ -446,6 +446,9 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
                 delete this.user[key];
               }
               this.deleteData('currentConfigName');
+              if (this.timer != null) {
+                $timeout.cancel(this.timer);
+              }
               return this.deleteData('auth_headers');
             },
             signOut: function() {
@@ -520,9 +523,24 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
               }
             },
             setAuthHeaders: function(h) {
-              var newHeaders;
+              var expiry, newHeaders, now, result;
               newHeaders = angular.extend(this.retrieveData('auth_headers') || {}, h);
-              return this.persistData('auth_headers', newHeaders);
+              result = this.persistData('auth_headers', newHeaders);
+              expiry = this.getExpiry();
+              now = new Date().getTime();
+              if (expiry > now) {
+                if (this.timer != null) {
+                  $timeout.cancel(this.timer);
+                }
+                this.timer = $timeout(((function(_this) {
+                  return function() {
+                    return _this.validateUser({
+                      config: _this.getSavedConfig()
+                    });
+                  };
+                })(this)), parseInt((expiry - now) / 1000));
+              }
+              return result;
             },
             useExternalWindow: function() {
               return !(this.getConfig().forceHardRedirect || $window.isIE());

@@ -504,6 +504,8 @@ angular.module('ng-token-auth', ['ipCookie'])
             # remove any assumptions about current configuration
             @deleteData('currentConfigName')
 
+            $timeout.cancel @timer if @timer?
+
             # kill cookies, otherwise session will resume on page reload
             # setting this value to null will force the validateToken method
             # to re-validate credentials with api server when validate is called
@@ -587,7 +589,20 @@ angular.module('ng-token-auth', ['ipCookie'])
           # persist authentication token, client id, uid
           setAuthHeaders: (h) ->
             newHeaders = angular.extend((@retrieveData('auth_headers') || {}), h)
-            @persistData('auth_headers', newHeaders)
+            result = @persistData('auth_headers', newHeaders)
+
+            expiry = @getExpiry()
+            now    = new Date().getTime()
+
+            if expiry > now
+              $timeout.cancel @timer if @timer?
+
+              @timer = $timeout (=>
+                @validateUser {config: @getSavedConfig()}
+              ), parseInt (expiry - now) / 1000
+
+            result
+
 
 
           # ie8 + ie9 cannot use xdomain postMessage
