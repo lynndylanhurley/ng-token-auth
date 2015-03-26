@@ -1274,7 +1274,7 @@ It's impossible to control cookies' path values using `ngCookies`. This results 
 
 The only options were to re-implement cookie storage from scratch, or to use the [ipCookie module](https://github.com/ivpusic/angular-cookie). The ipCookie module seemed like the better choice, and it's been working well so far.
 
-Please direct complaints regarding this problem to [this angualar issue](https://github.com/angular/angular.js/issues/1786).
+Please direct complaints regarding this problem to [this angular issue](https://github.com/angular/angular.js/issues/1786).
 
 # Development
 
