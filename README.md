@@ -203,7 +203,7 @@ angular.module('myApp', ['ng-token-auth'])
 | **passwordResetPath** | path for requesting password reset emails. [Read more](#password-reset-flow). |
 | **passwordUpdatePath** | path for submitting new passwords for authenticated users. [Read more](#password-reset-flow) |
 | **passwordResetSuccessUrl** | the URL to which the API should redirect after users visit the links contained in password-reset emails. [Read more](#password-reset-flow). |
-| **storage** | the method used to persist tokens between sessions. cookies are used by default, but `window.localStorage` can be used as well. allowed values are `cookies` and `localStorage`. |
+| **storage** | the method used to persist tokens between sessions. cookies are used by default, but `window.localStorage` can be used as well. A custom object can also be used. Allowed strings are `cookies` and `localStorage`, otherwise an object implementing the interface defined below|
 | **proxyIf** | older browsers have trouble with CORS ([read more](#internet-explorer)). pass a method here to determine whether or not a proxy should be used. example: `function() { return !Modernizr.cors }` |
 | **proxyUrl** | proxy url if proxy is to be used |
 | **tokenFormat** | a template for authentication tokens. the template will be provided a context with the following params:<br><ul><li>token</li><li>clientId</li><li>uid</li><li>expiry</li></ul>Defaults to the [RFC 6750 Bearer Token](http://tools.ietf.org/html/rfc6750) format. [Read more](#using-alternate-header-formats). |
@@ -212,6 +212,15 @@ angular.module('myApp', ['ng-token-auth'])
 | **handleAccountUpdateResponse** | a function that will identify and return the current user's info (id, username, etc.) in the response of a successful account update request. [Read more](#using-alternate-response-formats). |
 | **handleTokenValidationResponse** | a function that will identify and return the current user's info (id, username, etc.) in the response of a successful token validation request. [Read more](#using-alternate-response-formats). |
 
+#### Custom Storage Object
+Must implement the following interface:
+```javascript
+{
+  function persistData(key, val) {}
+  function retrieveData(key) {}
+  function deleteData(key) {}
+}
+```
 
 # Usage
 
