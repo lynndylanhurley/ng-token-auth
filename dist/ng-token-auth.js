@@ -432,7 +432,7 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
             tokenHasExpired: function() {
               var expiry, now;
               expiry = this.getExpiry();
-              now = new Date().getTime();
+              now = Date.now();
               return expiry && expiry < now;
             },
             getExpiry: function() {
@@ -527,7 +527,7 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
               newHeaders = angular.extend(this.retrieveData('auth_headers') || {}, h);
               result = this.persistData('auth_headers', newHeaders);
               expiry = this.getExpiry();
-              now = new Date().getTime();
+              now = Date.now();
               if (expiry > now) {
                 if (this.timer != null) {
                   $timeout.cancel(this.timer);

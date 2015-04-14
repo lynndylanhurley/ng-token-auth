@@ -869,6 +869,7 @@ The `tokenFormat` param accepts an object as an argument. Each param of the obje
 * **clientId**: the id of the current device
 
 The `parseExpiry` param accepts a method that will be used to parse the expiration date from the auth headers. The current valid headers will be provided as an argument.
+The method must return the number of milliseconds elapsed since 1 January 1970 00:00:00 UTC.
 
 ### Using alternate response formats
 
