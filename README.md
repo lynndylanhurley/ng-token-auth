@@ -514,12 +514,12 @@ angular.module('ngTokenAuthTestApp')
 <form ng-submit="updatePassword(changePasswordForm)" role="form" ng-init="changePasswordForm = {}">
   <div class="form-group">
     <label>password</label>
-    <input type="password" name="password" ng-model="changePasswordForm.password" required="required" class="form-control"/>
+    <input type="password" name="password" ng-model="changePasswordForm.password" required="required" class="form-control">
   </div>
 
   <div class="form-group">
     <label>password confirmation</label>
-    <input type="password" name="password_confirmation" ng-model="changePasswordForm.password_confirmation" required="required"/>
+    <input type="password" name="password_confirmation" ng-model="changePasswordForm.password_confirmation" required="required" class="form-control">
   </div>
 
   <button type="submit">Change your password</button>
