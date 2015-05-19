@@ -1,7 +1,6 @@
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 var express   = require('express');
 var request   = require('request');
-var httpProxy = require('http-proxy');
 var s3Policy  = require('./server/s3');
 var sm        = require('sitemap');
 var os        = require('os');

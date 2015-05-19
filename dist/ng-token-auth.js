@@ -495,12 +495,15 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
               return headers;
             },
             persistData: function(key, val, configName) {
+              var expiry;
               switch (this.getConfig(configName).storage) {
                 case 'localStorage':
                   return $window.localStorage.setItem(key, JSON.stringify(val));
                 default:
+                  expiry = this.getConfig().parseExpiry(val || {});
                   return ipCookie(key, val, {
-                    path: '/'
+                    path: '/',
+                    expires: expiry
                   });
               }
             },

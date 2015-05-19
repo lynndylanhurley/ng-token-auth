@@ -566,7 +566,8 @@ angular.module('ng-token-auth', ['ipCookie'])
               when 'localStorage'
                 $window.localStorage.setItem(key, JSON.stringify(val))
               else
-                ipCookie(key, val, {path: '/'})
+                expiry = @getConfig().parseExpiry(val || {})
+                ipCookie(key, val, {path: '/', expires: expiry})
 
 
           # abstract persistent data retrieval
