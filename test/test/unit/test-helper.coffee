@@ -81,6 +81,10 @@ setValidEmailConfirmQS = ->
   setValidAuthQS()
   $location.search('account_confirmation_success', true)
 
+setValidOauthRegistrationQS = ->
+  setValidAuthQS()
+  $location.search('oauth_registration', true)
+
 setValidEmailConfirmQSForAdminUser = ->
   setValidEmailConfirmQS()
   $location.search('config', 'admin')

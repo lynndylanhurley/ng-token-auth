@@ -48,6 +48,7 @@ This project comes bundled with a test app. You can run the demo locally by foll
   * [`auth:validation-error`](#authvalidation-error)
   * [`auth:logout-success`](#authlogout-success)
   * [`auth:logout-error`](#authlogout-error)
+  * [`auth:oauth-registration`](#authoauth-registration)
   * [`auth:registration-email-success`](#authregistration-email-success)
   * [`auth:registration-email-error`](#authregistration-email-error)
   * [`auth:email-confirmation-success`](#authemail-confirmation-success)
@@ -240,6 +241,7 @@ This method emits the following events:
 
 * [`auth:login-success`](#authlogin-success)
 * [`auth:login-error`](#authlogin-error)
+* [`auth:oauth-registration`](#authoauth-registration)
 
 #### Example use in a controller
 ~~~javascript
@@ -632,6 +634,18 @@ Broadcast after user fails authentication. This event is broadcast by the follow
 ~~~javascript
 $rootScope.$on('auth:login-error', function(ev, reason) {
     alert('auth failed because', reason.errors[0]);
+});
+~~~
+
+###auth:oauth-registration
+Broadcast when the message posted after an oauth login as the new_record attribute set to `true`. This event is broadcast by the following methods:
+
+* [`$auth.authenticate`](#authauthenticate)
+
+##### Example:
+~~~javascript
+$rootScope.$on('auth:oauth-registration', function(ev, user) {
+    alert('new user registered through oauth:' + user.email);
 });
 ~~~
 
