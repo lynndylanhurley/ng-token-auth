@@ -123,11 +123,16 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
               }
             },
             handlePostMessage: function(ev) {
-              var error;
+              var error, newRecord;
               if (ev.data.message === 'deliverCredentials') {
                 delete ev.data.message;
+                newRecord = ev.data.new_record;
+                delete ev.data.new_record;
                 this.handleValidAuth(ev.data, true);
                 $rootScope.$broadcast('auth:login-success', ev.data);
+                if (newRecord === true) {
+                  $rootScope.$broadcast('auth:oauth-registration', ev.data);
+                }
               }
               if (ev.data.message === 'authFailure') {
                 error = {

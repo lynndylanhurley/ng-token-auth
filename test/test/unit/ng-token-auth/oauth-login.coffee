@@ -41,29 +41,51 @@ suite 'oauth2 login', ->
           signedIn:   true
           configName: "default"
 
-        setup ->
-          # mock pm response
-          $window.postMessage(angular.extend({message: 'deliverCredentials'}, expectedUser), '*')
+        suite 'with existing user', -> 
+          setup ->
+            # mock pm response
+            $window.postMessage(angular.extend({message: 'deliverCredentials'}, expectedUser), '*')
 
 
-        test 'user should be authenticated, promise is resolved', (done) ->
-          called = false
-          dfd.then(=>
-            called = true
-          )
+          test 'user should be authenticated, promise is resolved', (done) ->
+            called = false
+            dfd.then(=>
+              called = true
+            )
 
-          setTimeout ->
-            $timeout.flush()
-            assert.deepEqual($rootScope.user, expectedUser)
-            assert(called)
-            done()
+            setTimeout ->
+              $timeout.flush()
+              assert.deepEqual($rootScope.user, expectedUser)
+              assert $rootScope.$broadcast.calledWith('auth:login-success')
+              assert $rootScope.$broadcast.neverCalledWith('auth:oauth-registration')
+              assert(called)
+              done()
 
 
-        test 'expiry is set', (done) ->
-          setTimeout ->
-            $timeout.flush()
-            assert.equal(validExpiry * 1000, $auth.getConfig().parseExpiry($auth.retrieveData('auth_headers')))
-            done()
+          test 'expiry is set', (done) ->
+            setTimeout ->
+              $timeout.flush()
+              assert.equal(validExpiry * 1000, $auth.getConfig().parseExpiry($auth.retrieveData('auth_headers')))
+              done()
+
+        suite 'with new user', ->
+          setup ->
+            # mock pm response
+            $window.postMessage(angular.extend({message: 'deliverCredentials', new_record: true}, expectedUser), '*')
+
+
+          test 'should fire oauth-registration event', (done) ->
+            called = false
+            dfd.then(=>
+              called = true
+            )
+
+            setTimeout ->
+              $timeout.flush()
+              assert $rootScope.$broadcast.calledWithMatch('auth:oauth-registration', expectedUser)
+              assert(called)
+              done()
+
 
 
       suite 'directive access', ->
