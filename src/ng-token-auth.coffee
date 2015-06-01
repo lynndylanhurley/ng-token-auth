@@ -136,11 +136,13 @@ angular.module('ng-token-auth', ['ipCookie'])
           handlePostMessage: (ev) ->
             if ev.data.message == 'deliverCredentials'
               delete ev.data.message
-              newRecord = ev.data.new_record
-              delete ev.data.new_record
+
+              # check if a new user was registered
+              oauthRegistration = ev.data.oauth_registration
+              delete ev.data.oauth_registration
               @handleValidAuth(ev.data, true)
               $rootScope.$broadcast('auth:login-success', ev.data)
-              if newRecord == true
+              if oauthRegistration == true
                 $rootScope.$broadcast('auth:oauth-registration', ev.data)
             if ev.data.message == 'authFailure'
               error = {
@@ -387,7 +389,7 @@ angular.module('ng-token-auth', ['ipCookie'])
                   clientId   = $location.search().client_id
                   uid        = $location.search().uid
                   expiry     = $location.search().expiry
-                  configName = $location.search().config
+                  configName = $location.search().config                  
 
                   # use the configuration that was used in creating
                   # the confirmation link
@@ -398,6 +400,9 @@ angular.module('ng-token-auth', ['ipCookie'])
 
                   # check if redirected from email confirmation link
                   @firstTimeLogin = $location.search().account_confirmation_success
+
+                  # check if redirected from auth registration
+                  @oauthRegistration = $location.search().oauth_registration
 
                   # persist these values
                   @setAuthHeaders(@buildAuthHeaders({
@@ -453,6 +458,9 @@ angular.module('ng-token-auth', ['ipCookie'])
                   # broadcast event for first time login
                   if @firstTimeLogin
                     $rootScope.$broadcast('auth:email-confirmation-success', @user)
+
+                  if @oauthRegistration
+                    $rootScope.$broadcast('auth:oauth-registration', @user)
 
                   if @mustResetPassword
                     $rootScope.$broadcast('auth:password-reset-confirm-success', @user)

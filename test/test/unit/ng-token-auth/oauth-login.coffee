@@ -71,7 +71,7 @@ suite 'oauth2 login', ->
         suite 'with new user', ->
           setup ->
             # mock pm response
-            $window.postMessage(angular.extend({message: 'deliverCredentials', new_record: true}, expectedUser), '*')
+            $window.postMessage(angular.extend({message: 'deliverCredentials', oauth_registration: true}, expectedUser), '*')
 
 
           test 'should fire oauth-registration event', (done) ->
