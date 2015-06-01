@@ -130,7 +130,7 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
                 delete ev.data.oauth_registration;
                 this.handleValidAuth(ev.data, true);
                 $rootScope.$broadcast('auth:login-success', ev.data);
-                if (oauthRegistration === true) {
+                if (oauthRegistration) {
                   $rootScope.$broadcast('auth:oauth-registration', ev.data);
                 }
               }
