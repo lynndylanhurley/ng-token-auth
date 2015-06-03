@@ -668,7 +668,14 @@ angular.module('ng-token-auth', ['ipCookie'])
             c   = undefined
             key = 'currentConfigName'
 
-            if $window.localStorage
+            # accessing $window.localStorage will 
+            # throw an error if localStorage is disabled
+            hasLocalStorage = false
+            try
+              hasLocalStorage = !!$window.localStorage
+            catch error
+
+            if hasLocalStorage
               c ?= JSON.parse($window.localStorage.getItem(key))
 
             c ?= ipCookie(key)
