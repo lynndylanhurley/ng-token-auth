@@ -503,7 +503,8 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
                   expiry = this.getConfig().parseExpiry(val || {});
                   return ipCookie(key, val, {
                     path: '/',
-                    expires: expiry
+                    expires: expiry,
+                    domain: this.getConfig().cookiesDomain
                   });
               }
             },
