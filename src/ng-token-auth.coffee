@@ -465,11 +465,16 @@ angular.module('ng-token-auth', ['ipCookie'])
                     $rootScope.$broadcast('auth:password-reset-confirm-error', data)
 
                   $rootScope.$broadcast('auth:validation-error', data)
-
-                  @rejectDfd({
-                    reason: 'unauthorized'
-                    errors: data.errors
-                  })
+                  if data
+                    @rejectDfd({
+                      reason: 'unauthorized'
+                      errors: data.errors
+                    })
+                  else
+                    @rejectDfd({
+                      reason: 'unauthorized'
+                      errors: 'no data returned'
+                    })
                 )
             else
               @rejectDfd({
