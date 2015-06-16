@@ -583,10 +583,16 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
               return name || this.getSavedConfig();
             },
             getSavedConfig: function() {
-              var c, key;
+              var c, error, hasLocalStorage, key;
               c = void 0;
               key = 'currentConfigName';
-              if ($window.localStorage) {
+              hasLocalStorage = false;
+              try {
+                hasLocalStorage = !!$window.localStorage;
+              } catch (_error) {
+                error = _error;
+              }
+              if (hasLocalStorage) {
                 if (c == null) {
                   c = JSON.parse($window.localStorage.getItem(key));
                 }
