@@ -1286,6 +1286,7 @@ There is a test project in the `test` directory of this app. To start a dev serv
 1. `npm install`
 1. `cd test && bower install`
 1. `cd ..`
+1. `gem install sass`
 1. `gulp dev`
 
 A dev server will start on [localhost:7777](http://localhost:7777).
