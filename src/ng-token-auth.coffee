@@ -362,6 +362,16 @@ angular.module('ng-token-auth', ['ipCookie'])
             ), 0)
 
 
+          # generates query string based on simple or complex object graphs
+          buildQueryString: (param, prefix) ->
+            str = []
+            for k,v of param
+              k = if prefix then prefix + "[" + k + "]" else k
+              encoded = if angular.isObject(v) then @buildQueryString(v, k) else (k) + "=" + encodeURIComponent(v)
+              str.push encoded
+            str.join "&"
+
+
           # this is something that can be returned from 'resolve' methods
           # of pages that have restricted access
           validateUser: (opts={}) ->
@@ -379,22 +389,23 @@ angular.module('ng-token-auth', ['ipCookie'])
               else
                 # token querystring is present. user most likely just came from
                 # registration email link.
-                if $location.search().token != undefined
-                  token      = $location.search().token
-                  clientId   = $location.search().client_id
-                  uid        = $location.search().uid
-                  expiry     = $location.search().expiry
-                  configName = $location.search().config
+                params = $location.search()
+                if params.token != undefined
+                  token      = params.token
+                  clientId   = params.client_id
+                  uid        = params.uid
+                  expiry     = params.expiry
+                  configName = params.config
 
                   # use the configuration that was used in creating
                   # the confirmation link
                   @setConfigName(configName)
 
                   # check if redirected from password reset link
-                  @mustResetPassword = $location.search().reset_password
+                  @mustResetPassword = params.reset_password
 
                   # check if redirected from email confirmation link
-                  @firstTimeLogin = $location.search().account_confirmation_success
+                  @firstTimeLogin = params.account_confirmation_success
 
                   # persist these values
                   @setAuthHeaders(@buildAuthHeaders({
@@ -404,9 +415,20 @@ angular.module('ng-token-auth', ['ipCookie'])
                     expiry:   expiry
                   }))
 
-                  # strip qs from url to prevent re-use of these params
+                  # build url base
+                  url = ($location.path() || '/')
+
+                  # strip token-related qs from url to prevent re-use of these params
                   # on page refresh
-                  $location.url(($location.path() || '/'))
+                  ['token', 'client_id', 'uid', 'expiry', 'config', 'reset_password', 'account_confirmation_success', 'oauth_registration'].forEach (prop) ->
+                    delete params[prop];
+
+                  # append any remaining params, if any
+                  if Object.keys(params).length > 0
+                    url += '?' + @buildQueryString(params);
+
+                  # redirect to target url
+                  $location.url(url)
 
                 # token cookie is present. user is returning to the site, or
                 # has refreshed the page.
