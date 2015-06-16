@@ -136,9 +136,14 @@ angular.module('ng-token-auth', ['ipCookie'])
           handlePostMessage: (ev) ->
             if ev.data.message == 'deliverCredentials'
               delete ev.data.message
+
+              # check if a new user was registered
+              oauthRegistration = ev.data.oauth_registration
+              delete ev.data.oauth_registration
               @handleValidAuth(ev.data, true)
               $rootScope.$broadcast('auth:login-success', ev.data)
-
+              if oauthRegistration
+                $rootScope.$broadcast('auth:oauth-registration', ev.data)
             if ev.data.message == 'authFailure'
               error = {
                 reason: 'unauthorized'
@@ -407,6 +412,9 @@ angular.module('ng-token-auth', ['ipCookie'])
                   # check if redirected from email confirmation link
                   @firstTimeLogin = params.account_confirmation_success
 
+                  # check if redirected from auth registration
+                  @oauthRegistration = $location.search().oauth_registration
+
                   # persist these values
                   @setAuthHeaders(@buildAuthHeaders({
                     token:    token
@@ -472,6 +480,9 @@ angular.module('ng-token-auth', ['ipCookie'])
                   # broadcast event for first time login
                   if @firstTimeLogin
                     $rootScope.$broadcast('auth:email-confirmation-success', @user)
+
+                  if @oauthRegistration
+                    $rootScope.$broadcast('auth:oauth-registration', @user)
 
                   if @mustResetPassword
                     $rootScope.$broadcast('auth:password-reset-confirm-success', @user)

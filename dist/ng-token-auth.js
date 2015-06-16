@@ -123,11 +123,16 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
               }
             },
             handlePostMessage: function(ev) {
-              var error;
+              var error, oauthRegistration;
               if (ev.data.message === 'deliverCredentials') {
                 delete ev.data.message;
+                oauthRegistration = ev.data.oauth_registration;
+                delete ev.data.oauth_registration;
                 this.handleValidAuth(ev.data, true);
                 $rootScope.$broadcast('auth:login-success', ev.data);
+                if (oauthRegistration) {
+                  $rootScope.$broadcast('auth:oauth-registration', ev.data);
+                }
               }
               if (ev.data.message === 'authFailure') {
                 error = {
@@ -336,8 +341,19 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
                 };
               })(this)), 0);
             },
+            buildQueryString: function(param, prefix) {
+              var encoded, k, str, v;
+              str = [];
+              for (k in param) {
+                v = param[k];
+                k = prefix ? prefix + "[" + k + "]" : k;
+                encoded = angular.isObject(v) ? this.buildQueryString(v, k) : k + "=" + encodeURIComponent(v);
+                str.push(encoded);
+              }
+              return str.join("&");
+            },
             validateUser: function(opts) {
-              var clientId, configName, expiry, token, uid;
+              var clientId, configName, expiry, params, token, uid, url;
               if (opts == null) {
                 opts = {};
               }
@@ -347,22 +363,31 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
                 if (this.userIsAuthenticated()) {
                   this.resolveDfd();
                 } else {
-                  if ($location.search().token !== void 0) {
-                    token = $location.search().token;
-                    clientId = $location.search().client_id;
-                    uid = $location.search().uid;
-                    expiry = $location.search().expiry;
-                    configName = $location.search().config;
+                  params = $location.search();
+                  if (params.token !== void 0) {
+                    token = params.token;
+                    clientId = params.client_id;
+                    uid = params.uid;
+                    expiry = params.expiry;
+                    configName = params.config;
                     this.setConfigName(configName);
-                    this.mustResetPassword = $location.search().reset_password;
-                    this.firstTimeLogin = $location.search().account_confirmation_success;
+                    this.mustResetPassword = params.reset_password;
+                    this.firstTimeLogin = params.account_confirmation_success;
+                    this.oauthRegistration = $location.search().oauth_registration;
                     this.setAuthHeaders(this.buildAuthHeaders({
                       token: token,
                       clientId: clientId,
                       uid: uid,
                       expiry: expiry
                     }));
-                    $location.url($location.path() || '/');
+                    url = $location.path() || '/';
+                    ['token', 'client_id', 'uid', 'expiry', 'config', 'reset_password', 'account_confirmation_success', 'oauth_registration'].forEach(function(prop) {
+                      return delete params[prop];
+                    });
+                    if (Object.keys(params).length > 0) {
+                      url += '?' + this.buildQueryString(params);
+                    }
+                    $location.url(url);
                   } else if (this.retrieveData('currentConfigName')) {
                     configName = this.retrieveData('currentConfigName');
                   }
@@ -401,6 +426,9 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
                     _this.handleValidAuth(authData);
                     if (_this.firstTimeLogin) {
                       $rootScope.$broadcast('auth:email-confirmation-success', _this.user);
+                    }
+                    if (_this.oauthRegistration) {
+                      $rootScope.$broadcast('auth:oauth-registration', _this.user);
                     }
                     if (_this.mustResetPassword) {
                       $rootScope.$broadcast('auth:password-reset-confirm-success', _this.user);

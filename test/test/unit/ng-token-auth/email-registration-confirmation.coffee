@@ -19,7 +19,7 @@ suite 'email registration confirmation', ->
       assert.equal(validUser.uid, $rootScope.user.uid)
 
     test '$rootScope broadcast validation success event', ->
-      assert $rootScope.$broadcast.calledWith('auth:validation-success')
+      assert $rootScope.$broadcast.calledWith('auth:validation-success')    
 
     test '$rootScope broadcast email confirmation success event', ->
       assert $rootScope.$broadcast.calledWith('auth:email-confirmation-success')
@@ -32,6 +32,24 @@ suite 'email registration confirmation', ->
       dfd.then(-> resolved = true)
       $timeout.flush()
       assert(resolved)
+
+  suite 'successful oauth registration', ->
+    setup ->
+      $httpBackend
+        .expectGET('/api/auth/validate_token')
+        .respond(201, {
+          sucess: true
+          data: validUser
+        })
+
+      # mock the querystring coming back from an oauth registration
+      setValidOauthRegistrationQS();
+
+      dfd = $auth.validateUser()
+      $httpBackend.flush()
+
+    test '$rootScope broadcast oauth registration event', ->
+      assert $rootScope.$broadcast.calledWith('auth:oauth-registration')
 
 
   suite 'failed registration', ->
