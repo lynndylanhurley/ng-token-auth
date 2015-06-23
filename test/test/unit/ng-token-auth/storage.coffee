@@ -68,3 +68,39 @@ suite 'alternate storage', ->
 
       test 'localStorage item should no longer be present', ->
         assert(ipCookie('auth_headers') == undefined)
+
+  suite 'customStorage', ->
+    storageObj = {
+      persistData: sinon.spy(),
+      retrieveData: sinon.spy(),
+      deleteData: sinon.spy()
+    }
+    # configure for local storage
+    setup ->
+      $authProvider.configure({
+        storage: storageObj
+      })
+
+    # restore config defaults
+    teardown ->
+      $authProvider.configure({
+        storage: 'cookies'
+      })
+
+    suite 'data persistence and retrieval', ->
+      setup ->
+        $auth.setAuthHeaders(newAuthHeader)
+
+      test 'persist data should be called', ->
+        storageObj.persistData.should.have.been.called
+
+      test 'retrieve data should be called', ->
+        storageObj.retrieveData.should.have.been.called
+
+
+    suite 'data deletion', ->
+      setup ->
+        $auth.invalidateTokens()
+
+      test 'delete data should be called', ->
+        storageObj.deleteData.should.have.been.called
