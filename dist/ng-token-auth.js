@@ -57,38 +57,7 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
   defaultConfigName = "default";
   return {
     configure: function(params) {
-      var conf, defaults, fullConfig, i, k, label, storage, v, _i, _len;
-      storage = {
-        localStorage: {
-          persistData: function(key, val) {
-            return $window.localStorage.setItem(key, JSON.stringify(val));
-          },
-          retrieveData: function(key) {
-            return JSON.parse($window.localStorage.getItem(key));
-          },
-          deleteData: function(key) {
-            return $window.localStorage.removeItem(key);
-          }
-        },
-        cookies: {
-          persistData: function(key, val, config) {
-            var expiry;
-            expiry = config.parseExpiry(val || {});
-            return ipCookie(key, val, {
-              path: '/',
-              expires: expiry
-            });
-          },
-          retrieveData: function(key) {
-            return ipCookie(key);
-          },
-          deleteData: function(key) {
-            return ipCookie.remove(key, {
-              path: '/'
-            });
-          }
-        }
-      };
+      var conf, defaults, fullConfig, i, k, label, v, _i, _len;
       if (params instanceof Array && params.length) {
         for (i = _i = 0, _len = params.length; _i < _len; i = ++_i) {
           conf = params[i];
@@ -103,9 +72,6 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
           defaults = angular.copy(configs["default"]);
           fullConfig = {};
           fullConfig[label] = angular.extend(defaults, conf[label]);
-          if (!(fullConfig[label].storage instanceof Object)) {
-            fullConfig[label].storage = storage[fullConfig[label].storage];
-          }
           angular.extend(configs, fullConfig);
         }
         if (defaultConfigName !== "default") {
@@ -113,9 +79,6 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
         }
       } else if (params instanceof Object) {
         angular.extend(configs["default"], params);
-        if (!(configs["default"].storage instanceof Object)) {
-          configs["default"].storage = storage[configs["default"].storage];
-        }
       } else {
         throw "Invalid argument: ng-token-auth config should be an Array or Object.";
       }
@@ -560,13 +523,46 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
               return headers;
             },
             persistData: function(key, val, configName) {
-              return this.getConfig(configName).storage.persistData(key, val, this.getConfig(configName));
+              var expiry;
+              if (this.getConfig(configName).storage instanceof Object) {
+                return this.getConfig(configName).storage.persistData(key, val, this.getConfig(configName));
+              } else {
+                switch (this.getConfig(configName).storage) {
+                  case 'localStorage':
+                    return $window.localStorage.setItem(key, JSON.stringify(val));
+                  default:
+                    expiry = this.getConfig().parseExpiry(val || {});
+                    return ipCookie(key, val, {
+                      path: '/',
+                      expires: expiry
+                    });
+                }
+              }
             },
             retrieveData: function(key) {
-              return this.getConfig().storage.retrieveData(key);
+              if (this.getConfig().storage instanceof Object) {
+                return this.getConfig().storage.retrieveData(key);
+              } else {
+                switch (this.getConfig().storage) {
+                  case 'localStorage':
+                    return JSON.parse($window.localStorage.getItem(key));
+                  default:
+                    return ipCookie(key);
+                }
+              }
             },
             deleteData: function(key) {
-              return this.getConfig().storage.deleteData(key);
+              if (this.getConfig().storage instanceof Object) {
+                this.getConfig().storage.deleteData(key);
+              }
+              switch (this.getConfig().storage) {
+                case 'localStorage':
+                  return $window.localStorage.removeItem(key);
+                default:
+                  return ipCookie.remove(key, {
+                    path: '/'
+                  });
+              }
             },
             setAuthHeaders: function(h) {
               var expiry, newHeaders, now, result;

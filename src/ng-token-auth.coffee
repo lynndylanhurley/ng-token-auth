@@ -48,22 +48,7 @@ angular.module('ng-token-auth', ['ipCookie'])
 
     return {
       configure: (params) ->
-        storage =
-          localStorage:
-            persistData: (key, val) ->
-              $window.localStorage.setItem(key, JSON.stringify(val))
-            retrieveData: (key) ->
-              JSON.parse($window.localStorage.getItem(key))
-            deleteData: (key) ->
-              $window.localStorage.removeItem(key)
-          cookies:
-            persistData: (key, val, config) ->
-              expiry = config.parseExpiry(val || {})
-              ipCookie(key, val, {path: '/', expires: expiry})
-            retrieveData: (key) ->
-              ipCookie(key)
-            deleteData: (key) ->
-              ipCookie.remove(key, {path: '/'})
+
         # user is using multiple concurrent configs (>1 user types).
         if params instanceof Array and params.length
           # extend each item in array from default settings
@@ -81,8 +66,6 @@ angular.module('ng-token-auth', ['ipCookie'])
             defaults = angular.copy(configs["default"])
             fullConfig = {}
             fullConfig[label] = angular.extend(defaults, conf[label])
-            unless fullConfig[label].storage instanceof Object
-              fullConfig[label].storage = storage[fullConfig[label].storage]
             angular.extend(configs, fullConfig)
 
 
@@ -92,8 +75,7 @@ angular.module('ng-token-auth', ['ipCookie'])
         # user is extending the single default config
         else if params instanceof Object
           angular.extend(configs["default"], params)
-          unless configs["default"].storage instanceof Object
-            configs["default"].storage = storage[configs["default"].storage]
+
 
         # user is doing something wrong
         else
@@ -615,18 +597,35 @@ angular.module('ng-token-auth', ['ipCookie'])
 
           # abstract persistent data store
           persistData: (key, val, configName) ->
-            @getConfig(configName).storage.persistData(key, val, @getConfig(configName))
-
+            if @getConfig(configName).storage instanceof Object
+              @getConfig(configName).storage.persistData(key, val, @getConfig(configName))
+            else
+              switch @getConfig(configName).storage
+                when 'localStorage'
+                  $window.localStorage.setItem(key, JSON.stringify(val))
+                else
+                  expiry = @getConfig().parseExpiry(val || {})
+                  ipCookie(key, val, {path: '/', expires: expiry})
 
           # abstract persistent data retrieval
           retrieveData: (key) ->
-            @getConfig().storage.retrieveData(key)
-
+            if @getConfig().storage instanceof Object
+              @getConfig().storage.retrieveData(key)
+            else
+              switch @getConfig().storage
+                when 'localStorage'
+                  JSON.parse($window.localStorage.getItem(key))
+                else ipCookie(key)
 
           # abstract persistent data removal
           deleteData: (key) ->
-            @getConfig().storage.deleteData(key);
-
+            if @getConfig().storage instanceof Object
+              @getConfig().storage.deleteData(key);
+            switch @getConfig().storage
+              when 'localStorage'
+                $window.localStorage.removeItem(key)
+              else
+                ipCookie.remove(key, {path: '/'})
 
           # persist authentication token, client id, uid
           setAuthHeaders: (h) ->
