@@ -523,7 +523,6 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
               return headers;
             },
             persistData: function(key, val, configName) {
-              var expiry;
               if (this.getConfig(configName).storage instanceof Object) {
                 return this.getConfig(configName).storage.persistData(key, val, this.getConfig(configName));
               } else {
@@ -531,10 +530,10 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
                   case 'localStorage':
                     return $window.localStorage.setItem(key, JSON.stringify(val));
                   default:
-                    expiry = this.getConfig().parseExpiry(val || {});
                     return ipCookie(key, val, {
                       path: '/',
-                      expires: expiry
+                      expires: 9999,
+                      expirationUnit: 'days'
                     });
                 }
               }
