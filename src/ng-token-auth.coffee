@@ -639,7 +639,7 @@ angular.module('ng-token-auth', ['ipCookie'])
 
               @timer = $timeout (=>
                 @validateUser {config: @getSavedConfig()}
-              ), parseInt (expiry - now) / 1000
+              ), parseInt (expiry - now)
 
             result
 

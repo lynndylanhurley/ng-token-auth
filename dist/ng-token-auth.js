@@ -579,7 +579,7 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
                       config: _this.getSavedConfig()
                     });
                   };
-                })(this)), parseInt((expiry - now) / 1000));
+                })(this)), parseInt(expiry - now));
               }
               return result;
             },
