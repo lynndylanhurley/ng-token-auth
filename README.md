@@ -500,11 +500,11 @@ angular.module('ngTokenAuthTestApp')
 ###$auth.updatePassword
 Change an authenticated user's password. This only applies to users that have registered using email. This method accepts an object with the following params:
 
-* **old_password**
+* **current_password**
 * **password**
 * **password_confirmation**
 
-The `password` and `password_confirmation` params must match. `current_password` param is optional - depends on the server configuration it might be checked before password update.
+The `password` and `password_confirmation` params must match. `current_password` param is optional - depends on the server configuration. It might be checked before password update.
 
 This method broadcasts the following events:
 
