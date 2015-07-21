@@ -99,12 +99,12 @@ Not using AngularJS? Use [jToker](https://github.com/lynndylanhurley/j-toker) in
 # Installation
 
 
-* Download this module and its dependencies:   
+* Download this module and its dependencies: 
   ~~~bash
   # from the terminal at the root of your project
   bower install ng-token-auth --save
   ~~~
-  
+
 * Ensure that [angularjs](https://github.com/angular/angular.js), [angular-cookie](https://github.com/ivpusic/angular-cookie), and ng-token-auth are included on your page: 
   ~~~html
   <!-- in your index.html file -->
@@ -112,7 +112,7 @@ Not using AngularJS? Use [jToker](https://github.com/lynndylanhurley/j-toker) in
   <script src="/js/angular-cookie/angular-cookie.js"></script>
   <script src="/js/ng-token-auth/dist/ng-token-auth.js"></script>
   ~~~
-  
+
 * Include `ng-token-auth` in your module's dependencies:
   ~~~javascript
   // in your js app's module definition
@@ -226,7 +226,7 @@ Must implement the following interface:
 
 ## API
 
-The `$auth` module is available for dependency injection during your app's run phase (for controllers, directives, filters, etc.). Each API method returns a [$q deferred promise](https://docs.angularjs.org/api/ng/service/$q) that will be resolved on success, 
+The `$auth` module is available for dependency injection during your app's run phase (for controllers, directives, filters, etc.). Each API method returns a [$q deferred promise](https://docs.angularjs.org/api/ng/service/$q) that will be resolved on success,
 
 
 ###$auth.authenticate
@@ -236,7 +236,7 @@ Initiate an OAuth2 authentication. This method accepts 2 arguments:
   ~~~javascript
   $auth.authenticate('github')
   ~~~
-  
+
 * **options**: _(optional)_ an object containing the following params:
   *  **params**: additional params to be passed to the OAuth provider. For example, to pass the user's favorite color on sign up:
 
@@ -258,10 +258,10 @@ angular.module('ngTokenAuthTestApp')
   .controller('IndexCtrl', function($scope, $auth) {
     $scope.handleBtnClick = function() {
       $auth.authenticate('github')
-        .then(function(resp) { 
+        .then(function(resp) {
           // handle success
         })
-        .catch(function(resp) { 
+        .catch(function(resp) {
           // handle errors
         });
     };
@@ -353,10 +353,10 @@ angular.module('ngTokenAuthTestApp')
   .controller('IndexCtrl', function($scope, $auth) {
     $scope.handleRegBtnClick = function() {
       $auth.submitRegistration($scope.registrationForm)
-        .then(function(resp) { 
+        .then(function(resp) {
           // handle success response
         })
-        .catch(function(resp) { 
+        .catch(function(resp) {
           // handle error response
         });
     };
@@ -403,10 +403,10 @@ angular.module('ngTokenAuthTestApp')
   .controller('IndexCtrl', function($scope, $auth) {
     $scope.handleLoginBtnClick = function() {
       $auth.submitLogin($scope.loginForm)
-        .then(function(resp) { 
+        .then(function(resp) {
           // handle success response
         })
-        .catch(function(resp) { 
+        .catch(function(resp) {
           // handle error response
         });
     };
@@ -444,10 +444,10 @@ angular.module('ngTokenAuthTestApp')
   .controller('IndexCtrl', function($scope, $auth) {
     $scope.handleSignOutBtnClick = function() {
       $auth.signOut()
-        .then(function(resp) { 
+        .then(function(resp) {
           // handle success response
         })
-        .catch(function(resp) { 
+        .catch(function(resp) {
           // handle error response
         });
     };
@@ -475,10 +475,10 @@ angular.module('ngTokenAuthTestApp')
   .controller('IndexCtrl', function($scope, $auth) {
     $scope.handlePwdResetBtnClick = function() {
       $auth.requestPasswordReset($scope.pwdResetForm)
-        .then(function(resp) { 
+        .then(function(resp) {
           // handle success response
         })
-        .catch(function(resp) { 
+        .catch(function(resp) {
           // handle error response
         });
     };
@@ -500,10 +500,11 @@ angular.module('ngTokenAuthTestApp')
 ###$auth.updatePassword
 Change an authenticated user's password. This only applies to users that have registered using email. This method accepts an object with the following params:
 
+* **old_password**
 * **password**
 * **password_confirmation**
 
-The two params must match.
+The `password` and `password_confirmation` params must match. `current_password` param is optional - depends on the server configuration it might be checked before password update.
 
 This method broadcasts the following events:
 
@@ -516,10 +517,10 @@ angular.module('ngTokenAuthTestApp')
   .controller('IndexCtrl', function($scope, $auth) {
     $scope.handleUpdatePasswordBtnClick = function() {
       $auth.updatePassword($scope.updatePasswordForm)
-        .then(function(resp) { 
+        .then(function(resp) {
           // handle success response
         })
-        .catch(function(resp) { 
+        .catch(function(resp) {
           // handle error response
         });
     };
@@ -544,7 +545,7 @@ angular.module('ngTokenAuthTestApp')
 ~~~
 
 ###$auth.updateAccount
-Change an authenticated user's account info. This method accepts an object that contains valid params for your API's user model. The following shows how to update a user's `zodiac_sign` param:
+Change an authenticated user's account info. This method accepts an object that contains valid params for your API's user model. When `password` and `password_confirmation` params are supported it updates the password as well. Depending on the server configuration `current_password` param might be needed. The following shows how to update a user's `zodiac_sign` param:
 
 ##### Example use in a template:
 ~~~html
@@ -571,10 +572,10 @@ angular.module('ngTokenAuthTestApp')
   .controller('IndexCtrl', function($scope, $auth) {
     $scope.handleUpdateAccountBtnClick = function() {
       $auth.updateAccount($scope.updateAccountForm)
-        .then(function(resp) { 
+        .then(function(resp) {
           // handle success response
         })
-        .catch(function(resp) { 
+        .catch(function(resp) {
           // handle error response
         });
     };
@@ -597,10 +598,10 @@ angular.module('ngTokenAuthTestApp')
   .controller('IndexCtrl', function($scope, $auth) {
     $scope.handleDestroyAccountBtnClick = function() {
       $auth.destroyAccount()
-        .then(function(resp) { 
+        .then(function(resp) {
           // handle success response
         })
-        .catch(function(resp) { 
+        .catch(function(resp) {
           // handle error response
         });
     };
@@ -616,7 +617,7 @@ angular.module('ngTokenAuthTestApp')
 
 ## Events
 
-This module broadcasts events after the success or failure of each API method. Using these events to build your app can result in more flexibility while reducing code spaghetti. 
+This module broadcasts events after the success or failure of each API method. Using these events to build your app can result in more flexibility while reducing code spaghetti.
 
 For example, any template can initiate an authentication, and any controller can subscribe to the `auth:login-success` event to provide success notifications, redirects, etc.
 
@@ -938,7 +939,7 @@ angular.module('myApp', ['ng-token-auth'])
       handleLoginResponse: function(response) {
         return response;
       },
-      
+
       handleAccountUpdateResponse: function(response) {
         return response;
       },
@@ -963,7 +964,7 @@ To set up an application for multiple users, pass an array of configuration obje
 ##### Multiple user configuration example
 ~~~javascript
 $authProvider.configure([
-  { 
+  {
     default: {
       apiUrl:  CONFIG.apiUrl,
       proxyIf: function() { window.isOldIE() },
@@ -972,7 +973,7 @@ $authProvider.configure([
         facebook:  '/auth/facebook',
         google:    '/auth/google_oauth2'
       }
-    }   
+    }
   }, {
     evilUser: {
       apiUrl:                CONFIG.apiUrl,
@@ -997,7 +998,7 @@ $authProvider.configure([
 
 ### Multiple user type usage
 
-The following API methods accept a `config` option that can be used to specify the desired configuration. 
+The following API methods accept a `config` option that can be used to specify the desired configuration.
 
 * [`$auth.authenticate`](#authauthenticate)
 * [`$auth.validateUser`](#authvalidateuser)
@@ -1338,7 +1339,7 @@ Just send a pull request. You will be granted commit access if you send quality 
 
 # Alternatives
 
-###[Satellizer](https://github.com/sahat/satellizer) 
+###[Satellizer](https://github.com/sahat/satellizer)
 
 Satellizer occupies the same problem domain as ng-token-auth. Advantages of ng-token-auth (at the time of this writing) include:
   * [Events](#events).
