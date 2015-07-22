@@ -94,7 +94,8 @@ angular.module('ng-token-auth', ['ipCookie'])
         '$timeout'
         '$rootScope'
         '$interpolate'
-        ($http, $q, $location, ipCookie, $window, $timeout, $rootScope, $interpolate) =>
+        '$interval'
+        ($http, $q, $location, ipCookie, $window, $timeout, $rootScope, $interpolate, $interval) =>
           header:            null
           dfd:               null
           user:              {}
@@ -620,7 +621,7 @@ angular.module('ng-token-auth', ['ipCookie'])
             # remove any assumptions about current configuration
             @deleteData('currentConfigName')
 
-            $timeout.cancel @timer if @timer?
+            $interval.cancel @timer if @timer?
 
             # kill cookies, otherwise session will resume on page reload
             # setting this value to null will force the validateToken method
@@ -726,11 +727,11 @@ angular.module('ng-token-auth', ['ipCookie'])
             now    = new Date().getTime()
 
             if expiry > now
-              $timeout.cancel @timer if @timer?
+              $interval.cancel @timer if @timer?
 
-              @timer = $timeout (=>
+              @timer = $interval (=>
                 @validateUser {config: @getSavedConfig()}
-              ), parseInt (expiry - now)
+              ), (parseInt (expiry - now)), 1
 
             result
 

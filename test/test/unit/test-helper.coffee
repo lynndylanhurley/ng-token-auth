@@ -5,6 +5,7 @@ ipCookie          = null
 $httpBackend      = null
 $rootScope        = null
 $location         = null
+$interval         = null
 $provider         = null
 $timeout          = null
 $window           = null
@@ -50,6 +51,7 @@ setup ->
     ipCookie     = $injector.get('ipCookie')
     $rootScope   = $injector.get('$rootScope')
     $location    = $injector.get('$location')
+    $interval    = $injector.get('$interval')
     $timeout     = $injector.get('$timeout')
     $window      = $injector.get('$window')
     $http        = $injector.get('$http')
