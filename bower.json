@@ -25,10 +25,7 @@
     "tests"
   ],
   "dependencies": {
-    "angular": ">=1.2.0",
-    "angular-cookie": ">=4.0.6"
-  },
-  "resolutions": {
-    "angular": "1.2.25"
+    "angular": "~1.4.4",
+    "angular-cookie": "~4.0.9"
   }
 }

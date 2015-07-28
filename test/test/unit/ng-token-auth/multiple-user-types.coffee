@@ -11,6 +11,7 @@ suite 'multiple concurrent auth configurations', ->
       passwordResetPath:       '/vega/password'
       passwordUpdatePath:      '/vega/password'
       tokenValidationPath:     '/vega/validate_token'
+      omniauthWindowType:      'newWindow'
       authProviderPaths:
         github:    '/vega/github'
 
@@ -76,6 +77,7 @@ suite 'multiple concurrent auth configurations', ->
         passwordResetPath:       '/rigel/password'
         passwordUpdatePath:      '/rigel/password'
         tokenValidationPath:     '/rigel/validate_token'
+        omniauthWindowType:      'newWindow'
         authProviderPaths:
           github: '/rigel/github'
 
@@ -89,6 +91,7 @@ suite 'multiple concurrent auth configurations', ->
         passwordResetPath:       '/cygni/password'
         passwordUpdatePath:      '/cygni/password'
         tokenValidationPath:     '/cygni/validate_token'
+        omniauthWindowType:      'newWindow'
         authProviderPaths:
           github: '/cygni/github'
 

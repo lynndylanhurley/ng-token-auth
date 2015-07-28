@@ -159,6 +159,7 @@ angular.module('myApp', ['ng-token-auth'])
       storage:                 'cookies',
       proxyIf:                 function() { return false; },
       proxyUrl:                '/proxy',
+      omniauthWindowType:      'sameWindow',
       authProviderPaths: {
         github:   '/auth/github',
         facebook: '/auth/facebook',
@@ -211,6 +212,7 @@ angular.module('myApp', ['ng-token-auth'])
 | **handleLoginResponse** | a function that will identify and return the current user's info (id, username, etc.) in the response of a successful login request. [Read more](#using-alternate-response-formats). |
 | **handleAccountUpdateResponse** | a function that will identify and return the current user's info (id, username, etc.) in the response of a successful account update request. [Read more](#using-alternate-response-formats). |
 | **handleTokenValidationResponse** | a function that will identify and return the current user's info (id, username, etc.) in the response of a successful token validation request. [Read more](#using-alternate-response-formats). |
+| **omniauthWindowType** | Dictates the methodolgy of the OAuth login flow. One of: `sameWindow` (default), `newWindow`, `inAppBrowser` [Read more](#oauth2-authentication-flow). |
 
 #### Custom Storage Object
 Must implement the following interface:
@@ -1077,20 +1079,28 @@ The following diagram illustrates the steps necessary to authenticate a client u
 
 ![oauth flow](https://github.com/lynndylanhurley/ng-token-auth/raw/master/test/app/images/flow/omniauth-flow.jpg)
 
-When authenticating with a 3rd party provider, the following steps will take place.
+When authenticating with a 3rd party provider, the following steps will take place, assuming the backend server is configured appropriately. [devise token auth](https://github.com/lynndylanhurley/devise_token_auth) already accounts for these flows.
 
-1. An external window will be opened to the provider's authentication page.
-1. Once the user signs in, they will be redirected back to the API at the callback uri that was registered with the oauth2 provider.
-1. The API will send the user's info back to the client via `postMessage` event, and then close the external window.
+- `sameWindow` Mode
+  1. The existing window will be used to access the provider's authentication page.
+  2. Once the user signs in, they will be redirected back to the API using the same window, with the user and authentication tokens being set.
 
-The postMessage event must include the following a parameters:
+- `newWindow` Mode
+  1. An external window will be opened to the provider's authentication page.
+  2. Once the user signs in, they will be redirected back to the API at the callback uri that was registered with the oauth2 provider.
+  3. The API will send the user's info back to the client via `postMessage` event, and then close the external window.
+
+- `inAppBrowser` Mode
+  - This mode is virtually identical to the `newWindow` flow, except the flow varies slightly to account for limitations with the [Cordova inAppBrowser Plugin](https://github.com/apache/cordova-plugin-inappbrowser) and the `postMessage` API.
+
+The `postMessage` event (utilized for both `newWindow` and `inAppBrowser` modes) must include the following a parameters:
 * **message** - this must contain the value `"deliverCredentials"`
 * **auth_token** - a unique token set by your server.
 * **uid** - the id that was returned by the provider. For example, the user's facebook id, twitter id, etc.
 
-Rails example: [controller](https://github.com/lynndylanhurley/ng-token-auth-api-rails/blob/master/app/controllers/users/auth_controller.rb#L21), [layout](https://github.com/lynndylanhurley/ng-token-auth-api-rails/blob/master/app/views/layouts/oauth_response.html.erb), [view](https://github.com/lynndylanhurley/ng-token-auth-api-rails/blob/master/app/views/users/auth/oauth_success.html.erb).
+Rails newWindow example: [controller](https://github.com/lynndylanhurley/ng-token-auth-api-rails/blob/master/app/controllers/users/auth_controller.rb#L21), [layout](https://github.com/lynndylanhurley/ng-token-auth-api-rails/blob/master/app/views/layouts/oauth_response.html.erb), [view](https://github.com/lynndylanhurley/ng-token-auth-api-rails/blob/master/app/views/users/auth/oauth_success.html.erb).
 
-##### Example redirect_uri destination:
+##### Example newWindow redirect_uri destination:
 
 ~~~html
 <!DOCTYPE html>
@@ -1277,7 +1287,7 @@ app.all('/proxy/*', function(req, res, next) {
 
 The above example assumes that you're using [express](http://expressjs.com/), [request](https://github.com/mikeal/request), and [http-proxy](https://github.com/nodejitsu/node-http-proxy), and that you have set the API_URL value using [node-config](https://github.com/lorenwest/node-config).
 
-#### IE8+ must use hard redirects for provider authentication
+#### IE8-11 / iOS 8.2 must use `sameWindow` for provider authentication
 
 Most modern browsers can communicate across tabs and windows using [postMessage](https://developer.mozilla.org/en-US/docs/Web/API/Window.postMessage). This doesn't work for certain flawed browsers. In these cases the client must take the following steps when performing provider authentication (facebook, github, etc.):
 
@@ -1286,7 +1296,13 @@ Most modern browsers can communicate across tabs and windows using [postMessage]
 1. navigate from the provider to the API
 1. navigate from the API back to the client
 
-These steps are taken automatically when using this module with IE8+.
+If you prefer to use the `newWindow` mode, be sure to handle this in the configuration. Eg:
+
+```javascript
+      $authProvider.configure({
+        omniauthWindowType: isIE ? `sameWindow` : `newWindow`
+      })
+```
 
 ---
 
