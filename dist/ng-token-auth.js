@@ -57,9 +57,9 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
   defaultConfigName = "default";
   return {
     configure: function(params) {
-      var conf, defaults, fullConfig, i, j, k, label, len, v;
+      var conf, defaults, fullConfig, i, k, label, v, _i, _len;
       if (params instanceof Array && params.length) {
-        for (i = j = 0, len = params.length; j < len; i = ++j) {
+        for (i = _i = 0, _len = params.length; _i < _len; i = ++_i) {
           conf = params[i];
           label = null;
           for (k in conf) {
@@ -231,15 +231,15 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
             updateAccount: function(params) {
               return $http.put(this.apiUrl() + this.getConfig().accountUpdatePath, params).success((function(_this) {
                 return function(resp) {
-                  var curHeaders, key, newHeaders, ref, updateResponse, val;
+                  var curHeaders, key, newHeaders, updateResponse, val, _ref;
                   updateResponse = _this.getConfig().handleAccountUpdateResponse(resp);
                   curHeaders = _this.retrieveData('auth_headers');
                   angular.extend(_this.user, updateResponse);
                   if (curHeaders) {
                     newHeaders = {};
-                    ref = _this.getConfig().tokenFormat;
-                    for (key in ref) {
-                      val = ref[key];
+                    _ref = _this.getConfig().tokenFormat;
+                    for (key in _ref) {
+                      val = _ref[key];
                       if (curHeaders[key] && updateResponse[key]) {
                         newHeaders[key] = updateResponse[key];
                       }
@@ -292,7 +292,7 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
               return $window.location.replace(url);
             },
             buildAuthUrl: function(provider, opts) {
-              var authUrl, key, ref, val;
+              var authUrl, key, val, _ref;
               if (opts == null) {
                 opts = {};
               }
@@ -300,9 +300,9 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
               authUrl += this.getConfig(opts.config).authProviderPaths[provider];
               authUrl += '?auth_origin_url=' + encodeURIComponent($window.location.href);
               if (opts.params != null) {
-                ref = opts.params;
-                for (key in ref) {
-                  val = ref[key];
+                _ref = opts.params;
+                for (key in _ref) {
+                  val = _ref[key];
                   authUrl += '&';
                   authUrl += encodeURIComponent(key);
                   authUrl += '=';
@@ -485,10 +485,10 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
               return this.getConfig().parseExpiry(this.retrieveData('auth_headers') || {});
             },
             invalidateTokens: function() {
-              var key, ref, val;
-              ref = this.user;
-              for (key in ref) {
-                val = ref[key];
+              var key, val, _ref;
+              _ref = this.user;
+              for (key in _ref) {
+                val = _ref[key];
                 delete this.user[key];
               }
               this.deleteData('currentConfigName');
@@ -531,11 +531,11 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
               return this.resolveDfd();
             },
             buildAuthHeaders: function(ctx) {
-              var headers, key, ref, val;
+              var headers, key, val, _ref;
               headers = {};
-              ref = this.getConfig().tokenFormat;
-              for (key in ref) {
-                val = ref[key];
+              _ref = this.getConfig().tokenFormat;
+              for (key in _ref) {
+                val = _ref[key];
                 headers[key] = $interpolate(val)(ctx);
               }
               return headers;
@@ -673,11 +673,11 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
       return newTokenExpiry >= oldTokenExpiry;
     };
     updateHeadersFromResponse = function($auth, resp) {
-      var key, newHeaders, ref, val;
+      var key, newHeaders, val, _ref;
       newHeaders = {};
-      ref = $auth.getConfig().tokenFormat;
-      for (key in ref) {
-        val = ref[key];
+      _ref = $auth.getConfig().tokenFormat;
+      for (key in _ref) {
+        val = _ref[key];
         if (resp.headers(key)) {
           newHeaders[key] = resp.headers(key);
         }
@@ -692,15 +692,15 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
           request: function(req) {
             $injector.invoke([
               '$http', '$auth', function($http, $auth) {
-                var key, ref, results, val;
+                var key, val, _ref, _results;
                 if (req.url.match($auth.apiUrl())) {
-                  ref = $auth.retrieveData('auth_headers');
-                  results = [];
-                  for (key in ref) {
-                    val = ref[key];
-                    results.push(req.headers[key] = val);
+                  _ref = $auth.retrieveData('auth_headers');
+                  _results = [];
+                  for (key in _ref) {
+                    val = _ref[key];
+                    _results.push(req.headers[key] = val);
                   }
-                  return results;
+                  return _results;
                 }
               }
             ]);
@@ -731,9 +731,9 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
     ]);
     httpMethods = ['get', 'post', 'put', 'patch', 'delete'];
     return angular.forEach(httpMethods, function(method) {
-      var base;
-      if ((base = $httpProvider.defaults.headers)[method] == null) {
-        base[method] = {};
+      var _base;
+      if ((_base = $httpProvider.defaults.headers)[method] == null) {
+        _base[method] = {};
       }
       return $httpProvider.defaults.headers[method]['If-Modified-Since'] = 'Mon, 26 Jul 1997 05:00:00 GMT';
     });
