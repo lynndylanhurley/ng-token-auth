@@ -378,6 +378,18 @@ angular.module('ng-token-auth', ['ipCookie'])
               str.push encoded
             str.join "&"
 
+          parseLocation: (location) ->
+            pairs = location.substring(1).split('&')
+            obj = {}
+            pair = undefined
+            i = undefined
+            for i of pairs
+              `i = i`
+              if pairs[i] == ''
+                continue
+              pair = pairs[i].split('=')
+              obj[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1])
+            obj
 
           # this is something that can be returned from 'resolve' methods
           # of pages that have restricted access
@@ -396,7 +408,10 @@ angular.module('ng-token-auth', ['ipCookie'])
               else
                 # token querystring is present. user most likely just came from
                 # registration email link.
-                params = $location.search()
+                search = $location.search()
+                location_parse = @parseLocation(window.location.search)
+                params = if Object.keys(search).length==0 then location_parse else search
+
                 if params.token != undefined
                   token      = params.token
                   clientId   = params.client_id
@@ -415,7 +430,7 @@ angular.module('ng-token-auth', ['ipCookie'])
                   @firstTimeLogin = params.account_confirmation_success
 
                   # check if redirected from auth registration
-                  @oauthRegistration = $location.search().oauth_registration
+                  @oauthRegistration = params.oauth_registration
 
                   # persist these values
                   @setAuthHeaders(@buildAuthHeaders({
