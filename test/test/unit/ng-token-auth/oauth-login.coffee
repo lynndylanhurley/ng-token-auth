@@ -231,6 +231,13 @@ suite 'oauth2 login', ->
     popupWindow = 
         addEventListener: (eventName, callback) -> 
           listeners[eventName] = callback
+        removeEventListener: -> (eventName, callback) ->
+          i = 0
+          while listeners[eventName][i]
+            if listeners[eventName][i] == callback
+              delete listeners[eventName][i] 
+            else
+              i += 1
         dispatchEvent: (event) ->
           listeners[event.type](event)
         closed: false

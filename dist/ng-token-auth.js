@@ -331,13 +331,13 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
               }
             },
             requestCredentialsViaExecuteScript: function(authWindow) {
-              var cancelOmniauthInAppBrowserListeners, handleAuthWindowClose, handleLoadStop;
+              var handleAuthWindowClose, handleLoadStop;
               this.cancelOmniauthInAppBrowserListeners();
               handleAuthWindowClose = this.handleAuthWindowClose.bind(this, authWindow);
               handleLoadStop = this.handleLoadStop.bind(this, authWindow);
               authWindow.addEventListener('loadstop', handleLoadStop);
               authWindow.addEventListener('exit', handleAuthWindowClose);
-              return cancelOmniauthInAppBrowserListeners = function() {
+              return this.cancelOmniauthInAppBrowserListeners = function() {
                 authWindow.removeEventListener('loadstop', handleLoadStop);
                 return authWindow.removeEventListener('exit', handleAuthWindowClose);
               };
@@ -352,12 +352,10 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
                 if (data) {
                   ev = new Event('message');
                   ev.data = data;
-                  $window.dispatchEvent(ev);
                   _this.cancelOmniauthInAppBrowserListeners();
+                  $window.dispatchEvent(ev);
                   _this.initDfd();
-                  return _this.handleValidAuth(data, true).then(function() {
-                    return authWindow.close();
-                  });
+                  return authWindow.close();
                 }
               });
             },

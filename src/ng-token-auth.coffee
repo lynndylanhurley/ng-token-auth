@@ -376,7 +376,7 @@ angular.module('ng-token-auth', ['ipCookie'])
             authWindow.addEventListener('loadstop', handleLoadStop)
             authWindow.addEventListener('exit', handleAuthWindowClose)
 
-            cancelOmniauthInAppBrowserListeners = () ->
+            this.cancelOmniauthInAppBrowserListeners = () ->
               authWindow.removeEventListener('loadstop', handleLoadStop)
               authWindow.removeEventListener('exit', handleAuthWindowClose)
 
@@ -389,13 +389,10 @@ angular.module('ng-token-auth', ['ipCookie'])
               if data
                 ev = new Event('message')
                 ev.data = data
-                $window.dispatchEvent(ev)
                 _this.cancelOmniauthInAppBrowserListeners()
+                $window.dispatchEvent(ev)
                 _this.initDfd();
-
-                # validate the user at this point
-                _this.handleValidAuth(data, true).then () ->
-                  authWindow.close()
+                authWindow.close()
             )
 
           # responds to inAppBrowser window closes
