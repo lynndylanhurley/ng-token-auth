@@ -424,7 +424,7 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
                     } else {
                       return _this.rejectDfd({
                         reason: 'unauthorized',
-                        errors: 'no data returned'
+                        errors: 'No data returned'
                       });
                     }
                   };

@@ -473,7 +473,7 @@ angular.module('ng-token-auth', ['ipCookie'])
                   else
                     @rejectDfd({
                       reason: 'unauthorized'
-                      errors: 'no data returned'
+                      errors: 'No data returned'
                     })
                 )
             else
