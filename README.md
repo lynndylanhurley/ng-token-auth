@@ -353,10 +353,10 @@ angular.module('ngTokenAuthTestApp')
   .controller('IndexCtrl', function($scope, $auth) {
     $scope.handleRegBtnClick = function() {
       $auth.submitRegistration($scope.registrationForm)
-        .then(function(resp) {
+        .success(function(resp) {
           // handle success response
         })
-        .catch(function(resp) {
+        .error(function(resp) {
           // handle error response
         });
     };
