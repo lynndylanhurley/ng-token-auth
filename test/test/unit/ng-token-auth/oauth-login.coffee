@@ -1,12 +1,15 @@
 suite 'oauth2 login', ->
   dfd = null
 
-  suite 'using postMessage', ->
+  suite 'using newWindow', ->
     popupWindow =
       closed: false
       postMessage: ->
 
     setup ->
+
+      $authProvider.configure({omniauthWindowType: 'newWindow'})
+
       # disable popup behavior
       $window.open = -> popupWindow
 
@@ -19,10 +22,10 @@ suite 'oauth2 login', ->
           $auth.getConfig().authProviderPaths['github'] +
           '?auth_origin_url=' +
           encodeURIComponent(window.location.href) +
-          '&spirit_animal=scorpion'
+          '&spirit_animal=scorpion&omniauth_window_type=newWindow'
 
         $auth.authenticate('github', {params: {spirit_animal: 'scorpion'}})
-        assert $window.open.calledWith(expectedAuthUrl)
+        assert $window.open.calledWith(expectedAuthUrl, '_blank')
 
     suite 'defaults config', ->
       setup ->
@@ -142,7 +145,7 @@ suite 'oauth2 login', ->
 
           assert $auth.cancel.called
           assert.equal(true, caught)
-          assert.equal(null, $auth.t)
+          assert.equal(null, $auth.requestCredentialsPollingTimer)
           done()
 
 
@@ -150,7 +153,7 @@ suite 'oauth2 login', ->
         test 'timer is rejected then nullified', (done) ->
           called = false
 
-          $auth.t.catch =>
+          $auth.requestCredentialsPollingTimer.catch =>
             called = true
 
           $auth.cancel()
@@ -159,7 +162,7 @@ suite 'oauth2 login', ->
           setTimeout((->
             $timeout.flush()
             assert.equal(true, called)
-            assert.equal(null, $auth.t)
+            assert.equal(null, $auth.requestCredentialsPollingTimer)
             done()
           ), 0)
 
@@ -179,7 +182,7 @@ suite 'oauth2 login', ->
             done()
           ), 0)
 
-  suite 'using hard redirect', ->
+  suite 'using sameWindow', ->
     successResp =
       success: true
       data: validUser
@@ -188,8 +191,8 @@ suite 'oauth2 login', ->
       redirectUrl = null
 
       setup ->
-        redirectUrl = $auth.buildAuthUrl('github')
-        $authProvider.configure({forceHardRedirect: true})
+        redirectUrl = $auth.buildAuthUrl('sameWindow', 'github')
+        $authProvider.configure({omniauthWindowType: 'sameWindow'})
 
         # mock location replace, create spy
         sinon.stub($auth, 'visitUrl').returns(null)
@@ -219,3 +222,120 @@ suite 'oauth2 login', ->
 
       test '$rootScope broadcast validation success event', ->
         assert $rootScope.$broadcast.calledWithMatch('auth:validation-success', validUser)
+
+  suite 'using inAppBrowser', ->
+
+    listeners = {}
+    response = {}
+
+    popupWindow = 
+        addEventListener: (eventName, callback) -> 
+          listeners[eventName] = callback
+        dispatchEvent: (event) ->
+          listeners[event.type](event)
+        closed: false
+        close: (->)
+        executeScript: (code, callback) ->
+          callback([response]) # inAppBrowser wraps values in array
+
+
+
+    setup ->
+
+      $authProvider.configure({omniauthWindowType: 'inAppBrowser'})
+
+      # disable popup behavior
+      $window.open = -> popupWindow
+
+      # verify that popup was initiated
+      sinon.stub($window, 'open').returns(popupWindow)
+
+    suite 'using config options', ->
+      test 'optional params are sent', ->
+        expectedAuthUrl = $auth.apiUrl() +
+          $auth.getConfig().authProviderPaths['github'] +
+          '?auth_origin_url=' +
+          encodeURIComponent(window.location.href) +
+          '&spirit_animal=scorpion&omniauth_window_type=inAppBrowser'
+
+        $auth.authenticate('github', {params: {spirit_animal: 'scorpion'}})
+        assert $window.open.calledWith(expectedAuthUrl, '_blank')
+
+    suite 'defaults config', ->
+      setup ->
+        dfd = $auth.authenticate('github')
+        return false
+
+
+      suite 'executeScript success', ->
+        expectedUser =
+          id:         validUser.id
+          uid:        validUser.uid
+          email:      validUser.email
+          auth_token: validToken
+          expiry:     validExpiry
+          client_id:  validClient
+          signedIn:   true
+          configName: "default"
+
+        suite 'with existing user', -> 
+          setup ->
+            response = angular.extend({message: 'deliverCredentials'}, expectedUser)
+
+          test 'user should be authenticated, promise is resolved', (done) ->
+            called = false
+            dfd.then(=>
+              called = true
+            )
+
+            popupWindow.dispatchEvent(new Event('loadstop'))
+
+            setTimeout((->
+              assert.deepEqual($rootScope.user, expectedUser)
+              done()
+            ), 0)
+
+
+      suite 'executeScript error', (done) ->
+        errorResponse =
+          message: 'authFailure'
+          errors: ['420']
+
+        setup ->
+          sinon.spy($auth, 'cancel')
+          response = angular.extend({message: 'deliverCredentials'}, errorResponse)
+
+        test 'error response cancels authentication, rejects promise', (done) ->
+          caught = false
+
+          dfd.catch(->
+            caught = true
+          )
+
+          popupWindow.dispatchEvent(new Event('loadstop'))
+
+          setTimeout((->
+            assert true, caught
+            assert $auth.cancel.called
+            assert $rootScope.$broadcast.calledWith('auth:login-error')
+            done()
+          ), 0)
+
+      suite 'inAppBrowser window closed before message is sent', ->
+        setup ->
+          sinon.spy($auth, 'cancel')
+
+        teardown ->
+          popupWindow.closed = false
+
+        test 'auth is cancelled, promise is rejected', (done) ->
+          caught = false
+
+          dfd.catch =>
+            caught = true
+
+          $auth.handleAuthWindowClose()
+
+          assert $auth.cancel.called
+          assert.equal(null, $auth.requestCredentialsPollingTimer)
+          done()
