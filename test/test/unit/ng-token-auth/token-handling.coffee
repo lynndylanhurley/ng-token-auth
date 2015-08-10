@@ -89,6 +89,29 @@ suite 'token handling', ->
       $timeout.flush()
       assert(caught)
 
+  suite 'undefined headers but forcing token validation', ->
+    setup ->
+      $auth.getConfig().forceValidateToken = true
+      $httpBackend
+        .expectGET('/api/auth/validate_token')
+        .respond(201, successResp, newAuthHeader)
+
+    test 'validateUser should validate the token even if it is not present', ->
+      caught = false
+      $auth.validateUser().catch(-> caught = true)
+      $timeout.flush()
+      assert(!caught)
+
+    test 'validation request should be made if headers are empty', ->
+      ipCookie('auth_headers', {}, {path: '/'})
+      caught = false
+      $auth.validateUser().catch(-> caught = true)
+      $timeout.flush()
+      assert(!caught)
+
+    teardown ->
+      $httpBackend.flush()
+
 
   suite 'error response containing tokens', ->
     setup ->
