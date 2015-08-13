@@ -700,8 +700,12 @@ angular.module('ng-token-auth', ['ipCookie'])
                   when 'localStorage'
                     JSON.parse($window.localStorage.getItem(key))
                   else ipCookie(key)
-            catch SyntaxError # gracefully handle
-              undefined
+            catch e
+              # gracefully handle if JSON parsing
+              if e instanceof SyntaxError
+                undefined
+              else
+                throw e
 
           # abstract persistent data removal
           deleteData: (key) ->

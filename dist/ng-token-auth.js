@@ -603,7 +603,7 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
               }
             },
             retrieveData: function(key) {
-              var SyntaxError;
+              var e;
               try {
                 if (this.getConfig().storage instanceof Object) {
                   return this.getConfig().storage.retrieveData(key);
@@ -616,8 +616,12 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
                   }
                 }
               } catch (_error) {
-                SyntaxError = _error;
-                return void 0;
+                e = _error;
+                if (e instanceof SyntaxError) {
+                  return void 0;
+                } else {
+                  throw e;
+                }
               }
             },
             deleteData: function(key) {
