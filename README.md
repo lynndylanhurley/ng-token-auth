@@ -76,6 +76,7 @@ This project comes bundled with a test app. You can run the demo locally by foll
 * [Notes on Token Management](#about-token-management)
 * [Notes on Batch Requests](#about-batch-requests)
 * [Notes on Token Formatting](#identifying-users-on-the-server)
+* [iOS Caveats](#ios)
 * [Internet Explorer Caveats](#internet-explorer)
 * [FAQ](#faq)
 * [Development](#development)
@@ -1228,6 +1229,10 @@ Replace `xxxxx` with the user's `auth_token` and `zzzzz` with the user's `uid`. 
 This will all happen automatically when using this module.
 
 **Note**: You can customize the auth headers however you like. [Read more](#using-alternate-header-formats).
+
+# iOS
+
+ * localStoage may not writable in Private Browsing mode. You may wish to configure `storage` to use a generic object store or temporary cookie store. See also: [Frustration](http://spin.atomicobject.com/2013/01/23/ios-private-browsing-localstorage/)
 
 # Internet Explorer
 
