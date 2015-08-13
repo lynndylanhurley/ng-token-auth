@@ -603,15 +603,21 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
               }
             },
             retrieveData: function(key) {
-              if (this.getConfig().storage instanceof Object) {
-                return this.getConfig().storage.retrieveData(key);
-              } else {
-                switch (this.getConfig().storage) {
-                  case 'localStorage':
-                    return JSON.parse($window.localStorage.getItem(key));
-                  default:
-                    return ipCookie(key);
+              var SyntaxError;
+              try {
+                if (this.getConfig().storage instanceof Object) {
+                  return this.getConfig().storage.retrieveData(key);
+                } else {
+                  switch (this.getConfig().storage) {
+                    case 'localStorage':
+                      return JSON.parse($window.localStorage.getItem(key));
+                    default:
+                      return ipCookie(key);
+                  }
                 }
+              } catch (_error) {
+                SyntaxError = _error;
+                return void 0;
               }
             },
             deleteData: function(key) {

@@ -104,3 +104,17 @@ suite 'alternate storage', ->
 
       test 'delete data should be called', ->
         storageObj.deleteData.should.have.been.called
+
+  suite 'invalid data', ->
+
+    setup ->
+      $authProvider.configure({
+        storage: 'localStorage'
+      })
+      sinon.spy($auth, "setAuthHeaders");
+
+    teardown ->
+      $auth.setAuthHeaders.restore()
+
+    test 'should treat retrieved data as undefined', ->
+      assert.equal($auth.setAuthHeaders.threw(), false)

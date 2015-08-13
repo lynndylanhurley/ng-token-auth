@@ -692,13 +692,16 @@ angular.module('ng-token-auth', ['ipCookie'])
 
           # abstract persistent data retrieval
           retrieveData: (key) ->
-            if @getConfig().storage instanceof Object
-              @getConfig().storage.retrieveData(key)
-            else
-              switch @getConfig().storage
-                when 'localStorage'
-                  JSON.parse($window.localStorage.getItem(key))
-                else ipCookie(key)
+            try
+              if @getConfig().storage instanceof Object
+                @getConfig().storage.retrieveData(key)
+              else
+                switch @getConfig().storage
+                  when 'localStorage'
+                    JSON.parse($window.localStorage.getItem(key))
+                  else ipCookie(key)
+            catch SyntaxError # gracefully handle
+              undefined
 
           # abstract persistent data removal
           deleteData: (key) ->
