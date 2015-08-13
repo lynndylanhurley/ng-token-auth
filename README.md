@@ -1296,14 +1296,7 @@ The above example assumes that you're using [express](http://expressjs.com/), [r
 
 #### IE8-11 / iOS 8.2 must use `sameWindow` for provider authentication
 
-Most modern browsers can communicate across tabs and windows using [postMessage](https://developer.mozilla.org/en-US/docs/Web/API/Window.postMessage). This doesn't work for certain flawed browsers. In these cases the client must take the following steps when performing provider authentication (facebook, github, etc.):
-
-1. navigate from the client site to the API
-1. navigate from the API to the provider
-1. navigate from the provider to the API
-1. navigate from the API back to the client
-
-If you prefer to use the `newWindow` mode, be sure to handle this in the configuration. Eg:
+Most modern browsers can communicate across tabs and windows using [postMessage](https://developer.mozilla.org/en-US/docs/Web/API/Window.postMessage). This doesn't work for certain flawed browsers. In these instances, it's recommended to always use `sameWindow` mode. If you are configured to use `newWindow` mode, you will most likely wish to handle this in the configuration. Eg:
 
 ```javascript
       $authProvider.configure({
