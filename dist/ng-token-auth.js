@@ -86,8 +86,8 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
       return configs;
     },
     $get: [
-      '$http', '$q', '$location', 'ipCookie', '$window', '$timeout', '$rootScope', '$interpolate', (function(_this) {
-        return function($http, $q, $location, ipCookie, $window, $timeout, $rootScope, $interpolate) {
+      '$http', '$q', '$location', 'ipCookie', '$window', '$timeout', '$rootScope', '$interpolate', '$interval', (function(_this) {
+        return function($http, $q, $location, ipCookie, $window, $timeout, $rootScope, $interpolate, $interval) {
           return {
             header: null,
             dfd: null,
@@ -538,7 +538,7 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
               }
               this.deleteData('currentConfigName');
               if (this.timer != null) {
-                $timeout.cancel(this.timer);
+                $interval.cancel(this.timer);
               }
               return this.deleteData('auth_headers');
             },
@@ -645,15 +645,15 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
               now = new Date().getTime();
               if (expiry > now) {
                 if (this.timer != null) {
-                  $timeout.cancel(this.timer);
+                  $interval.cancel(this.timer);
                 }
-                this.timer = $timeout(((function(_this) {
+                this.timer = $interval(((function(_this) {
                   return function() {
                     return _this.validateUser({
                       config: _this.getSavedConfig()
                     });
                   };
-                })(this)), parseInt(expiry - now));
+                })(this)), parseInt(expiry - now), 1);
               }
               return result;
             },
