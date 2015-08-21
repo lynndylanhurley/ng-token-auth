@@ -369,7 +369,7 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
               return $rootScope.$broadcast('auth:window-closed');
             },
             createPopup: function(url) {
-              return $window.open(url, '_blank');
+              return $window.open(url, '_blank', 'closebuttoncaption=Cancel');
             },
             resolveDfd: function() {
               this.dfd.resolve(this.user);

@@ -409,7 +409,7 @@ angular.module('ng-token-auth', ['ipCookie'])
 
           # popups are difficult to test. mock this method in testing.
           createPopup: (url) ->
-            $window.open(url, '_blank')
+            $window.open(url, '_blank', 'closebuttoncaption=Cancel')
 
 
           # this needs to happen after a reflow so that the promise

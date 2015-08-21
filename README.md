@@ -1094,7 +1094,7 @@ When authenticating with a 3rd party provider, the following steps will take pla
   3. The API will send the user's info back to the client via `postMessage` event, and then close the external window.
 
 - `inAppBrowser` Mode
-  - This mode is virtually identical to the `newWindow` flow, except the flow varies slightly to account for limitations with the [Cordova inAppBrowser Plugin](https://github.com/apache/cordova-plugin-inappbrowser) and the `postMessage` API.
+  - This mode is virtually identical to the `newWindow` flow, except the flow varies slightly to account for limitations with the [Cordova inAppBrowser Plugin](https://github.com/apache/cordova-plugin-inappbrowser) and the `postMessage` API. Note: In order for this mode to work out of the box, inAppBrowser is assumed to be registered with any external window.open calls. eg - `window.open = window.cordova.InAppBrowser.open;`
 
 The `postMessage` event (utilized for both `newWindow` and `inAppBrowser` modes) must include the following a parameters:
 * **message** - this must contain the value `"deliverCredentials"`
