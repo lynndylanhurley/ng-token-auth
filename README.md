@@ -181,7 +181,7 @@ angular.module('myApp', ['ng-token-auth'])
       handleLoginResponse: function(response) {
         return response.data;
       },
-      handleAccountResponse: function(response) {
+      handleAccountUpdateResponse: function(response) {
         return response.data;
       },
       handleTokenValidationResponse: function(response) {
