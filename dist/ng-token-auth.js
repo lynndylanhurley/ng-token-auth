@@ -692,16 +692,10 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
               return name || this.getSavedConfig();
             },
             getSavedConfig: function() {
-              var c, error, hasLocalStorage, key;
+              var c, key;
               c = void 0;
               key = 'currentConfigName';
-              hasLocalStorage = false;
-              try {
-                hasLocalStorage = !!$window.localStorage;
-              } catch (_error) {
-                error = _error;
-              }
-              if (hasLocalStorage) {
+              if (this.hasLocalStorage()) {
                 if (c == null) {
                   c = JSON.parse($window.localStorage.getItem(key));
                 }
@@ -710,6 +704,20 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
                 c = ipCookie(key);
               }
               return c || defaultConfigName;
+            },
+            hasLocalStorage: function() {
+              var error;
+              if (this._hasLocalStorage == null) {
+                this._hasLocalStorage = false;
+                try {
+                  $window.localStorage.setItem('ng-token-auth-test', 'ng-token-auth-test');
+                  $window.localStorage.removeItem('ng-token-auth-test');
+                  this._hasLocalStorage = true;
+                } catch (_error) {
+                  error = _error;
+                }
+              }
+              return this._hasLocalStorage;
             }
           };
         };
