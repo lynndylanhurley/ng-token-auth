@@ -792,21 +792,29 @@ angular.module('ng-token-auth', ['ipCookie'])
           # 3. default (first available config)
           getSavedConfig: ->
             c   = undefined
-            key = 'currentConfigName'
+            key = 'currentConfigName'            
 
-            # accessing $window.localStorage will
-            # throw an error if localStorage is disabled
-            hasLocalStorage = false
-            try
-              hasLocalStorage = !!$window.localStorage
-            catch error
-
-            if hasLocalStorage
+            if @hasLocalStorage()
               c ?= JSON.parse($window.localStorage.getItem(key))
 
             c ?= ipCookie(key)
 
             return c || defaultConfigName
+
+          hasLocalStorage: ->
+            if !@_hasLocalStorage?
+
+              @_hasLocalStorage = false
+              # trying to call setItem will
+              # throw an error if localStorage is disabled
+              try
+                $window.localStorage.setItem('ng-token-auth-test', 'ng-token-auth-test');
+                $window.localStorage.removeItem('ng-token-auth-test');
+                @_hasLocalStorage = true
+              catch error
+
+            return @_hasLocalStorage
+
 
       ]
     }
