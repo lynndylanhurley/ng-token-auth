@@ -246,7 +246,7 @@ Initiate an OAuth2 authentication. This method accepts 2 arguments:
   *  **params**: additional params to be passed to the OAuth provider. For example, to pass the user's favorite color on sign up:
 
      ~~~javascript
-     $auth.authenticate('github', {params: {favorite_color: 'green'})
+     $auth.authenticate('github', {params: {favorite_color: 'green'}})
      ~~~
 
 This method is also added to the `$rootScope` for use in templates. [Read more](#oauth2-authentication-flow).
