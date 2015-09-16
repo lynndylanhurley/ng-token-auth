@@ -159,6 +159,7 @@ angular.module('myApp', ['ng-token-auth'])
       emailSignInPath:         '/auth/sign_in',
       storage:                 'cookies',
       forceValidateToken:      false,
+      validateOnPageLoad:      true,
       proxyIf:                 function() { return false; },
       proxyUrl:                '/proxy',
       omniauthWindowType:      'sameWindow',
@@ -284,6 +285,8 @@ angular.module('ngTokenAuthTestApp')
 This method returns a promise that will resolve if a user's auth token exists and is valid. This method does not accept any arguments. [Read more](#token-validation-flow)
 
 This method automatically is called on page load during the app's run phase so that returning users will not need to manually re-authenticate themselves.
+
+You can disable this automatic check by setting `validateOnPageLoad: false` in the configuration phase.
 
 This method will broadcast the following events:
 
