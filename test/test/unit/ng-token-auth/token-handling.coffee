@@ -238,3 +238,21 @@ suite 'token handling', ->
       $auth.validateUser()
       $timeout.flush()
       assert.equal(null, $auth.retrieveData('auth_headers'))
+
+  suite 'empty response', ->
+    setup ->
+      $auth.getConfig().forceValidateToken = true
+      $httpBackend
+        .expectGET('/api/auth/validate_token')
+        .respond(401, undefined)
+
+      dfd = $auth.validateUser()
+
+      $httpBackend.flush()
+
+    test 'promise should be rejected without error', (done) ->
+      dfd.catch(->
+        assert true
+        done()
+      )
+      $timeout.flush()
