@@ -509,7 +509,7 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
                     $rootScope.$broadcast('auth:validation-error', data);
                     return _this.rejectDfd({
                       reason: 'unauthorized',
-                      errors: data.errors
+                      errors: data != null ? data.errors : ['Unspecified error']
                     });
                   };
                 })(this));
