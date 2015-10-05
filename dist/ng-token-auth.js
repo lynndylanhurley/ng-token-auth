@@ -28,6 +28,7 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
       validateOnPageLoad: true,
       omniauthWindowType: 'sameWindow',
       storage: 'cookies',
+      secureCookies: false,
       forceValidateToken: false,
       tokenFormat: {
         "access-token": "{{ token }}",
@@ -597,7 +598,8 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
                     return ipCookie(key, val, {
                       path: '/',
                       expires: 9999,
-                      expirationUnit: 'days'
+                      expirationUnit: 'days',
+                      secure: this.getConfig(configName).secureCookies
                     });
                 }
               }
