@@ -21,6 +21,7 @@ angular.module('ng-token-auth', ['ipCookie'])
         validateOnPageLoad:      true
         omniauthWindowType:      'sameWindow'
         storage:                 'cookies'
+        secureCookies:           false
         forceValidateToken:      false
 
         tokenFormat:
@@ -689,7 +690,7 @@ angular.module('ng-token-auth', ['ipCookie'])
                 when 'localStorage'
                   $window.localStorage.setItem(key, JSON.stringify(val))
                 else
-                  ipCookie(key, val, {path: '/', expires: 9999, expirationUnit: 'days'})
+                  ipCookie(key, val, {path: '/', expires: 9999, expirationUnit: 'days', secure: @getConfig(configName).secureCookies})
 
           # abstract persistent data retrieval
           retrieveData: (key) ->
