@@ -436,16 +436,18 @@ angular.module('ng-token-auth', ['ipCookie'])
           # parses raw URL for querystring parameters to account for issues
           # with querystring / fragment ordering in angular < 1.4.x
           parseLocation: (location) ->
-            pairs = location.substring(1).split('&')
+            locationSubstring = location.substring(1)
             obj = {}
-            pair = undefined
-            i = undefined
-            for i of pairs
-              `i = i`
-              if pairs[i] == ''
-                continue
-              pair = pairs[i].split('=')
-              obj[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1])
+            if locationSubstring
+              pairs = locationSubstring.split('&')
+              pair = undefined
+              i = undefined
+              for i of pairs
+                `i = i`
+                if pairs[i] == ''
+                  continue
+                pair = pairs[i].split('=')
+                obj[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1])
             obj
 
 
