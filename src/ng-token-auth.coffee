@@ -510,7 +510,7 @@ angular.module('ng-token-auth', ['ipCookie'])
 
                   # strip token-related qs from url to prevent re-use of these params
                   # on page refresh
-                  ['token', 'client_id', 'uid', 'expiry', 'config', 'reset_password', 'account_confirmation_success', 'oauth_registration'].forEach (prop) ->
+                  ['auth_token', 'token', 'client_id', 'uid', 'expiry', 'config', 'reset_password', 'account_confirmation_success', 'oauth_registration'].forEach (prop) ->
                     delete params[prop];
 
                   # append any remaining params, if any
