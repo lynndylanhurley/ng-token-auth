@@ -21,7 +21,6 @@ angular.module('ng-token-auth', ['ipCookie'])
         validateOnPageLoad:      true
         omniauthWindowType:      'sameWindow'
         storage:                 'cookies'
-        secureCookies:           false
         forceValidateToken:      false
 
         tokenFormat:

@@ -28,7 +28,6 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
       validateOnPageLoad: true,
       omniauthWindowType: 'sameWindow',
       storage: 'cookies',
-      secureCookies: false,
       forceValidateToken: false,
       tokenFormat: {
         "access-token": "{{ token }}",
@@ -36,6 +35,12 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
         client: "{{ clientId }}",
         expiry: "{{ expiry }}",
         uid: "{{ uid }}"
+      },
+      cookieOps: {
+        path: "/",
+        expires: 9999,
+        expirationUnit: 'days',
+        secure: false
       },
       parseExpiry: function(headers) {
         return (parseInt(headers['expiry'], 10) * 1000) || null;
@@ -598,12 +603,7 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
                   case 'localStorage':
                     return $window.localStorage.setItem(key, JSON.stringify(val));
                   default:
-                    return ipCookie(key, val, {
-                      path: '/',
-                      expires: 9999,
-                      expirationUnit: 'days',
-                      secure: this.getConfig(configName).secureCookies
-                    });
+                    return ipCookie(key, val, this.getConfig().cookieOps);
                 }
               }
             },
@@ -638,7 +638,7 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
                   return $window.localStorage.removeItem(key);
                 default:
                   return ipCookie.remove(key, {
-                    path: '/'
+                    path: this.getConfig().cookieOps.path
                   });
               }
             },
