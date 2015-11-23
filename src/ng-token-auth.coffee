@@ -31,6 +31,12 @@ angular.module('ng-token-auth', ['ipCookie'])
           expiry:         "{{ expiry }}"
           uid:            "{{ uid }}"
 
+        cookieOps:
+          path: "/"
+          expires: 9999
+          expirationUnit: 'days'
+          secure: false
+
         parseExpiry: (headers) ->
           # convert from ruby time (seconds) to js time (millis)
           (parseInt(headers['expiry'], 10) * 1000) || null
@@ -473,7 +479,7 @@ angular.module('ng-token-auth', ['ipCookie'])
                 # determine querystring params accounting for possible angular parsing issues
                 location_parse = @parseLocation(window.location.search)
                 params = if Object.keys(search).length==0 then location_parse else search
-                
+
                 # auth_token matches what is sent with postMessage, but supporting token for
                 # backwards compatability
                 token = params.auth_token || params.token
@@ -692,7 +698,7 @@ angular.module('ng-token-auth', ['ipCookie'])
                 when 'localStorage'
                   $window.localStorage.setItem(key, JSON.stringify(val))
                 else
-                  ipCookie(key, val, {path: '/', expires: 9999, expirationUnit: 'days', secure: @getConfig(configName).secureCookies})
+                  ipCookie(key, val, @getConfig().cookieOps)
 
           # abstract persistent data retrieval
           retrieveData: (key) ->
@@ -719,7 +725,7 @@ angular.module('ng-token-auth', ['ipCookie'])
               when 'localStorage'
                 $window.localStorage.removeItem(key)
               else
-                ipCookie.remove(key, {path: '/'})
+                ipCookie.remove(key, {path: @getConfig().cookieOps.path})
 
           # persist authentication token, client id, uid
           setAuthHeaders: (h) ->
@@ -795,7 +801,7 @@ angular.module('ng-token-auth', ['ipCookie'])
           # 3. default (first available config)
           getSavedConfig: ->
             c   = undefined
-            key = 'currentConfigName'            
+            key = 'currentConfigName'
 
             if @hasLocalStorage()
               c ?= JSON.parse($window.localStorage.getItem(key))
