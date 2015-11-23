@@ -175,6 +175,13 @@ angular.module('myApp', ['ng-token-auth'])
         "expiry":       "{{ expiry }}",
         "uid":          "{{ uid }}"
       },
+      cookieOps: {
+        path: "/",
+        expires: 9999,
+        expirationUnit: 'days',
+        secure: false,
+        domain: 'domain.com'
+      },
       parseExpiry: function(headers) {
         // convert from UTC ruby (seconds) to UTC js (milliseconds)
         return (parseInt(headers['expiry']) * 1000) || null;
