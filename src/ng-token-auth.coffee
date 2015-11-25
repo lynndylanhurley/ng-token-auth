@@ -445,8 +445,6 @@ angular.module('ng-token-auth', ['ipCookie'])
             obj = {}
             if locationSubstring
               pairs = locationSubstring.split('&')
-              pair = undefined
-              i = undefined
               for i in pairs
                 if i == ''
                   continue
