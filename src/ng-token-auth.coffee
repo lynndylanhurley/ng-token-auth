@@ -290,7 +290,7 @@ angular.module('ng-token-auth', ['ipCookie'])
 
           # permanently destroy a user's account.
           destroyAccount: (params) ->
-            $http.delete(@apiUrl() + @getConfig().accountUpdatePath, params)
+            $http.delete(@apiUrl() + @getConfig().accountDeletePath, params)
               .success((resp) =>
                 @invalidateTokens()
                 $rootScope.$broadcast('auth:account-destroy-success', resp)
