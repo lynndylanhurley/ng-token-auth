@@ -262,7 +262,7 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
               });
             },
             destroyAccount: function(params) {
-              return $http["delete"](this.apiUrl() + this.getConfig().accountUpdatePath, params).success((function(_this) {
+              return $http["delete"](this.apiUrl() + this.getConfig().accountDeletePath, params).success((function(_this) {
                 return function(resp) {
                   _this.invalidateTokens();
                   return $rootScope.$broadcast('auth:account-destroy-success', resp);
