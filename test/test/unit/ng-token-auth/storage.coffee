@@ -11,11 +11,11 @@ suite 'alternate storage', ->
     success: true
     data: validUser
 
-  suite 'localStorage', ->
-    # configure for local storage
+  suite 'sessionStorage', ->
+    # configure for session storage
     setup ->
       $authProvider.configure({
-        storage: 'localStorage'
+        storage: 'sessionStorage'
       })
 
     # restore config defaults
@@ -30,7 +30,7 @@ suite 'alternate storage', ->
           .expectGET('/api/auth/validate_token')
           .respond(201, successResp, newAuthHeader)
 
-        $window.localStorage.setItem('auth_headers', JSON.stringify(validAuthHeader))
+        $window.sessionStorage.setItem('auth_headers', JSON.stringify(validAuthHeader))
 
         $auth.validateUser()
 
@@ -57,7 +57,7 @@ suite 'alternate storage', ->
           .expectDELETE('/api/auth/sign_out')
           .respond(201, successResp)
 
-        $window.localStorage.setItem('auth_headers', JSON.stringify(validAuthHeader))
+        $window.sessionStorage.setItem('auth_headers', JSON.stringify(validAuthHeader))
 
         $auth.signOut()
 
@@ -66,7 +66,7 @@ suite 'alternate storage', ->
       test '$rootScope should broadcast logout success event', ->
         assert $rootScope.$broadcast.calledWith('auth:logout-success')
 
-      test 'localStorage item should no longer be present', ->
+      test 'sessionStorage item should no longer be present', ->
         assert(ipCookie('auth_headers') == undefined)
 
   suite 'customStorage', ->
@@ -75,7 +75,7 @@ suite 'alternate storage', ->
       retrieveData: sinon.spy(),
       deleteData: sinon.spy()
     }
-    # configure for local storage
+    # configure for session storage
     setup ->
       $authProvider.configure({
         storage: storageObj
@@ -109,7 +109,7 @@ suite 'alternate storage', ->
 
     setup ->
       $authProvider.configure({
-        storage: 'localStorage'
+        storage: 'sessionStorage'
       })
       sinon.spy($auth, "setAuthHeaders");
 
