@@ -17,7 +17,7 @@ This module provides the following features:
 * Seamless integration with the [devise token auth](https://github.com/lynndylanhurley/devise_token_auth) Rails gem
 * Extensive [event notifications](#events)
 * Allows for extensive [configuration](#configuration) to work with any API
-* Session support using cookies or localStorage
+* Session support using cookies or sessionStorage
 * Tested with Chrome, Safari, Firefox and [IE8+](#internet-explorer)
 
 # [Live Demo](http://ng-token-auth-demo.herokuapp.com/)
@@ -214,7 +214,7 @@ angular.module('myApp', ['ng-token-auth'])
 | **passwordResetPath** | path for requesting password reset emails. [Read more](#password-reset-flow). |
 | **passwordUpdatePath** | path for submitting new passwords for authenticated users. [Read more](#password-reset-flow) |
 | **passwordResetSuccessUrl** | the URL to which the API should redirect after users visit the links contained in password-reset emails. [Read more](#password-reset-flow). |
-| **storage** | the method used to persist tokens between sessions. cookies are used by default, but `window.localStorage` can be used as well. A custom object can also be used. Allowed strings are `cookies` and `localStorage`, otherwise an object implementing the interface defined below|
+| **storage** | the method used to persist tokens between sessions. cookies are used by default, but `window.sessionStorage` can be used as well. A custom object can also be used. Allowed strings are `cookies` and `sessionStorage`, otherwise an object implementing the interface defined below|
 | **forceValidateToken** | if this flag is set, the API's token validation will be called even if the auth token is not saved in `storage`. This can be useful for implementing a single sign-on (SSO) system.|
 | **proxyIf** | older browsers have trouble with CORS ([read more](#internet-explorer)). pass a method here to determine whether or not a proxy should be used. example: `function() { return !Modernizr.cors }` |
 | **proxyUrl** | proxy url if proxy is to be used |
@@ -1242,7 +1242,7 @@ This will all happen automatically when using this module.
 
 # iOS
 
- * localStoage may not writable in Private Browsing mode. You may wish to configure `storage` to use a generic object store or temporary cookie store. See also: [Frustration](http://spin.atomicobject.com/2013/01/23/ios-private-browsing-localstorage/)
+ * sessionStorage may not writable in Private Browsing mode. You may wish to configure `storage` to use a generic object store or temporary cookie store. See also: [Frustration](http://spin.atomicobject.com/2013/01/23/ios-private-browsing-localstorage/)
 
 # Internet Explorer
 
@@ -1372,7 +1372,7 @@ Satellizer occupies the same problem domain as ng-token-auth. Advantages of ng-t
   * Seamless, out-of-the-box integration with the [devise token auth](https://github.com/lynndylanhurley/devise_token_auth) gem. This gem provides a high level of security with minimal configuration.
   * [Auth header customization](#using-alternate-header-formats).
   * [Auth response customization](#using-alternate-response-formats).
-  * Supports both cookies and localStorage for session persistence.
+  * Supports both cookies and sessionStorage for session persistence.
   * Supports [password reset](#authrequestpasswordreset) and [password update](#authupdatepassword) for users that registered by email.
   * Supports [account updates](#authupdateaccount) and [account deletion](#authdestroyaccount).
   * Supports [changing tokens with each request](#about-token-management).
