@@ -17,7 +17,7 @@ This module provides the following features:
 * Seamless integration with the [devise token auth](https://github.com/lynndylanhurley/devise_token_auth) Rails gem
 * Extensive [event notifications](#events)
 * Allows for extensive [configuration](#configuration) to work with any API
-* Session support using cookies or localStorage
+* Session support using cookies, localStorage, or sessionStorage
 * Tested with Chrome, Safari, Firefox and [IE8+](#internet-explorer)
 
 # [Live Demo](http://ng-token-auth-demo.herokuapp.com/)
@@ -214,7 +214,7 @@ angular.module('myApp', ['ng-token-auth'])
 | **passwordResetPath** | path for requesting password reset emails. [Read more](#password-reset-flow). |
 | **passwordUpdatePath** | path for submitting new passwords for authenticated users. [Read more](#password-reset-flow) |
 | **passwordResetSuccessUrl** | the URL to which the API should redirect after users visit the links contained in password-reset emails. [Read more](#password-reset-flow). |
-| **storage** | the method used to persist tokens between sessions. cookies are used by default, but `window.localStorage` can be used as well. A custom object can also be used. Allowed strings are `cookies` and `localStorage`, otherwise an object implementing the interface defined below|
+| **storage** | the method used to persist tokens between sessions. cookies are used by default, but `window.localStorage` and `window.sessionStorage` can be used as well. A custom object can also be used. Allowed strings are `cookies`, `localStorage`, and `sessionStorage`, otherwise an object implementing the interface defined below|
 | **forceValidateToken** | if this flag is set, the API's token validation will be called even if the auth token is not saved in `storage`. This can be useful for implementing a single sign-on (SSO) system.|
 | **proxyIf** | older browsers have trouble with CORS ([read more](#internet-explorer)). pass a method here to determine whether or not a proxy should be used. example: `function() { return !Modernizr.cors }` |
 | **proxyUrl** | proxy url if proxy is to be used |

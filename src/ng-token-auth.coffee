@@ -696,6 +696,8 @@ angular.module('ng-token-auth', ['ipCookie'])
               switch @getConfig(configName).storage
                 when 'localStorage'
                   $window.localStorage.setItem(key, JSON.stringify(val))
+                when 'sessionStorage'
+                  $window.sessionStorage.setItem(key, JSON.stringify(val))
                 else
                   ipCookie(key, val, @getConfig().cookieOps)
 
@@ -708,6 +710,8 @@ angular.module('ng-token-auth', ['ipCookie'])
                 switch @getConfig().storage
                   when 'localStorage'
                     JSON.parse($window.localStorage.getItem(key))
+                  when 'sessionStorage'
+                    JSON.parse($window.sessionStorage.getItem(key))
                   else ipCookie(key)
             catch e
               # gracefully handle if JSON parsing
@@ -723,6 +727,8 @@ angular.module('ng-token-auth', ['ipCookie'])
             switch @getConfig().storage
               when 'localStorage'
                 $window.localStorage.removeItem(key)
+              when 'sessionStorage'
+                $window.sessionStorage.removeItem(key)
               else
                 ipCookie.remove(key, {path: @getConfig().cookieOps.path})
 
@@ -796,18 +802,35 @@ angular.module('ng-token-auth', ['ipCookie'])
           # value of 'defaultConfigName'. searches the following places in
           # this priority:
           # 1. localStorage
-          # 2. cookies
-          # 3. default (first available config)
+          # 2. sessionStorage
+          # 3. cookies
+          # 4. default (first available config)
           getSavedConfig: ->
             c   = undefined
             key = 'currentConfigName'
 
             if @hasLocalStorage()
               c ?= JSON.parse($window.localStorage.getItem(key))
-
+            else if @hasSessionStorage()
+              c ?= JSON.parse($window.sessionStorage.getItem(key))
+            
             c ?= ipCookie(key)
 
             return c || defaultConfigName
+
+          hasSessionStorage: ->
+            if !@_hasSessionStorage?
+
+              @_hasSessionStorage = false
+              # trying to call setItem will
+              # throw an error if sessionStorage is disabled
+              try
+                $window.sessionStorage.setItem('ng-token-auth-test', 'ng-token-auth-test');
+                $window.sessionStorage.removeItem('ng-token-auth-test');
+                @_hasSessionStorage = true
+              catch error
+
+            return @_hasSessionStorage
 
           hasLocalStorage: ->
             if !@_hasLocalStorage?
@@ -822,7 +845,6 @@ angular.module('ng-token-auth', ['ipCookie'])
               catch error
 
             return @_hasLocalStorage
-
 
       ]
     }
