@@ -2,6 +2,7 @@ node_modules
 test/.tmp
 test/dist
 .sass-cache
+.ruby-version
 .awspublish-*
 test/app/bower_components
 test/app/bower_components
