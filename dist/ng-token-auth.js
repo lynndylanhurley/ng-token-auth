@@ -409,7 +409,7 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
                 i = void 0;
                 for (i in pairs) {
                   i = i;
-                  if (pairs[i] === '') {
+                  if ((pairs[i] === '') || (typeof pairs[i] === 'function')) {
                     continue;
                   }
                   pair = pairs[i].split('=');
