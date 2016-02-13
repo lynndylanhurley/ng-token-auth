@@ -88,7 +88,7 @@ This project comes bundled with a test app. You can run the demo locally by foll
 
 This module relies on [token based authentication](http://stackoverflow.com/questions/1592534/what-is-token-based-authentication). This requires coordination between the client and the server. [Diagrams](#conceptual) are included to illustrate this relationship.
 
-This module was designed to work out of the box with the outstanding [devise token auth](https://github.com/lynndylanhurley/devise_token_auth) gem, but it's seen use in other environments as well ([go](http://golang.org/), [gorm](https://github.com/jinzhu/gorm) and [gomniauth](https://github.com/stretchr/gomniauth) for example).
+This module was designed to work out of the box with the outstanding [devise token auth](https://github.com/lynndylanhurley/devise_token_auth) gem, but it's seen use in other environments as well ([go](https://golang.org/), [gorm](https://github.com/jinzhu/gorm) and [gomniauth](https://github.com/stretchr/gomniauth) for example).
 
 Not using AngularJS? Use [jToker](https://github.com/lynndylanhurley/j-toker) instead!
 
@@ -1066,7 +1066,7 @@ $auth.requestPasswordReset({
 
 Some file upload libraries interfere with the authentication headers set by this module. Workarounds are documented below:
 
-### [angular-file-upload](https://github.com/danialfarid/angular-file-upload)#
+### [angular-file-upload](https://github.com/danialfarid/ng-file-upload)#
 
 The `upload` method accepts a `headers` option. Manually pass the current auth headers to the `upload` method as follows:
 
@@ -1242,7 +1242,7 @@ This will all happen automatically when using this module.
 
 # iOS
 
- * localStoage may not writable in Private Browsing mode. You may wish to configure `storage` to use a generic object store or temporary cookie store. See also: [Frustration](http://spin.atomicobject.com/2013/01/23/ios-private-browsing-localstorage/)
+ * localStoage may not writable in Private Browsing mode. You may wish to configure `storage` to use a generic object store or temporary cookie store. See also: [Frustration](https://spin.atomicobject.com/2013/01/23/ios-private-browsing-localstorage/)
 
 # Internet Explorer
 
@@ -1302,11 +1302,11 @@ app.all('/proxy/*', function(req, res, next) {
 });
 ~~~
 
-The above example assumes that you're using [express](http://expressjs.com/), [request](https://github.com/mikeal/request), and [http-proxy](https://github.com/nodejitsu/node-http-proxy), and that you have set the API_URL value using [node-config](https://github.com/lorenwest/node-config).
+The above example assumes that you're using [express](http://expressjs.com/), [request](https://github.com/request/request), and [http-proxy](https://github.com/nodejitsu/node-http-proxy), and that you have set the API_URL value using [node-config](https://github.com/lorenwest/node-config).
 
 #### IE8-11 / iOS 8.2 must use `sameWindow` for provider authentication
 
-Most modern browsers can communicate across tabs and windows using [postMessage](https://developer.mozilla.org/en-US/docs/Web/API/Window.postMessage). This doesn't work for certain flawed browsers. In these instances, it's recommended to always use `sameWindow` mode. If you are configured to use `newWindow` mode, you will most likely wish to handle this in the configuration. Eg:
+Most modern browsers can communicate across tabs and windows using [postMessage](https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage). This doesn't work for certain flawed browsers. In these instances, it's recommended to always use `sameWindow` mode. If you are configured to use `newWindow` mode, you will most likely wish to handle this in the configuration. Eg:
 
 ```javascript
       $authProvider.configure({
