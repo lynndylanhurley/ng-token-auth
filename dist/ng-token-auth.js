@@ -42,6 +42,9 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
         expirationUnit: 'days',
         secure: false
       },
+      createPopup: function(url) {
+        return window.open(url, '_blank', 'closebuttoncaption=Cancel');
+      },
       parseExpiry: function(headers) {
         return (parseInt(headers['expiry'], 10) * 1000) || null;
       },
@@ -293,9 +296,9 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
               omniauthWindowType = this.getConfig(opts.config).omniauthWindowType;
               authUrl = this.buildAuthUrl(omniauthWindowType, provider, opts);
               if (omniauthWindowType === 'newWindow') {
-                return this.requestCredentialsViaPostMessage(this.createPopup(authUrl));
+                return this.requestCredentialsViaPostMessage(this.getConfig().createPopup(authUrl));
               } else if (omniauthWindowType === 'inAppBrowser') {
-                return this.requestCredentialsViaExecuteScript(this.createPopup(authUrl));
+                return this.requestCredentialsViaExecuteScript(this.getConfig().createPopup(authUrl));
               } else if (omniauthWindowType === 'sameWindow') {
                 return this.visitUrl(authUrl);
               } else {
@@ -373,9 +376,6 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
               });
               this.cancelOmniauthInAppBrowserListeners;
               return $rootScope.$broadcast('auth:window-closed');
-            },
-            createPopup: function(url) {
-              return $window.open(url, '_blank', 'closebuttoncaption=Cancel');
             },
             resolveDfd: function() {
               this.dfd.resolve(this.user);

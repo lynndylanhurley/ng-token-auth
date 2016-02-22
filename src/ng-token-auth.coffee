@@ -36,6 +36,10 @@ angular.module('ng-token-auth', ['ipCookie'])
           expirationUnit: 'days'
           secure: false
 
+        # popups are difficult to test. mock this method in testing.
+        createPopup: (url) ->
+          window.open(url, '_blank', 'closebuttoncaption=Cancel')
+
         parseExpiry: (headers) ->
           # convert from ruby time (seconds) to js time (millis)
           (parseInt(headers['expiry'], 10) * 1000) || null
@@ -323,9 +327,9 @@ angular.module('ng-token-auth', ['ipCookie'])
             authUrl = @buildAuthUrl(omniauthWindowType, provider, opts)
 
             if omniauthWindowType is 'newWindow'
-              @requestCredentialsViaPostMessage(@createPopup(authUrl))
+              @requestCredentialsViaPostMessage(@getConfig().createPopup(authUrl))
             else if omniauthWindowType is 'inAppBrowser'
-              @requestCredentialsViaExecuteScript(@createPopup(authUrl))
+              @requestCredentialsViaExecuteScript(@getConfig().createPopup(authUrl))
             else if omniauthWindowType is 'sameWindow'
               @visitUrl(authUrl)
             else
@@ -411,12 +415,6 @@ angular.module('ng-token-auth', ['ipCookie'])
             })
             @cancelOmniauthInAppBrowserListeners
             $rootScope.$broadcast('auth:window-closed')
-
-
-          # popups are difficult to test. mock this method in testing.
-          createPopup: (url) ->
-            $window.open(url, '_blank', 'closebuttoncaption=Cancel')
-
 
           # this needs to happen after a reflow so that the promise
           # can be rejected properly before it is destroyed.
@@ -813,7 +811,7 @@ angular.module('ng-token-auth', ['ipCookie'])
               c ?= JSON.parse($window.localStorage.getItem(key))
             else if @hasSessionStorage()
               c ?= JSON.parse($window.sessionStorage.getItem(key))
-            
+
             c ?= ipCookie(key)
 
             return c || defaultConfigName

@@ -37,7 +37,7 @@ suite 'multiple concurrent auth configurations', ->
         postMessage: -> null
       })
       $auth.authenticate('github')
-      assert($auth.createPopup.calledWithMatch(expectedRoute))
+      assert($auth.getConfig().createPopup.calledWithMatch(expectedRoute))
 
 
     test 'submitLogin uses only config by default', ->
@@ -133,7 +133,7 @@ suite 'multiple concurrent auth configurations', ->
           postMessage: -> null
         })
         $auth.authenticate('github')
-        assert($auth.createPopup.calledWithMatch(expectedRoute))
+        assert($auth.getConfig().createPopup.calledWithMatch(expectedRoute))
 
 
       test 'uses second config when specified', ->
@@ -143,7 +143,7 @@ suite 'multiple concurrent auth configurations', ->
           postMessage: -> null
         })
         $auth.authenticate('github', {config: 'admin'})
-        assert($auth.createPopup.calledWithMatch(expectedRoute))
+        assert($auth.getConfig().createPopup.calledWithMatch(expectedRoute))
 
 
     suite 'submitLogin', ->

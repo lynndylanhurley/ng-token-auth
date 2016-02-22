@@ -82,6 +82,22 @@ suite 'configuration', ->
       expiry = $auth.getExpiry()
       assert.equal(expiry, validExpiry)
 
+  suite 'alternate window function', ->
+    setup ->
+      # define custom function
+      $authProvider.configure({
+        createPopup: (url) -> url
+      })
+
+    teardown ->
+      $authProvider.configure({
+        createPopup: (url) ->
+          window.open(url, '_blank', 'closebuttoncaption=Cancel')
+      })
+
+    test 'expect that custom method', ->
+      assert.equal($auth.getConfig().createPopup('test'), 'test')
+
   suite 'alternate login response format', ->
     setup ->
       # define custom login response handler

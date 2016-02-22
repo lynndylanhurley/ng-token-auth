@@ -182,6 +182,9 @@ angular.module('myApp', ['ng-token-auth'])
         secure: false,
         domain: 'domain.com'
       },
+      createPopup: function(url) {
+        return window.open(url, '_blank', 'closebuttoncaption=Cancel');
+      },
       parseExpiry: function(headers) {
         // convert from UTC ruby (seconds) to UTC js (milliseconds)
         return (parseInt(headers['expiry']) * 1000) || null;
@@ -219,6 +222,7 @@ angular.module('myApp', ['ng-token-auth'])
 | **proxyIf** | older browsers have trouble with CORS ([read more](#internet-explorer)). pass a method here to determine whether or not a proxy should be used. example: `function() { return !Modernizr.cors }` |
 | **proxyUrl** | proxy url if proxy is to be used |
 | **tokenFormat** | a template for authentication tokens. the template will be provided a context with the following params:<br><ul><li>token</li><li>clientId</li><li>uid</li><li>expiry</li></ul>Defaults to the [RFC 6750 Bearer Token](http://tools.ietf.org/html/rfc6750) format. [Read more](#using-alternate-header-formats). |
+| **createPopup** | a function that will open OmniAuth window by `url`. [Read more](#example-newwindow-redirect_uri-destination). |
 | **parseExpiry** | a function that will return the token's expiry from the current headers. Returns null if no headers or expiry are found. [Read more](#using-alternate-header-formats). |
 | **handleLoginResponse** | a function that will identify and return the current user's info (id, username, etc.) in the response of a successful login request. [Read more](#using-alternate-response-formats). |
 | **handleAccountUpdateResponse** | a function that will identify and return the current user's info (id, username, etc.) in the response of a successful account update request. [Read more](#using-alternate-response-formats). |
@@ -1398,4 +1402,3 @@ This module has been featured by [http://angular-js.in](http://angular-js.in/).
 # License
 
 This project uses the WTFPL
-
