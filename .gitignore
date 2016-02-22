@@ -1,6 +1,7 @@
 node_modules
 test/.tmp
 test/dist
+.idea
 .sass-cache
 .ruby-version
 .awspublish-*
