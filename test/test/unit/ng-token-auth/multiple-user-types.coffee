@@ -34,8 +34,17 @@ suite 'multiple concurrent auth configurations', ->
       assert.equal(defaultConfig.tokenValidationPath, $auth.getConfig().tokenValidationPath)
 
     test 'authenticate uses only config by default', ->
+
+      sinon.stub(defaultConfig, 'createPopup').returns({
+        closed: false
+        postMessage: -> null
+      })
+
+      $authProvider.configure(defaultConfig)
+
       expectedRoute = "/api/vega/github"
       $auth.authenticate('github')
+
       assert($auth.getConfig().createPopup.calledWithMatch(expectedRoute))
 
 
@@ -101,11 +110,8 @@ suite 'multiple concurrent auth configurations', ->
           github: '/cygni/github'
 
 
-    setup ->
-      cs = $authProvider.configure([userConfig, adminConfig])
-
-
     test 'getConfig returns first ("user") config when no params specified', ->
+      cs = $authProvider.configure([userConfig, adminConfig])
       assert.equal(userConfig.user.signOutUrl, $auth.getConfig().signOutUrl)
       assert.equal(userConfig.user.emailSignInPath, $auth.getConfig().emailSignInPath)
       assert.equal(userConfig.user.emailRegistrationPath, $auth.getConfig().emailRegistrationPath)
@@ -117,6 +123,7 @@ suite 'multiple concurrent auth configurations', ->
 
 
     test 'getConfig returns "admin" config when specified', ->
+      cs = $authProvider.configure([userConfig, adminConfig])
       assert.equal(adminConfig.admin.signOutUrl, $auth.getConfig("admin").signOutUrl)
       assert.equal(adminConfig.admin.emailSignInPath, $auth.getConfig("admin").emailSignInPath)
       assert.equal(adminConfig.admin.emailRegistrationPath, $auth.getConfig("admin").emailRegistrationPath)
@@ -127,15 +134,26 @@ suite 'multiple concurrent auth configurations', ->
       assert.equal(adminConfig.admin.tokenValidationPath, $auth.getConfig("admin").tokenValidationPath)
 
 
-    test 'default methods still work'
-
-
     suite 'authenticate', ->
+      setup ->
+        sinon.stub(userConfig.user, 'createPopup').returns({
+          closed: false
+          postMessage: -> null
+        })
+        sinon.stub(adminConfig.admin, 'createPopup').returns({
+          closed: false
+          postMessage: -> null
+        })
+        cs = $authProvider.configure([userConfig, adminConfig])
+
+      teardown ->
+        userConfig.user.createPopup.restore()
+        adminConfig.admin.createPopup.restore()
+
       test 'uses first config by default', ->
         expectedRoute = "/api/rigel/github"
         $auth.authenticate('github')
         assert($auth.getConfig().createPopup.calledWithMatch(expectedRoute))
-
 
       test 'uses second config when specified', ->
         expectedRoute = "/api/cygni/github"
@@ -144,6 +162,10 @@ suite 'multiple concurrent auth configurations', ->
 
 
     suite 'submitLogin', ->
+
+      setup ->
+        cs = $authProvider.configure([userConfig, adminConfig])
+
       test 'uses first config by default', ->
         args =
           email: validUser.email
@@ -158,7 +180,6 @@ suite 'multiple concurrent auth configurations', ->
 
         $rootScope.submitLogin(args)
         $httpBackend.flush()
-
 
       test 'uses second config when specified', ->
         args =
@@ -195,6 +216,7 @@ suite 'multiple concurrent auth configurations', ->
 
     suite 'signOut', ->
       setup ->
+        cs = $authProvider.configure([userConfig, adminConfig])
         # ensure that user is signed in, named config is set
         args =
           email: validUser.email
@@ -227,6 +249,9 @@ suite 'multiple concurrent auth configurations', ->
 
 
     suite 'validateUser', ->
+      setup ->
+        cs = $authProvider.configure([userConfig, adminConfig])
+
       test 'uses saved config if present', ->
         $auth.setConfigName('admin')
 
@@ -260,6 +285,9 @@ suite 'multiple concurrent auth configurations', ->
 
 
     suite 'submitRegistration', ->
+      setup ->
+        cs = $authProvider.configure([userConfig, adminConfig])
+
       test 'uses first config by default', ->
         $httpBackend
           .expectPOST('/api/rigel')
@@ -291,6 +319,9 @@ suite 'multiple concurrent auth configurations', ->
 
 
     suite 'registration confirmation', ->
+      setup ->
+        cs = $authProvider.configure([userConfig, adminConfig])
+
       test 'admin user is validated using the correct configuration', ->
         setValidEmailConfirmQSForAdminUser()
         $httpBackend
@@ -302,6 +333,9 @@ suite 'multiple concurrent auth configurations', ->
 
 
     suite 'password change request confirmation', ->
+      setup ->
+        cs = $authProvider.configure([userConfig, adminConfig])
+
       test 'admin user is validated using the correct configuration', ->
         setValidPasswordConfirmQSForAdminUser()
         $httpBackend
@@ -313,6 +347,9 @@ suite 'multiple concurrent auth configurations', ->
 
 
     suite 'destroyAccount', ->
+      setup ->
+        cs = $authProvider.configure([userConfig, adminConfig])
+
       test 'uses stored named config when present', ->
         $auth.setConfigName('admin')
 
@@ -336,6 +373,9 @@ suite 'multiple concurrent auth configurations', ->
 
 
     suite 'requestPasswordReset', ->
+      setup ->
+        cs = $authProvider.configure([userConfig, adminConfig])
+
       test 'uses first config by default', ->
         $httpBackend
           .expectPOST('/api/rigel/password')
@@ -363,6 +403,9 @@ suite 'multiple concurrent auth configurations', ->
 
 
     suite 'updatePassword', ->
+      setup ->
+        cs = $authProvider.configure([userConfig, adminConfig])
+
       test 'uses stored named config', ->
         $auth.setConfigName('admin')
 
@@ -392,6 +435,9 @@ suite 'multiple concurrent auth configurations', ->
 
 
     suite 'updateAccount', ->
+      setup ->
+        cs = $authProvider.configure([userConfig, adminConfig])
+
       test 'uses stored named config', ->
         $auth.setConfigName('admin')
 
