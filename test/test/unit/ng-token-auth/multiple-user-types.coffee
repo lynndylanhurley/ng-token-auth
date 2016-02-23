@@ -12,6 +12,9 @@ suite 'multiple concurrent auth configurations', ->
       passwordUpdatePath:      '/vega/password'
       tokenValidationPath:     '/vega/validate_token'
       omniauthWindowType:      'newWindow'
+      createPopup:             (url) ->
+                                 closed: false
+                                 postMessage: -> null
       authProviderPaths:
         github:    '/vega/github'
 
@@ -32,10 +35,6 @@ suite 'multiple concurrent auth configurations', ->
 
     test 'authenticate uses only config by default', ->
       expectedRoute = "/api/vega/github"
-      sinon.stub($auth, 'createPopup').returns({
-        closed: false
-        postMessage: -> null
-      })
       $auth.authenticate('github')
       assert($auth.getConfig().createPopup.calledWithMatch(expectedRoute))
 
@@ -78,6 +77,9 @@ suite 'multiple concurrent auth configurations', ->
         passwordUpdatePath:      '/rigel/password'
         tokenValidationPath:     '/rigel/validate_token'
         omniauthWindowType:      'newWindow'
+        createPopup:             (url) ->
+                                   closed: false
+                                   postMessage: -> null
         authProviderPaths:
           github: '/rigel/github'
 
@@ -92,6 +94,9 @@ suite 'multiple concurrent auth configurations', ->
         passwordUpdatePath:      '/cygni/password'
         tokenValidationPath:     '/cygni/validate_token'
         omniauthWindowType:      'newWindow'
+        createPopup:             (url) ->
+                                   closed: false
+                                   postMessage: -> null
         authProviderPaths:
           github: '/cygni/github'
 
@@ -128,22 +133,14 @@ suite 'multiple concurrent auth configurations', ->
     suite 'authenticate', ->
       test 'uses first config by default', ->
         expectedRoute = "/api/rigel/github"
-        sinon.stub($auth, 'createPopup').returns({
-          closed: false
-          postMessage: -> null
-        })
         $auth.authenticate('github')
         assert($auth.getConfig().createPopup.calledWithMatch(expectedRoute))
 
 
       test 'uses second config when specified', ->
         expectedRoute = "/api/cygni/github"
-        sinon.stub($auth, 'createPopup').returns({
-          closed: false
-          postMessage: -> null
-        })
         $auth.authenticate('github', {config: 'admin'})
-        assert($auth.getConfig().createPopup.calledWithMatch(expectedRoute))
+        assert($auth.getConfig('admin').createPopup.calledWithMatch(expectedRoute))
 
 
     suite 'submitLogin', ->
