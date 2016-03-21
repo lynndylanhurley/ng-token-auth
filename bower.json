@@ -25,7 +25,7 @@
     "tests"
   ],
   "dependencies": {
-    "angular": ">=1.4 <=1.5.0",
+    "angular": ">=1.4 <=1.5.2",
     "angular-cookie": "~4.0.10"
   }
 }
