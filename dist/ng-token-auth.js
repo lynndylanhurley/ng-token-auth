@@ -187,12 +187,15 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
                 return $rootScope.$broadcast('auth:registration-email-error', resp);
               });
             },
-            submitLogin: function(params, opts) {
+            submitLogin: function(params, opts, httpopts) {
               if (opts == null) {
                 opts = {};
               }
+              if (httpopts == null) {
+                httpopts = {};
+              }
               this.initDfd();
-              $http.post(this.apiUrl(opts.config) + this.getConfig(opts.config).emailSignInPath, params).success((function(_this) {
+              $http.post(this.apiUrl(opts.config) + this.getConfig(opts.config).emailSignInPath, params, httpopts).success((function(_this) {
                 return function(resp) {
                   var authData;
                   _this.setConfigName(opts.config);
