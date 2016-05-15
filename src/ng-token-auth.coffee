@@ -809,7 +809,7 @@ angular.module('ng-token-auth', ['ipCookie'])
 
             if @hasLocalStorage()
               c ?= JSON.parse($window.localStorage.getItem(key))
-            else if @hasSessionStorage()
+            if @hasSessionStorage()
               c ?= JSON.parse($window.sessionStorage.getItem(key))
 
             c ?= ipCookie(key)
