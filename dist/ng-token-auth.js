@@ -381,6 +381,9 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
               return $rootScope.$broadcast('auth:window-closed');
             },
             resolveDfd: function() {
+              if (!this.dfd) {
+                return;
+              }
               this.dfd.resolve(this.user);
               return $timeout(((function(_this) {
                 return function() {
