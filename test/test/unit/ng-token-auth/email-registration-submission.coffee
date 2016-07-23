@@ -26,6 +26,28 @@ suite 'email registration submission', ->
         $timeout.flush()
         assert(resolved)
 
+      test 'request contains custom header', ->
+        run = false
+
+        data =
+          email: validEmail
+          password: 'secret123'
+          password_confirmation: 'secret123'
+        config =
+          headers:
+            'X-Custom-Header': 'value'
+
+        $httpBackend
+          .expectPOST('/api/auth', undefined, (headers) ->
+            assert.propertyVal headers, 'X-Custom-Header', 'value'
+            run = true
+          )
+          .respond(201, {success: true})
+
+        $auth.submitRegistration(data, config)
+        $httpBackend.flush()
+        assert run
+
     suite 'directive access', ->
       args =
         email: validEmail

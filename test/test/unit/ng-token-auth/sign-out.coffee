@@ -36,6 +36,24 @@ suite 'sign out', ->
       $timeout.flush()
       assert(resolved)
 
+    test 'request contains custom header', ->
+      run = false
+
+      config =
+        headers:
+          'X-Custom-Header': 'value'
+
+      $httpBackend
+        .expectDELETE('/api/auth/sign_out', (headers) ->
+          assert.propertyVal headers, 'X-Custom-Header', 'value'
+          run = true
+        )
+        .respond(201, {success: true})
+
+      $auth.signOut(config)
+      $httpBackend.flush()
+      assert run
+
 
   suite 'directive access', ->
     test '$auth.signOut was called from $rootScope', ->

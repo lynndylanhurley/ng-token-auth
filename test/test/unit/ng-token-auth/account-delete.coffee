@@ -32,6 +32,24 @@ suite 'account delete', ->
       $timeout.flush()
       assert(resolved)
 
+    test 'request contains custom header', ->
+      run = false
+
+      $httpBackend
+        .expectDELETE('/api/auth', (headers) ->
+          assert.propertyVal headers, 'X-Custom-Header', 'value'
+          run = true
+        )
+        .respond(201)
+
+      $auth.destroyAccount({},
+        headers:
+          'X-Custom-Header': 'value'
+      )
+
+      $httpBackend.flush()
+      assert run
+
   suite 'failed update', ->
     failedResp =
       success: false
