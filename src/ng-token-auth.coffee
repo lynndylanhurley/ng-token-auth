@@ -729,7 +729,12 @@ angular.module('ng-token-auth', ['ipCookie'])
               when 'sessionStorage'
                 $window.sessionStorage.removeItem(key)
               else
-                ipCookie.remove(key, {path: @getConfig().cookieOps.path})
+                cookieOps = {path: @getConfig().cookieOps.path}
+                
+                if @getConfig().cookieOps.domain != undefined
+                  cookieOps.domain = @getConfig().cookieOps.domain
+
+                ipCookie.remove(key, cookieOps)
 
           # persist authentication token, client id, uid
           setAuthHeaders: (h) ->
