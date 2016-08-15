@@ -90,7 +90,7 @@ This module relies on [token based authentication](http://stackoverflow.com/ques
 
 This module was designed to work out of the box with the outstanding [devise token auth](https://github.com/lynndylanhurley/devise_token_auth) gem, but it's seen use in other environments as well ([go](https://golang.org/), [gorm](https://github.com/jinzhu/gorm) and [gomniauth](https://github.com/stretchr/gomniauth) for example).
 
-Not using AngularJS? Use [jToker](https://github.com/lynndylanhurley/j-toker) instead!
+Not using AngularJS? Use [jToker](https://github.com/lynndylanhurley/j-toker) (jQuery) or [Angular2-Token](https://github.com/neroniaky/angular2-token) (Angular2) instead!
 
 **About security**: [read here](http://stackoverflow.com/questions/18605294/is-devises-token-authenticatable-secure) for more information on securing your token auth system. The [devise token auth](https://github.com/lynndylanhurley/devise_token_auth#security) gem has adequate security measures in place, and the gem works seamlessly with this module.
 
