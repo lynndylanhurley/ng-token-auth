@@ -196,15 +196,21 @@ angular.module('ng-token-auth', ['ipCookie'])
           # register by email. server will send confirmation email
           # containing a link to activate the account. the link will
           # redirect to this site.
-          submitRegistration: (params, opts={}) ->
+          submitRegistration: (data, opts={}) ->
             successUrl = @getResultOrValue(@getConfig(opts.config).confirmationSuccessUrl)
-            angular.extend(params, {
-              confirm_success_url: successUrl,
-              config_name: @getCurrentConfigName(opts.config)
+
+            opts = angular.extend({}, opts, {
+              url: @apiUrl(opts.config) + @getConfig(opts.config).emailRegistrationPath,
+              method: 'POST',
+              data: angular.extend({}, data, {
+                confirm_success_url: successUrl,
+                config_name: @getCurrentConfigName(opts.config)
+              })
             })
-            $http.post(@apiUrl(opts.config) + @getConfig(opts.config).emailRegistrationPath, params)
+
+            $http(opts)
               .success((resp)->
-                $rootScope.$broadcast('auth:registration-email-success', params)
+                $rootScope.$broadcast('auth:registration-email-success', data)
               )
               .error((resp) ->
                 $rootScope.$broadcast('auth:registration-email-error', resp)
@@ -212,9 +218,16 @@ angular.module('ng-token-auth', ['ipCookie'])
 
 
           # capture input from user, authenticate serverside
-          submitLogin: (params, opts={}, httpopts={}) ->
+          submitLogin: (data, opts={}) ->
             @initDfd()
-            $http.post(@apiUrl(opts.config) + @getConfig(opts.config).emailSignInPath, params, httpopts)
+
+            opts = angular.extend({}, opts, {
+              url: @apiUrl(opts.config) + @getConfig(opts.config).emailSignInPath,
+              method: 'POST',
+              data: data
+            })
+
+            $http(opts)
               .success((resp) =>
                 @setConfigName(opts.config)
                 authData = @getConfig(opts.config).handleLoginResponse(resp, @)
@@ -237,17 +250,23 @@ angular.module('ng-token-auth', ['ipCookie'])
 
 
           # request password reset from API
-          requestPasswordReset: (params, opts={}) ->
+          requestPasswordReset: (data, opts={}) ->
             successUrl = @getResultOrValue(
               @getConfig(opts.config).passwordResetSuccessUrl
             )
 
-            params.redirect_url = successUrl
-            params.config_name  = opts.config if opts.config?
+            opts = angular.extend({}, opts, {
+              url: @apiUrl(opts.config) + @getConfig(opts.config).passwordResetPath,
+              method: 'POST',
+              data: angular.extend({}, data, {
+                redirect_url: successUrl,
+                config_name: opts.config if opts.config?
+              })
+            })
 
-            $http.post(@apiUrl(opts.config) + @getConfig(opts.config).passwordResetPath, params)
+            $http(opts)
               .success((resp) ->
-                $rootScope.$broadcast('auth:password-reset-request-success', params)
+                $rootScope.$broadcast('auth:password-reset-request-success', data)
               )
               .error((resp) ->
                 $rootScope.$broadcast('auth:password-reset-request-error', resp)
@@ -255,8 +274,15 @@ angular.module('ng-token-auth', ['ipCookie'])
 
 
           # update user password
-          updatePassword: (params) ->
-            $http.put(@apiUrl() + @getConfig().passwordUpdatePath, params)
+          updatePassword: (data, opts={}) ->
+
+            opts = angular.extend({}, opts, {
+              url: @apiUrl(opts.config) + @getConfig(opts.config).passwordUpdatePath
+              method: 'PUT',
+              data: data
+            })
+
+            $http(opts)
               .success((resp) =>
                 $rootScope.$broadcast('auth:password-change-success', resp)
                 @mustResetPassword = false
@@ -267,8 +293,15 @@ angular.module('ng-token-auth', ['ipCookie'])
 
 
           # update user account info
-          updateAccount: (params) ->
-            $http.put(@apiUrl() + @getConfig().accountUpdatePath, params)
+          updateAccount: (data, opts={}) ->
+
+            opts = angular.extend({}, opts, {
+              url: @apiUrl(opts.config) + @getConfig(opts.config).accountUpdatePath,
+              method: 'PUT',
+              data: data
+            })
+
+            $http(opts)
               .success((resp) =>
 
                 updateResponse = @getConfig().handleAccountUpdateResponse(resp)
@@ -293,8 +326,15 @@ angular.module('ng-token-auth', ['ipCookie'])
 
 
           # permanently destroy a user's account.
-          destroyAccount: (params) ->
-            $http.delete(@apiUrl() + @getConfig().accountUpdatePath, params)
+          destroyAccount: (data, opts={}) ->
+
+            opts = angular.extend({}, opts, {
+              url: @apiUrl(opts.config) + @getConfig(opts.config).accountUpdatePath,
+              method: 'DELETE',
+              data: data
+            })
+
+            $http(opts)
               .success((resp) =>
                 @invalidateTokens()
                 $rootScope.$broadcast('auth:account-destroy-success', resp)
@@ -563,7 +603,13 @@ angular.module('ng-token-auth', ['ipCookie'])
           # confirm that user's auth token is still valid.
           validateToken: (opts={}) ->
             unless @tokenHasExpired()
-              $http.get(@apiUrl(opts.config) + @getConfig(opts.config).tokenValidationPath)
+
+              opts = angular.extend({}, opts, {
+                url: @apiUrl(opts.config) + @getConfig(opts.config).tokenValidationPath,
+                method: 'GET'
+              })
+
+              $http(opts)
                 .success((resp) =>
                   authData = @getConfig(opts.config).handleTokenValidationResponse(resp)
                   @handleValidAuth(authData)
@@ -637,8 +683,14 @@ angular.module('ng-token-auth', ['ipCookie'])
 
 
           # destroy auth token on server, destroy user auth credentials
-          signOut: ->
-            $http.delete(@apiUrl() + @getConfig().signOutUrl)
+          signOut: (opts={}) ->
+
+            opts = angular.extend({}, opts, {
+              url: @apiUrl() + @getConfig().signOutUrl,
+              method: 'DELETE'
+            })
+
+            $http(opts)
               .success((resp) =>
                 @invalidateTokens()
                 $rootScope.$broadcast('auth:logout-success')

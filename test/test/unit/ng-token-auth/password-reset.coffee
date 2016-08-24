@@ -25,6 +25,26 @@ suite 'password update', ->
       $timeout.flush()
       assert(resolved)
 
+    test 'request contains custom header', ->
+      run = false
+
+      data =
+        password: 'secret123'
+        password_confirmation: 'secret123'
+      config =
+        headers:
+          'X-Custom-Header': 'value'
+
+      $httpBackend
+        .expectPUT('/api/auth/password', undefined, (headers) ->
+          assert.propertyVal headers, 'X-Custom-Header', 'value'
+          run = true
+        )
+        .respond(201, {success: true})
+
+      $auth.updatePassword(data, config)
+      $httpBackend.flush()
+      assert run
 
   suite 'directive access', ->
     args =

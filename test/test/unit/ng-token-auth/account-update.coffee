@@ -36,6 +36,26 @@ suite 'account update', ->
       $timeout.flush()
       assert(resolved)
 
+    test 'request contains custom header', ->
+      run = false
+
+      data =
+        operating_thetan: 123
+      config =
+        headers:
+          'X-Custom-Header': 'value'
+
+      $httpBackend
+        .expectPUT('/api/auth', undefined, (headers) ->
+          assert.propertyVal headers, 'X-Custom-Header', 'value'
+          run = true
+        )
+        .respond(201, {success: true, data: data})
+
+      $auth.updateAccount(data, config)
+      $httpBackend.flush()
+      assert run
+
   suite 'failed update', ->
     failedResp =
       success: false

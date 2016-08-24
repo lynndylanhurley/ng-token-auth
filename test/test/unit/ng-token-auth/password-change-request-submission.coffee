@@ -21,6 +21,26 @@ suite 'email user password change request', ->
       $timeout.flush()
       assert(resolved)
 
+    test 'request contains custom header', ->
+      run = false
+
+      data =
+        email: validUser.email
+      config =
+        headers:
+          'X-Custom-Header': 'value'
+
+      $httpBackend
+        .expectPOST('/api/auth/password', undefined, (headers) ->
+          assert.propertyVal headers, 'X-Custom-Header', 'value'
+          run = true
+        )
+        .respond(201, {success: true})
+
+      $auth.requestPasswordReset(data, config)
+      $httpBackend.flush()
+      assert run
+
   suite 'directive access', ->
     args =
       email: validUser.email
