@@ -222,10 +222,7 @@ angular.module('ng-token-auth', ['ipCookie'])
                 $rootScope.$broadcast('auth:login-success', @user)
               )
               .error((resp) =>
-                @rejectDfd({
-                  reason: 'unauthorized'
-                  errors: ['Invalid credentials']
-                })
+                @rejectDfd(angular.merge({reason: 'unauthorized', errors: ['Invalid credentials']}, resp))
                 $rootScope.$broadcast('auth:login-error', resp)
               )
             @dfd.promise
