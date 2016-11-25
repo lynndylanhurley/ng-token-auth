@@ -581,6 +581,11 @@ angular.module('ng-token-auth', ['ipCookie'])
                   $rootScope.$broadcast('auth:validation-success', @user)
                 )
                 .error((data) =>
+                  # Token cannot be destroyed if no connection
+                  unless data?
+                    $rootScope.$broadcast('auth:connection-error', '')
+                    return
+
                   # broadcast event for first time login failure
                   if @firstTimeLogin
                     $rootScope.$broadcast('auth:email-confirmation-error', data)
@@ -730,7 +735,7 @@ angular.module('ng-token-auth', ['ipCookie'])
                 $window.sessionStorage.removeItem(key)
               else
                 cookieOps = {path: @getConfig().cookieOps.path}
-                
+
                 if @getConfig().cookieOps.domain != undefined
                   cookieOps.domain = @getConfig().cookieOps.domain
 
