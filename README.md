@@ -1200,12 +1200,12 @@ By default, the API should update the auth token for each request ([read more](#
 ~~~javascript
 $scope.getResourceData = function() {
 
-  $http.get('/api/restricted_resource_1').success(function(resp) {
+  $http.get('/api/restricted_resource_1').then(function(resp) {
     // handle response
     $scope.resource1 = resp.data;
   });
 
-  $http.get('/api/restricted_resource_2').success(function(resp) {
+  $http.get('/api/restricted_resource_2').then(function(resp) {
     // handle response
     $scope.resource2 = resp.data;
   });
