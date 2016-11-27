@@ -2,7 +2,7 @@
 
 // config is in non-standard location. setting this env var will direct
 // node-config to the proper config files.
-process.env.NODE_CONFIG_DIR = './test/config'
+process.env.NODE_CONFIG_DIR = './test/config';
 
 var gulp     = require('gulp');
 var wiredep  = require('wiredep').stream;
@@ -15,12 +15,12 @@ var lazypipe = require('lazypipe');
 var nib      = require('nib');
 var ngAnnotate = require('gulp-ng-annotate');
 
-var appDir = 'test/app/'
-var distDir = 'test/dist/'
-var tmpDir = 'test/.tmp/'
+var appDir = 'test/app/';
+var distDir = 'test/dist/';
+var tmpDir = 'test/.tmp/';
 
-var componentSrcDir  = 'src/'
-var componentDistDir = 'dist/'
+var componentSrcDir  = 'src/';
+var componentDistDir = 'dist/';
 
 // for deployment
 var env             = (process.env.NODE_ENV || 'development').toLowerCase();
@@ -84,7 +84,7 @@ gulp.task('bower-fonts', function() {
   ])
     .pipe(gulp.dest(tmpDir+'/fonts'))
     .pipe($.size());
-})
+});
 
 // CoffeeScript
 gulp.task('coffee', function() {
@@ -196,7 +196,7 @@ gulp.task('base-tmpl', function() {
     .pipe(jadeify())
     .pipe(injectGlobals())
     .pipe($.inject($.bowerFiles({
-      paths: {bowerJson: "test/bower.json"},
+      paths: {bowerJson: 'test/bower.json'},
       read: false
     }), {
       ignorePath: [appDir],
@@ -262,13 +262,13 @@ gulp.task('useref', function () {
 gulp.task('replace', function() {
   var manifest = require('./'+tmpDir+'rev-manifest');
 
-  var patterns = []
+  var patterns = [];
   for (var k in manifest) {
     patterns.push({
       pattern: k,
       replacement: manifest[k]
     });
-  };
+  }
 
   return gulp.src([
     distDir+'/*.html',
@@ -299,7 +299,6 @@ gulp.task('cdnize', function() {
 
 // Deployment
 gulp.task('s3', function() {
-  var envName = (process.env.NODE_ENV || 'development').toLowerCase();
   var headers = {
     'Cache-Control': 'max-age=315360000, no-transform, public'
   };
@@ -352,7 +351,6 @@ gulp.task('test:e2e', ['protractor'], function() {
 // Watch
 gulp.task('watch', function () {
   var lr      = require('tiny-lr')();
-  var nodemon = require('gulp-nodemon');
 
   // start node server
   $.nodemon({
@@ -398,8 +396,8 @@ gulp.task('watch', function () {
   gulp.watch(componentSrcDir+'**/*.coffee', ['component-coffee']);
 
   // Watch .jade files
-  gulp.watch(appDir+'index.jade', ['base-tmpl'])
-  gulp.watch(appDir+'views/**/*.jade', ['reload-js-tmpl'])
+  gulp.watch(appDir+'index.jade', ['base-tmpl']);
+  gulp.watch(appDir+'views/**/*.jade', ['reload-js-tmpl']);
 
   // Watch image files
   gulp.watch(appDir+'images/**/*', ['images']);
@@ -445,7 +443,7 @@ gulp.task('build-prod', function(cb) {
 
 gulp.task('deploy', function(cb) {
   if (!process.env.NODE_ENV) {
-    throw 'Error: you forgot to set NODE_ENV'
+    throw 'Error: you forgot to set NODE_ENV';
   }
   seq('build-prod', 'push', cb);
 });
