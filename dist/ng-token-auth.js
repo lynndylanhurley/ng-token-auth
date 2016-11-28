@@ -528,6 +528,10 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
                   };
                 })(this), (function(_this) {
                   return function(resp) {
+                    if (resp.data == null) {
+                      $rootScope.$broadcast('auth:connection-error', '');
+                      return;
+                    }
                     if (_this.firstTimeLogin) {
                       $rootScope.$broadcast('auth:email-confirmation-error', resp.data);
                     }
