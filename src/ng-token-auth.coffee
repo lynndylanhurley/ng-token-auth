@@ -590,7 +590,7 @@ angular.module('ng-token-auth', ['ipCookie'])
                 , (resp) =>
                   # Token cannot be destroyed if no connection
                   unless resp.data?
-                    $rootScope.$broadcast('auth:connection-error', '')
+                    $rootScope.$broadcast('auth:connection-error', 'Check your Internet connection')
                     return
 
                   # broadcast event for first time login failure
