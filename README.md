@@ -64,6 +64,7 @@ This project comes bundled with a test app. You can run the demo locally by foll
   * [`auth:account-destroy-success`](#authaccount-destroy-success)
   * [`auth:account-destroy-error`](#authaccount-destroy-error)
   * [`auth:session-expired`](#authsession-expired)
+  * [`auth:connection-error`](#authconnection-error)
 * [Using alternate response formats](#using-alternate-response-formats)
 * [Multiple user types](#using-multiple-user-types)
 * [File uploads](#file-uploads)
