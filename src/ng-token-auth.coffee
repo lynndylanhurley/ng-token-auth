@@ -775,7 +775,7 @@ angular.module('ng-token-auth', ['ipCookie'])
           # failed login. invalidate auth header and reject promise.
           # defered object must be destroyed after reflow.
           rejectDfd: (reason, invalidateTokens = yes) ->
-            @invalidateTokens() if invalidateTokens
+            @invalidateTokens() if invalidateTokens is yes
             if @dfd?
               @dfd.reject(reason)
 

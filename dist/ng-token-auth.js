@@ -702,7 +702,7 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
               if (invalidateTokens == null) {
                 invalidateTokens = true;
               }
-              if (invalidateTokens) {
+              if (invalidateTokens === true) {
                 this.invalidateTokens();
               }
               if (this.dfd != null) {
