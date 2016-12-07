@@ -538,7 +538,7 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
                     _this.rejectDfd({
                       reason: 'unauthorized',
                       errors: resp.data != null ? resp.data.errors : ['Unspecified error']
-                    }, resp.data != null);
+                    }, resp.status > 0);
                     return $q.reject(resp);
                   };
                 })(this));

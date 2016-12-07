@@ -602,7 +602,7 @@ angular.module('ng-token-auth', ['ipCookie'])
                     reason: 'unauthorized'
                     errors: if resp.data? then resp.data.errors else ['Unspecified error']
                   ,
-                    resp.data?
+                    resp.status > 0
                   )
 
                   $q.reject(resp)
