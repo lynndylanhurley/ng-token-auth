@@ -295,7 +295,7 @@ angular.module('ngTokenAuthTestApp')
 ~~~
 
 ###$auth.authenticateAccessToken
-Authenticate with Oauth2 access token obtained by client-side SDK. This method accepts 2 arguments:
+Authenticate with Oauth2 access token obtained by client-side SDK. This method accepts 3 arguments:
 
 * **provider**: a string that is also the name of the target provider service.
 * **accessToken**: an access token string.
