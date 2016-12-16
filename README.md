@@ -32,6 +32,7 @@ This project comes bundled with a test app. You can run the demo locally by foll
 * [Configuration](#configuration)
 * [API](#api)
   * [`$auth.authenticate`](#authauthenticate)
+  * [`$auth.authenticateAccessToken`](#authauthenticateAccessToken)
   * [`$auth.validateUser`](#authvalidateuser)
   * [`$auth.submitRegistration`](#authsubmitregistration)
   * [`$auth.submitLogin`](#authsubmitlogin)
@@ -166,7 +167,8 @@ angular.module('myApp', ['ng-token-auth'])
       authProviderPaths: {
         github:   '/auth/github',
         facebook: '/auth/facebook',
-        google:   '/auth/google'
+        google:   '/auth/google',
+        facebookAccessToken: '/auth/facebook_access_token'
       },
       tokenFormat: {
         "access-token": "{{ token }}",
@@ -290,6 +292,49 @@ angular.module('ngTokenAuthTestApp')
 <button ng-click="authenticate('github')">
   Sign in with Github
 </button>
+~~~
+
+###$auth.authenticateAccessToken
+Authenticate with Oauth2 access token obtained by client-side SDK. This method accepts 2 arguments:
+
+* **provider**: a string that is also the name of the target provider service.
+* **accessToken**: an access token string.
+For example, to authenticate using facebook access token: 
+  ~~~javascript
+  $auth.authenticateAccessToken('facebookAccessToken', 'this-is-a-token...')
+  ~~~
+
+* **options**: _(optional)_ an object containing the following params:
+  *  **params**: additional params to be passed to the OAuth provider. For example, to pass the user's favorite color on sign up:
+
+     ~~~javascript
+     $auth.authenticateAccessToken('facebookAccessToken', 'this-is-a-token...', {params: {favorite_color: 'green'}})
+     ~~~
+
+This method emits the following events:
+
+* [`auth:login-success`](#authlogin-success)
+* [`auth:login-error`](#authlogin-error)
+* [`auth:oauth-registration`](#authoauth-registration)
+
+#### Example use in a controller, with token obtained by $cordovaFacebook
+~~~javascript
+angular.module('ngTokenAuthTestApp')
+  .controller('IndexCtrl', function($scope, $auth) {
+    $scope.handleBtnClick = function() {
+      $cordovaFacebook.login(["public_profile", "email", "user_friends"])
+        .then(function(resp) {
+          accessToken = resp.authResponse.accessToken
+          $auth.authenticateAccessToken('facebookAccessToken', accessToken)
+            .then(function(resp) {
+              // handle success
+            })
+            .catch(function(resp) {
+              // handle errors
+            });
+        });
+    };
+  });
 ~~~
 
 ###$auth.validateUser
@@ -645,6 +690,7 @@ Broadcast after successful user authentication. Event message contains the user 
 
 * [`$auth.submitLogin`](#authsubmitlogin)
 * [`$auth.authenticate`](#authauthenticate)
+* [`$auth.authenticateAccessToken`](#authauthenticateAccessToken)
 
 ##### Example:
 ~~~javascript
@@ -658,6 +704,7 @@ Broadcast after user fails authentication. This event is broadcast by the follow
 
 * [`$auth.submitLogin`](#authsubmitlogin)
 * [`$auth.authenticate`](#authauthenticate)
+* [`$auth.authenticateAccessToken`](#authauthenticateAccessToken)
 
 ##### Example:
 ~~~javascript
@@ -670,6 +717,7 @@ $rootScope.$on('auth:login-error', function(ev, reason) {
 Broadcast when the message posted after an oauth login as the new_record attribute set to `true`. This event is broadcast by the following methods:
 
 * [`$auth.authenticate`](#authauthenticate)
+* [`$auth.authenticateAccessToken`](#authauthenticateAccessToken)
 
 ##### Example:
 ~~~javascript
@@ -990,7 +1038,8 @@ $authProvider.configure([
       authProviderPaths: {
         github:    '/auth/github',
         facebook:  '/auth/facebook',
-        google:    '/auth/google_oauth2'
+        google:    '/auth/google_oauth2',
+        facebookAccessToken: '/auth/facebook_access_token'
       }
     }
   }, {
@@ -1008,7 +1057,8 @@ $authProvider.configure([
       authProviderPaths: {
         github:    '/evil_user_auth/github',
         facebook:  '/evil_user_auth/facebook',
-        google:    '/evil_user_auth/google_oauth2'
+        google:    '/evil_user_auth/google_oauth2',
+        facebookAccessToken: '/evil_user_auth/facebook_access_token'
       }
     }
   }
@@ -1020,6 +1070,7 @@ $authProvider.configure([
 The following API methods accept a `config` option that can be used to specify the desired configuration.
 
 * [`$auth.authenticate`](#authauthenticate)
+* [`$auth.authenticateAccessToken`](#authauthenticateAccessToken)
 * [`$auth.validateUser`](#authvalidateuser)
 * [`$auth.submitRegistration`](#authsubmitregistration)
 * [`$auth.submitLogin`](#authsubmitlogin)
@@ -1034,6 +1085,14 @@ The first available configuration will be used if none is provided (`default` in
 ~~~javascript
 // OAuth
 $auth.authenticate('github', {
+  config: 'evilUser',
+  params: {
+    favorite_color: $scope.favoriteColor
+  }
+});
+
+// OAuth Access Token
+$auth.authenticateAccessToken('facebookAccessToken', 'this-is-access-token', {
   config: 'evilUser',
   params: {
     favorite_color: $scope.favoriteColor
