@@ -32,7 +32,7 @@ This project comes bundled with a test app. You can run the demo locally by foll
 * [Configuration](#configuration)
 * [API](#api)
   * [`$auth.authenticate`](#authauthenticate)
-  * [`$auth.authenticateAccessToken`](#authauthenticateAccessToken)
+  * [`$auth.authenticateAccessToken`](#authauthenticateaccesstoken)
   * [`$auth.validateUser`](#authvalidateuser)
   * [`$auth.submitRegistration`](#authsubmitregistration)
   * [`$auth.submitLogin`](#authsubmitlogin)
