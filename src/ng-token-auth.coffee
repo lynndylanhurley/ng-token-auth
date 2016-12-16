@@ -52,6 +52,7 @@ angular.module('ng-token-auth', ['ipCookie'])
           github:    '/auth/github'
           facebook:  '/auth/facebook'
           google:    '/auth/google_oauth2'
+          facebookAccessToken:  '/auth/facebook_access_token'
 
 
     defaultConfigName = "default"
@@ -318,6 +319,28 @@ angular.module('ng-token-auth', ['ipCookie'])
               @initDfd()
               @openAuthWindow(provider, opts)
 
+            @dfd.promise
+
+
+          authenticateAccessToken: (provider, accessToken, opts={}) ->
+            unless @dfd?
+              @setConfigName(opts.config)
+              @initDfd()
+
+            params = angular.extend({access_token: accessToken}, opts.params || {})
+            $http.get(@apiUrl(opts.config) + @getConfig(opts.config).authProviderPaths[provider] + '/callback', {params: params})
+                .then((resp) =>
+                  ev = resp.data
+                  ev.data.message = 'deliverCredentials'
+                  @handlePostMessage(ev)
+                , (resp) =>
+                  @rejectDfd({
+                    reason: 'unauthorized'
+                    errors: ['Invalid token']
+                  })
+                  $rootScope.$broadcast('auth:login-error', resp.data)
+                  $q.reject(resp)
+                )
             @dfd.promise
 
 

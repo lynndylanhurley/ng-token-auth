@@ -60,7 +60,8 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
       authProviderPaths: {
         github: '/auth/github',
         facebook: '/auth/facebook',
-        google: '/auth/google_oauth2'
+        google: '/auth/google_oauth2',
+        facebookAccessToken: '/auth/facebook_access_token'
       }
     }
   };
@@ -298,6 +299,39 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
                 this.initDfd();
                 this.openAuthWindow(provider, opts);
               }
+              return this.dfd.promise;
+            },
+            authenticateAccessToken: function(provider, accessToken, opts) {
+              var params;
+              if (opts == null) {
+                opts = {};
+              }
+              if (this.dfd == null) {
+                this.setConfigName(opts.config);
+                this.initDfd();
+              }
+              params = angular.extend({
+                access_token: accessToken
+              }, opts.params || {});
+              $http.get(this.apiUrl(opts.config) + this.getConfig(opts.config).authProviderPaths[provider] + '/callback', {
+                params: params
+              }).then((function(_this) {
+                return function(resp) {
+                  var ev;
+                  ev = resp.data;
+                  ev.data.message = 'deliverCredentials';
+                  return _this.handlePostMessage(ev);
+                };
+              })(this), (function(_this) {
+                return function(resp) {
+                  _this.rejectDfd({
+                    reason: 'unauthorized',
+                    errors: ['Invalid token']
+                  });
+                  $rootScope.$broadcast('auth:login-error', resp.data);
+                  return $q.reject(resp);
+                };
+              })(this));
               return this.dfd.promise;
             },
             setConfigName: function(configName) {

@@ -26,6 +26,7 @@ angular.module('ngTokenAuthTestApp', [
           facebook:  '/auth/facebook'
           google:    '/auth/google_oauth2'
           developer: '/auth/developer'
+          facebookAccessToken: '/auth/facebook_access_token'
     ,
       evilUser:
         apiUrl:                CONFIG.apiUrl
