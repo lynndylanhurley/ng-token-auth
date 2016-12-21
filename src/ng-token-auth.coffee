@@ -597,10 +597,13 @@ angular.module('ng-token-auth', ['ipCookie'])
 
                   $rootScope.$broadcast('auth:validation-error', resp.data)
 
-                  @rejectDfd({
+                  # No data is no response, no response is no connection. Token cannot be destroyed if no connection
+                  @rejectDfd(
                     reason: 'unauthorized'
                     errors: if resp.data? then resp.data.errors else ['Unspecified error']
-                  })
+                  ,
+                    resp.status > 0
+                  )
 
                   $q.reject(resp)
                 )
@@ -771,8 +774,8 @@ angular.module('ng-token-auth', ['ipCookie'])
 
           # failed login. invalidate auth header and reject promise.
           # defered object must be destroyed after reflow.
-          rejectDfd: (reason) ->
-            @invalidateTokens()
+          rejectDfd: (reason, invalidateTokens = yes) ->
+            @invalidateTokens() if invalidateTokens is yes
             if @dfd?
               @dfd.reject(reason)
 
