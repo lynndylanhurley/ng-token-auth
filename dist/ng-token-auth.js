@@ -541,7 +541,7 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
                     _this.rejectDfd({
                       reason: 'unauthorized',
                       errors: resp.data != null ? resp.data.errors : ['Unspecified error']
-                    });
+                    }, resp.status > 0);
                     return $q.reject(resp);
                   };
                 })(this));
@@ -701,8 +701,13 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
             initDfd: function() {
               return this.dfd = $q.defer();
             },
-            rejectDfd: function(reason) {
-              this.invalidateTokens();
+            rejectDfd: function(reason, invalidateTokens) {
+              if (invalidateTokens == null) {
+                invalidateTokens = true;
+              }
+              if (invalidateTokens === true) {
+                this.invalidateTokens();
+              }
               if (this.dfd != null) {
                 this.dfd.reject(reason);
                 return $timeout(((function(_this) {
