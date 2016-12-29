@@ -1,3 +1,5 @@
+var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+
 if (typeof module !== 'undefined' && typeof exports !== 'undefined' && module.exports === exports) {
   module.exports = 'ng-token-auth';
 }
@@ -24,6 +26,7 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
       proxyIf: function() {
         return false;
       },
+      ifModifiedSince: true,
       proxyUrl: '/proxy',
       validateOnPageLoad: true,
       omniauthWindowType: 'sameWindow',
@@ -787,7 +790,7 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
   };
 }).config([
   '$httpProvider', function($httpProvider) {
-    var httpMethods, tokenIsCurrent, updateHeadersFromResponse;
+    var addIfModifiedSince, httpMethods, tokenIsCurrent, updateHeadersFromResponse;
     tokenIsCurrent = function($auth, headers) {
       var newTokenExpiry, oldTokenExpiry;
       oldTokenExpiry = Number($auth.getExpiry());
@@ -808,22 +811,32 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
         return $auth.setAuthHeaders(newHeaders);
       }
     };
-    $httpProvider.interceptors.push([
+    httpMethods = ['get', 'post', 'put', 'patch', 'delete'];
+    addIfModifiedSince = function($auth, req) {
+      var _ref;
+      if (_ref = req.method.toLowerCase(), __indexOf.call(httpMethods, _ref) < 0) {
+        return req;
+      }
+      if ($auth.getConfig().ifModifiedSince) {
+        req.headers['If-Modified-Since'] = 'Mon, 26 Jul 1997 05:00:00 GMT';
+      }
+      return req;
+    };
+    return $httpProvider.interceptors.push([
       '$injector', function($injector) {
         return {
           request: function(req) {
             $injector.invoke([
               '$http', '$auth', function($http, $auth) {
-                var key, val, _ref, _results;
+                var key, val, _ref;
                 if (req.url.match($auth.apiUrl())) {
                   _ref = $auth.retrieveData('auth_headers');
-                  _results = [];
                   for (key in _ref) {
                     val = _ref[key];
-                    _results.push(req.headers[key] = val);
+                    req.headers[key] = val;
                   }
-                  return _results;
                 }
+                return req = addIfModifiedSince($auth, req);
               }
             ]);
             return req;
@@ -851,14 +864,6 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
         };
       }
     ]);
-    httpMethods = ['get', 'post', 'put', 'patch', 'delete'];
-    return angular.forEach(httpMethods, function(method) {
-      var _base;
-      if ((_base = $httpProvider.defaults.headers)[method] == null) {
-        _base[method] = {};
-      }
-      return $httpProvider.defaults.headers[method]['If-Modified-Since'] = 'Mon, 26 Jul 1997 05:00:00 GMT';
-    });
   }
 ]).run([
   '$auth', '$window', '$rootScope', function($auth, $window, $rootScope) {

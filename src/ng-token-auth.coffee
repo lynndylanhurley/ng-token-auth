@@ -17,6 +17,7 @@ angular.module('ng-token-auth', ['ipCookie'])
         passwordResetSuccessUrl: -> window.location.href
         tokenValidationPath:     '/auth/validate_token'
         proxyIf:                 -> false
+        ifModifiedSince:         true
         proxyUrl:                '/proxy'
         validateOnPageLoad:      true
         omniauthWindowType:      'sameWindow'
@@ -891,6 +892,17 @@ angular.module('ng-token-auth', ['ipCookie'])
       if tokenIsCurrent($auth, newHeaders)
         $auth.setAuthHeaders(newHeaders)
 
+    # define http methods that may need to carry auth headers
+    httpMethods = ['get', 'post', 'put', 'patch', 'delete']
+
+    addIfModifiedSince = ($auth, req) ->
+      return req unless req.method.toLowerCase() in httpMethods
+
+      if $auth.getConfig().ifModifiedSince
+        req.headers['If-Modified-Since'] = 'Mon, 26 Jul 1997 05:00:00 GMT'
+
+      req
+
     # this is ugly...
     # we need to configure an interceptor (must be done in the configuration
     # phase), but we need access to the $http service, which is only available
@@ -903,6 +915,7 @@ angular.module('ng-token-auth', ['ipCookie'])
           if req.url.match($auth.apiUrl())
             for key, val of $auth.retrieveData('auth_headers')
               req.headers[key] = val
+          req = addIfModifiedSince($auth, req)
         ]
 
         return req
@@ -923,15 +936,6 @@ angular.module('ng-token-auth', ['ipCookie'])
 
         return $injector.get('$q').reject(resp)
     ]
-
-    # define http methods that may need to carry auth headers
-    httpMethods = ['get', 'post', 'put', 'patch', 'delete']
-
-    # disable IE ajax request caching for each of the necessary http methods
-    angular.forEach(httpMethods, (method) ->
-      $httpProvider.defaults.headers[method] ?= {}
-      $httpProvider.defaults.headers[method]['If-Modified-Since'] = 'Mon, 26 Jul 1997 05:00:00 GMT'
-    )
   ])
 
   .run(['$auth', '$window', '$rootScope', ($auth, $window, $rootScope) ->

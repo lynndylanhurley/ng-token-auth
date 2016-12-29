@@ -21,6 +21,9 @@ suite 'configuration', ->
     test 'apiUrl has been changed', ->
       assert.equal apiUrl, $auth.getConfig().apiUrl
 
+    test '$auth has enabled ifModifiedSince', ->
+      assert.equal true, $auth.getConfig().ifModifiedSince
+
     test '$auth proxies to proxy url', ->
       assert.equal '/proxy', $auth.apiUrl()
 
