@@ -754,6 +754,7 @@ angular.module('ng-token-auth', ['ipCookie'])
 
           initDfd: ->
             @dfd = $q.defer()
+            @dfd.promise.then angular.noop, angular.noop
 
           # failed login. invalidate auth header and reject promise.
           # defered object must be destroyed after reflow.
