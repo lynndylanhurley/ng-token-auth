@@ -522,11 +522,10 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
                       $rootScope.$broadcast('auth:password-reset-confirm-error', resp.data);
                     }
                     $rootScope.$broadcast('auth:validation-error', resp.data);
-                    _this.rejectDfd({
+                    return _this.rejectDfd({
                       reason: 'unauthorized',
                       errors: resp.data != null ? resp.data.errors : ['Unspecified error']
                     }, resp.status > 0);
-                    return $q.reject(resp);
                   };
                 })(this));
               } else {

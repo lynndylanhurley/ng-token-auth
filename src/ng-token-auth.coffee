@@ -591,7 +591,6 @@ angular.module('ng-token-auth', ['ipCookie'])
                     resp.status > 0
                   )
 
-                  $q.reject(resp)
                 )
             else
               @rejectDfd({
