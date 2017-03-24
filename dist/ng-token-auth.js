@@ -182,11 +182,9 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
                 config_name: this.getCurrentConfigName(opts.config)
               });
               return $http.post(this.apiUrl(opts.config) + this.getConfig(opts.config).emailRegistrationPath, params).then(function(resp) {
-                $rootScope.$broadcast('auth:registration-email-success', params);
-                return resp;
+                return $rootScope.$broadcast('auth:registration-email-success', params);
               }, function(resp) {
-                $rootScope.$broadcast('auth:registration-email-error', resp.data);
-                return $q.reject(resp);
+                return $rootScope.$broadcast('auth:registration-email-error', resp.data);
               });
             },
             submitLogin: function(params, opts, httpopts) {
@@ -203,8 +201,7 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
                   _this.setConfigName(opts.config);
                   authData = _this.getConfig(opts.config).handleLoginResponse(resp.data, _this);
                   _this.handleValidAuth(authData);
-                  $rootScope.$broadcast('auth:login-success', _this.user);
-                  return resp;
+                  return $rootScope.$broadcast('auth:login-success', _this.user);
                 };
               })(this), (function(_this) {
                 return function(resp) {
@@ -212,8 +209,7 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
                     reason: 'unauthorized',
                     errors: ['Invalid credentials']
                   });
-                  $rootScope.$broadcast('auth:login-error', resp.data);
-                  return $q.reject(resp);
+                  return $rootScope.$broadcast('auth:login-error', resp.data);
                 };
               })(this));
               return this.dfd.promise;
@@ -232,23 +228,19 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
                 params.config_name = opts.config;
               }
               return $http.post(this.apiUrl(opts.config) + this.getConfig(opts.config).passwordResetPath, params).then(function(resp) {
-                $rootScope.$broadcast('auth:password-reset-request-success', params);
-                return resp;
+                return $rootScope.$broadcast('auth:password-reset-request-success', params);
               }, function(resp) {
-                $rootScope.$broadcast('auth:password-reset-request-error', resp.data);
-                return $q.reject(resp);
+                return $rootScope.$broadcast('auth:password-reset-request-error', resp.data);
               });
             },
             updatePassword: function(params) {
               return $http.put(this.apiUrl() + this.getConfig().passwordUpdatePath, params).then((function(_this) {
                 return function(resp) {
                   $rootScope.$broadcast('auth:password-change-success', resp.data);
-                  _this.mustResetPassword = false;
-                  return resp;
+                  return _this.mustResetPassword = false;
                 };
               })(this), function(resp) {
-                $rootScope.$broadcast('auth:password-change-error', resp.data);
-                return $q.reject(resp);
+                return $rootScope.$broadcast('auth:password-change-error', resp.data);
               });
             },
             updateAccount: function(params) {
@@ -269,24 +261,20 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
                     }
                     _this.setAuthHeaders(newHeaders);
                   }
-                  $rootScope.$broadcast('auth:account-update-success', resp.data);
-                  return resp;
+                  return $rootScope.$broadcast('auth:account-update-success', resp.data);
                 };
               })(this), function(resp) {
-                $rootScope.$broadcast('auth:account-update-error', resp.data);
-                return $q.reject(resp);
+                return $rootScope.$broadcast('auth:account-update-error', resp.data);
               });
             },
             destroyAccount: function(params) {
               return $http["delete"](this.apiUrl() + this.getConfig().accountUpdatePath, params).then((function(_this) {
                 return function(resp) {
                   _this.invalidateTokens();
-                  $rootScope.$broadcast('auth:account-destroy-success', resp.data);
-                  return resp;
+                  return $rootScope.$broadcast('auth:account-destroy-success', resp.data);
                 };
               })(this), function(resp) {
-                $rootScope.$broadcast('auth:account-destroy-error', resp.data);
-                return $q.reject(resp);
+                return $rootScope.$broadcast('auth:account-destroy-error', resp.data);
               });
             },
             authenticate: function(provider, opts) {
@@ -523,8 +511,7 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
                     if (_this.mustResetPassword) {
                       $rootScope.$broadcast('auth:password-reset-confirm-success', _this.user);
                     }
-                    $rootScope.$broadcast('auth:validation-success', _this.user);
-                    return _this.user;
+                    return $rootScope.$broadcast('auth:validation-success', _this.user);
                   };
                 })(this), (function(_this) {
                   return function(resp) {
@@ -535,11 +522,10 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
                       $rootScope.$broadcast('auth:password-reset-confirm-error', resp.data);
                     }
                     $rootScope.$broadcast('auth:validation-error', resp.data);
-                    _this.rejectDfd({
+                    return _this.rejectDfd({
                       reason: 'unauthorized',
                       errors: resp.data != null ? resp.data.errors : ['Unspecified error']
                     }, resp.status > 0);
-                    return $q.reject(resp);
                   };
                 })(this));
               } else {
@@ -575,14 +561,12 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
               return $http["delete"](this.apiUrl() + this.getConfig().signOutUrl).then((function(_this) {
                 return function(resp) {
                   _this.invalidateTokens();
-                  $rootScope.$broadcast('auth:logout-success');
-                  return resp;
+                  return $rootScope.$broadcast('auth:logout-success');
                 };
               })(this), (function(_this) {
                 return function(resp) {
                   _this.invalidateTokens();
-                  $rootScope.$broadcast('auth:logout-error', resp.data);
-                  return $q.reject(resp);
+                  return $rootScope.$broadcast('auth:logout-error', resp.data);
                 };
               })(this));
             },

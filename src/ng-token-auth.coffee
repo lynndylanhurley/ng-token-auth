@@ -205,10 +205,8 @@ angular.module('ng-token-auth', ['ipCookie'])
             $http.post(@apiUrl(opts.config) + @getConfig(opts.config).emailRegistrationPath, params)
               .then((resp)->
                 $rootScope.$broadcast('auth:registration-email-success', params)
-                resp
               , (resp) ->
                 $rootScope.$broadcast('auth:registration-email-error', resp.data)
-                $q.reject(resp)
               )
 
 
@@ -221,14 +219,12 @@ angular.module('ng-token-auth', ['ipCookie'])
                 authData = @getConfig(opts.config).handleLoginResponse(resp.data, @)
                 @handleValidAuth(authData)
                 $rootScope.$broadcast('auth:login-success', @user)
-                resp
               , (resp) =>
                 @rejectDfd({
                   reason: 'unauthorized'
                   errors: ['Invalid credentials']
                 })
                 $rootScope.$broadcast('auth:login-error', resp.data)
-                $q.reject(resp)
               )
             @dfd.promise
 
@@ -250,10 +246,8 @@ angular.module('ng-token-auth', ['ipCookie'])
             $http.post(@apiUrl(opts.config) + @getConfig(opts.config).passwordResetPath, params)
               .then((resp) ->
                 $rootScope.$broadcast('auth:password-reset-request-success', params)
-                resp
               , (resp) ->
                 $rootScope.$broadcast('auth:password-reset-request-error', resp.data)
-                $q.reject(resp)
               )
 
 
@@ -263,10 +257,8 @@ angular.module('ng-token-auth', ['ipCookie'])
               .then((resp) =>
                 $rootScope.$broadcast('auth:password-change-success', resp.data)
                 @mustResetPassword = false
-                resp
               , (resp) ->
                 $rootScope.$broadcast('auth:password-change-error', resp.data)
-                $q.reject(resp)
               )
 
 
@@ -274,7 +266,6 @@ angular.module('ng-token-auth', ['ipCookie'])
           updateAccount: (params) ->
             $http.put(@apiUrl() + @getConfig().accountUpdatePath, params)
               .then((resp) =>
-
                 updateResponse = @getConfig().handleAccountUpdateResponse(resp.data)
                 curHeaders = @retrieveData('auth_headers')
 
@@ -290,10 +281,8 @@ angular.module('ng-token-auth', ['ipCookie'])
                   @setAuthHeaders(newHeaders)
 
                 $rootScope.$broadcast('auth:account-update-success', resp.data)
-                resp
               , (resp) ->
                 $rootScope.$broadcast('auth:account-update-error', resp.data)
-                $q.reject(resp)
               )
 
 
@@ -303,10 +292,8 @@ angular.module('ng-token-auth', ['ipCookie'])
               .then((resp) =>
                 @invalidateTokens()
                 $rootScope.$broadcast('auth:account-destroy-success', resp.data)
-                resp
               , (resp) ->
                 $rootScope.$broadcast('auth:account-destroy-error', resp.data)
-                $q.reject(resp)
               )
 
 
@@ -585,7 +572,6 @@ angular.module('ng-token-auth', ['ipCookie'])
                     $rootScope.$broadcast('auth:password-reset-confirm-success', @user)
 
                   $rootScope.$broadcast('auth:validation-success', @user)
-                  @user
 
                 , (resp) =>
                   # broadcast event for first time login failure
@@ -654,11 +640,9 @@ angular.module('ng-token-auth', ['ipCookie'])
               .then((resp) =>
                 @invalidateTokens()
                 $rootScope.$broadcast('auth:logout-success')
-                resp
               , (resp) =>
                 @invalidateTokens()
                 $rootScope.$broadcast('auth:logout-error', resp.data)
-                $q.reject(resp)
               )
 
 
@@ -770,7 +754,6 @@ angular.module('ng-token-auth', ['ipCookie'])
 
           initDfd: ->
             @dfd = $q.defer()
-
 
           # failed login. invalidate auth header and reject promise.
           # defered object must be destroyed after reflow.
