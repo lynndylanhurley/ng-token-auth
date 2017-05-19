@@ -1369,7 +1369,7 @@ Just send a pull request. You will be granted commit access if you send quality 
 
 # Alternatives
 
-###[Satellizer](https://github.com/sahat/satellizer)
+### [Satellizer](https://github.com/sahat/satellizer)
 
 Satellizer occupies the same problem domain as ng-token-auth. Advantages of ng-token-auth (at the time of this writing) include:
   * [Events](#events).
