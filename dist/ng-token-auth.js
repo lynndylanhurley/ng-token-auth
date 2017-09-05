@@ -215,7 +215,7 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
                   $rootScope.$broadcast('auth:login-error', resp.data);
                   return $q.reject(resp);
                 };
-              })(this));
+              })(this))["catch"](angular.noop);
               return this.dfd.promise;
             },
             userIsAuthenticated: function() {

@@ -229,7 +229,7 @@ angular.module('ng-token-auth', ['ipCookie'])
                 })
                 $rootScope.$broadcast('auth:login-error', resp.data)
                 $q.reject(resp)
-              )
+              ).catch(angular.noop)
             @dfd.promise
 
 
