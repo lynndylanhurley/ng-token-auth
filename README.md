@@ -321,7 +321,7 @@ angular.module('myApp', [
   'ui.router',
   'ng-token-auth'
 ])
-  .config(function($stateProvider) {
+  .config(function($stateProvider, $auth) {
     $stateProvider
       // this state will be visible to everyone
       .state('index', {
