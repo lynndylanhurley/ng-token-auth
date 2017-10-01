@@ -157,7 +157,7 @@ angular.module('myApp', ['ng-token-auth'])
       passwordUpdatePath:      '/auth/password',
       passwordResetSuccessUrl: window.location.href,
       emailSignInPath:         '/auth/sign_in',
-      storage:                 'cookies',
+      storage:                 'localStorage',
       forceValidateToken:      false,
       validateOnPageLoad:      true,
       proxyIf:                 function() { return false; },
