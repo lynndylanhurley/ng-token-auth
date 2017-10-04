@@ -172,7 +172,7 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
               }
             },
             submitRegistration: function(params, opts) {
-              var successUrl;
+              var request, successUrl;
               if (opts == null) {
                 opts = {};
               }
@@ -181,11 +181,13 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
                 confirm_success_url: successUrl,
                 config_name: this.getCurrentConfigName(opts.config)
               });
-              return $http.post(this.apiUrl(opts.config) + this.getConfig(opts.config).emailRegistrationPath, params).then(function(resp) {
+              request = $http.post(this.apiUrl(opts.config) + this.getConfig(opts.config).emailRegistrationPath, params);
+              request.then(function(resp) {
                 return $rootScope.$broadcast('auth:registration-email-success', params);
               }, function(resp) {
                 return $rootScope.$broadcast('auth:registration-email-error', resp.data);
               });
+              return request;
             },
             submitLogin: function(params, opts, httpopts) {
               if (opts == null) {
@@ -218,7 +220,7 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
               return this.retrieveData('auth_headers') && this.user.signedIn && !this.tokenHasExpired();
             },
             requestPasswordReset: function(params, opts) {
-              var successUrl;
+              var request, successUrl;
               if (opts == null) {
                 opts = {};
               }
@@ -227,14 +229,18 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
               if (opts.config != null) {
                 params.config_name = opts.config;
               }
-              return $http.post(this.apiUrl(opts.config) + this.getConfig(opts.config).passwordResetPath, params).then(function(resp) {
+              request = $http.post(this.apiUrl(opts.config) + this.getConfig(opts.config).passwordResetPath, params);
+              request.then(function(resp) {
                 return $rootScope.$broadcast('auth:password-reset-request-success', params);
               }, function(resp) {
                 return $rootScope.$broadcast('auth:password-reset-request-error', resp.data);
               });
+              return request;
             },
             updatePassword: function(params) {
-              return $http.put(this.apiUrl() + this.getConfig().passwordUpdatePath, params).then((function(_this) {
+              var request;
+              request = $http.put(this.apiUrl() + this.getConfig().passwordUpdatePath, params);
+              request.then((function(_this) {
                 return function(resp) {
                   $rootScope.$broadcast('auth:password-change-success', resp.data);
                   return _this.mustResetPassword = false;
@@ -242,9 +248,12 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
               })(this), function(resp) {
                 return $rootScope.$broadcast('auth:password-change-error', resp.data);
               });
+              return request;
             },
             updateAccount: function(params) {
-              return $http.put(this.apiUrl() + this.getConfig().accountUpdatePath, params).then((function(_this) {
+              var request;
+              request = $http.put(this.apiUrl() + this.getConfig().accountUpdatePath, params);
+              request.then((function(_this) {
                 return function(resp) {
                   var curHeaders, key, newHeaders, updateResponse, val, _ref;
                   updateResponse = _this.getConfig().handleAccountUpdateResponse(resp.data);
@@ -266,9 +275,12 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
               })(this), function(resp) {
                 return $rootScope.$broadcast('auth:account-update-error', resp.data);
               });
+              return request;
             },
             destroyAccount: function(params) {
-              return $http["delete"](this.apiUrl() + this.getConfig().accountUpdatePath, params).then((function(_this) {
+              var request;
+              request = $http["delete"](this.apiUrl() + this.getConfig().accountUpdatePath, params);
+              request.then((function(_this) {
                 return function(resp) {
                   _this.invalidateTokens();
                   return $rootScope.$broadcast('auth:account-destroy-success', resp.data);
@@ -276,6 +288,7 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
               })(this), function(resp) {
                 return $rootScope.$broadcast('auth:account-destroy-error', resp.data);
               });
+              return request;
             },
             authenticate: function(provider, opts) {
               if (opts == null) {
@@ -558,7 +571,9 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
               return this.deleteData('auth_headers');
             },
             signOut: function() {
-              return $http["delete"](this.apiUrl() + this.getConfig().signOutUrl).then((function(_this) {
+              var request;
+              request = $http["delete"](this.apiUrl() + this.getConfig().signOutUrl);
+              request.then((function(_this) {
                 return function(resp) {
                   _this.invalidateTokens();
                   return $rootScope.$broadcast('auth:logout-success');
@@ -569,6 +584,7 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
                   return $rootScope.$broadcast('auth:logout-error', resp.data);
                 };
               })(this));
+              return request;
             },
             handleValidAuth: function(user, setHeader) {
               if (setHeader == null) {
