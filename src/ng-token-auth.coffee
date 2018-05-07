@@ -202,14 +202,14 @@ angular.module('ng-token-auth', ['ipCookie'])
               confirm_success_url: successUrl,
               config_name: @getCurrentConfigName(opts.config)
             })
-            $http.post(@apiUrl(opts.config) + @getConfig(opts.config).emailRegistrationPath, params)
+            request = $http.post(@apiUrl(opts.config) + @getConfig(opts.config).emailRegistrationPath, params)
+            request
               .then((resp)->
                 $rootScope.$broadcast('auth:registration-email-success', params)
-                resp
               , (resp) ->
                 $rootScope.$broadcast('auth:registration-email-error', resp.data)
-                $q.reject(resp)
               )
+            request
 
 
           # capture input from user, authenticate serverside
@@ -221,14 +221,12 @@ angular.module('ng-token-auth', ['ipCookie'])
                 authData = @getConfig(opts.config).handleLoginResponse(resp.data, @)
                 @handleValidAuth(authData)
                 $rootScope.$broadcast('auth:login-success', @user)
-                resp
               , (resp) =>
                 @rejectDfd({
                   reason: 'unauthorized'
                   errors: ['Invalid credentials']
                 })
                 $rootScope.$broadcast('auth:login-error', resp.data)
-                $q.reject(resp)
               )
             @dfd.promise
 
@@ -247,34 +245,34 @@ angular.module('ng-token-auth', ['ipCookie'])
             params.redirect_url = successUrl
             params.config_name  = opts.config if opts.config?
 
-            $http.post(@apiUrl(opts.config) + @getConfig(opts.config).passwordResetPath, params)
+            request = $http.post(@apiUrl(opts.config) + @getConfig(opts.config).passwordResetPath, params)
+            request
               .then((resp) ->
                 $rootScope.$broadcast('auth:password-reset-request-success', params)
-                resp
               , (resp) ->
                 $rootScope.$broadcast('auth:password-reset-request-error', resp.data)
-                $q.reject(resp)
               )
+            request
 
 
           # update user password
           updatePassword: (params) ->
-            $http.put(@apiUrl() + @getConfig().passwordUpdatePath, params)
+            request = $http.put(@apiUrl() + @getConfig().passwordUpdatePath, params)
+            request
               .then((resp) =>
                 $rootScope.$broadcast('auth:password-change-success', resp.data)
                 @mustResetPassword = false
-                resp
               , (resp) ->
                 $rootScope.$broadcast('auth:password-change-error', resp.data)
-                $q.reject(resp)
               )
+            request
 
 
           # update user account info
           updateAccount: (params) ->
-            $http.put(@apiUrl() + @getConfig().accountUpdatePath, params)
+            request = $http.put(@apiUrl() + @getConfig().accountUpdatePath, params)
+            request
               .then((resp) =>
-
                 updateResponse = @getConfig().handleAccountUpdateResponse(resp.data)
                 curHeaders = @retrieveData('auth_headers')
 
@@ -290,24 +288,23 @@ angular.module('ng-token-auth', ['ipCookie'])
                   @setAuthHeaders(newHeaders)
 
                 $rootScope.$broadcast('auth:account-update-success', resp.data)
-                resp
               , (resp) ->
                 $rootScope.$broadcast('auth:account-update-error', resp.data)
-                $q.reject(resp)
               )
+            request
 
 
           # permanently destroy a user's account.
           destroyAccount: (params) ->
-            $http.delete(@apiUrl() + @getConfig().accountUpdatePath, params)
+            request = $http.delete(@apiUrl() + @getConfig().accountUpdatePath, params)
+            request
               .then((resp) =>
                 @invalidateTokens()
                 $rootScope.$broadcast('auth:account-destroy-success', resp.data)
-                resp
               , (resp) ->
                 $rootScope.$broadcast('auth:account-destroy-error', resp.data)
-                $q.reject(resp)
               )
+            request
 
 
           # open external auth provider in separate window, send requests for
@@ -585,7 +582,6 @@ angular.module('ng-token-auth', ['ipCookie'])
                     $rootScope.$broadcast('auth:password-reset-confirm-success', @user)
 
                   $rootScope.$broadcast('auth:validation-success', @user)
-                  @user
 
                 , (resp) =>
                   # broadcast event for first time login failure
@@ -605,7 +601,6 @@ angular.module('ng-token-auth', ['ipCookie'])
                     resp.status > 0
                   )
 
-                  $q.reject(resp)
                 )
             else
               @rejectDfd({
@@ -650,16 +645,15 @@ angular.module('ng-token-auth', ['ipCookie'])
 
           # destroy auth token on server, destroy user auth credentials
           signOut: ->
-            $http.delete(@apiUrl() + @getConfig().signOutUrl)
-              .then((resp) =>
+            request = $http.delete(@apiUrl() + @getConfig().signOutUrl)
+            request.then((resp) =>
                 @invalidateTokens()
                 $rootScope.$broadcast('auth:logout-success')
-                resp
               , (resp) =>
                 @invalidateTokens()
                 $rootScope.$broadcast('auth:logout-error', resp.data)
-                $q.reject(resp)
               )
+            request
 
 
           # handle successful authentication
@@ -770,7 +764,7 @@ angular.module('ng-token-auth', ['ipCookie'])
 
           initDfd: ->
             @dfd = $q.defer()
-
+            @dfd.promise.then angular.noop, angular.noop
 
           # failed login. invalidate auth header and reject promise.
           # defered object must be destroyed after reflow.
