@@ -1,16 +1,6 @@
 {
     "name": "ng-token-auth",
     "version": "0.0.30",
-    "dependencies": {
-        "config": "~0.4.35",
-        "crypto": "0.0.3",
-        "express": "~3.5.1",
-        "gulp-rename": "^1.2.0",
-        "http-proxy": "~1.1.4",
-        "js-yaml": "~3.0.2",
-        "request": "~2.36.0",
-        "sitemap": "~0.7.3"
-    },
     "main": "dist/ng-token-auth.js",
     "npmName": "ng-token-auth",
     "npmFileMap": [{
@@ -77,7 +67,15 @@
         "shelljs": "^0.2.6",
         "sinon": "^1.10.3",
         "tiny-lr": "0.0.7",
-        "wiredep": "~1.8.1"
+        "wiredep": "~1.8.1",
+        "config": "~0.4.35",
+        "crypto": "0.0.3",
+        "express": "~3.5.1",
+        "gulp-rename": "^1.2.0",
+        "http-proxy": "~1.1.4",
+        "js-yaml": "~3.0.2",
+        "request": "~2.36.0",
+        "sitemap": "~0.7.3"
     },
     "scripts": {
         "test": "karma start test/test/karma-ci.conf.coffee --single-run"
