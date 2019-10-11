@@ -166,7 +166,8 @@ angular.module('myApp', ['ng-token-auth'])
       authProviderPaths: {
         github:   '/auth/github',
         facebook: '/auth/facebook',
-        google:   '/auth/google'
+        google:   '/auth/google',
+        apple:    '/auth/apple'
       },
       tokenFormat: {
         "access-token": "{{ token }}",
@@ -990,7 +991,8 @@ $authProvider.configure([
       authProviderPaths: {
         github:    '/auth/github',
         facebook:  '/auth/facebook',
-        google:    '/auth/google_oauth2'
+        google:    '/auth/google_oauth2',
+        apple:     '/auth/apple'
       }
     }
   }, {
@@ -1008,7 +1010,8 @@ $authProvider.configure([
       authProviderPaths: {
         github:    '/evil_user_auth/github',
         facebook:  '/evil_user_auth/facebook',
-        google:    '/evil_user_auth/google_oauth2'
+        google:    '/evil_user_auth/google_oauth2',
+        apple:     '/evil_user_auth/apple'
       }
     }
   }

@@ -60,7 +60,8 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
       authProviderPaths: {
         github: '/auth/github',
         facebook: '/auth/facebook',
-        google: '/auth/google_oauth2'
+        google: '/auth/google_oauth2',
+        apple: '/auth/apple'
       }
     }
   };

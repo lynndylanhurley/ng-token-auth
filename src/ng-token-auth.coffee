@@ -52,6 +52,7 @@ angular.module('ng-token-auth', ['ipCookie'])
           github:    '/auth/github'
           facebook:  '/auth/facebook'
           google:    '/auth/google_oauth2'
+          apple:     '/auth/apple'
 
 
     defaultConfigName = "default"

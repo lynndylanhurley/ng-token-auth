@@ -25,6 +25,7 @@ angular.module('ngTokenAuthTestApp', [
           github:    '/auth/github'
           facebook:  '/auth/facebook'
           google:    '/auth/google_oauth2'
+          apple:     '/auth/apple'
           developer: '/auth/developer'
     ,
       evilUser:
@@ -42,6 +43,7 @@ angular.module('ngTokenAuthTestApp', [
           github:    '/mangs/github'
           facebook:  '/mangs/facebook'
           google:    '/mangs/google_oauth2'
+          apple:     '/auth/apple'
     ])
 
     $stateProvider
