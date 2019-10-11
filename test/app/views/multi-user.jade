@@ -69,6 +69,7 @@ br
             button.btn.btn-primary(ng-click="authenticate('github', {params: oAuthForm, config: 'evilUser'})") Github
             button.btn.btn-primary(ng-click="authenticate('facebook', {params: oAuthForm, config: 'evilUser'})") Facebook
             button.btn.btn-primary(ng-click="authenticate('google', {params: oAuthForm, config: 'evilUser'})") Google
+            button.btn.btn-primary(ng-click="authenticate('apple', {params: oAuthForm, config: 'evilUser'})") Apple
 
         .panel.panel-info
           p.panel-heading Code sample:
@@ -451,6 +452,7 @@ br
                   github:    '/auth/github',
                   facebook:  '/auth/facebook',
                   google:    '/auth/google_oauth2'
+                  apple:     '/auth/apple'
                 }
             }, {
               evilUser: {
@@ -468,6 +470,7 @@ br
                   github:    '/evil_auth/github',
                   facebook:  '/evil_auth/facebook',
                   google:    '/evil_auth/google_oauth2'
+                  apple:     '/evil_auth/apple'
                 }
             }])
 

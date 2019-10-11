@@ -3,12 +3,14 @@
     "version": "0.0.30",
     "main": "dist/ng-token-auth.js",
     "npmName": "ng-token-auth",
-    "npmFileMap": [{
-        "basePath": "/dist/",
-        "files": [
-            "*.js"
-        ]
-    }],
+    "npmFileMap": [
+        {
+            "basePath": "/dist/",
+            "files": [
+                "*.js"
+            ]
+        }
+    ],
     "devDependencies": {
         "bower": "^1.3.7",
         "chai": "^1.9.1",
