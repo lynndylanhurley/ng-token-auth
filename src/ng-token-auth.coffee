@@ -348,7 +348,7 @@ angular.module('ng-token-auth', ['ipCookie'])
           buildAuthUrl: (omniauthWindowType, provider, opts={}) ->
             authUrl  = @getConfig(opts.config).apiUrl
             authUrl += @getConfig(opts.config).authProviderPaths[provider]
-            authUrl += '?auth_origin_url=' + encodeURIComponent($window.location.href)
+            authUrl += '?auth_origin_url=' + encodeURIComponent(opts.auth_origin_url || $window.location.href)
 
             params = angular.extend({}, opts.params || {}, {
               omniauth_window_type: omniauthWindowType
@@ -388,26 +388,48 @@ angular.module('ng-token-auth', ['ipCookie'])
             @cancelOmniauthInAppBrowserListeners()
             handleAuthWindowClose = @handleAuthWindowClose.bind(this, authWindow)
             handleLoadStop = @handleLoadStop.bind(this, authWindow)
+            handlePostMessage = @handlePostMessage.bind(this)
 
             authWindow.addEventListener('loadstop', handleLoadStop)
             authWindow.addEventListener('exit', handleAuthWindowClose)
+            authWindow.addEventListener('message', handlePostMessage)
 
             this.cancelOmniauthInAppBrowserListeners = () ->
               authWindow.removeEventListener('loadstop', handleLoadStop)
               authWindow.removeEventListener('exit', handleAuthWindowClose)
+              authWindow.addEventListener('message', handlePostMessage)
 
 
           # responds to inAppBrowser window loads
           handleLoadStop: (authWindow) ->
             _this = this
-            authWindow.executeScript({code: 'requestCredentials()'}, (response) ->
+
+            # favor InAppBrowser postMessage API if available, otherwise revert to returning directly via
+            # the executeScript API, which is known to have limitations on payload size
+            remoteCode = "
+              function performBestTransit() {
+                var data = requestCredentials();
+                if (webkit && webkit.messageHandlers && webkit.messageHandlers.cordova_iab) {
+                  var dataWithDeliverMessage = Object.assign({}, data, { message: 'deliverCredentials' });
+                  webkit.messageHandlers.cordova_iab.postMessage(JSON.stringify(dataWithDeliverMessage));
+                  return 'postMessageSuccess';
+                } else {
+                  return data;
+                }
+              }
+              performBestTransit();"
+
+            authWindow.executeScript({code: remoteCode }, (response) ->
               data = response[0]
-              if data
+              if data == 'postMessageSuccess'
+                # the standard issue postHandler will take care of the rest
+                authWindow.close()
+              else if data
                 ev = new Event('message')
                 ev.data = data
                 _this.cancelOmniauthInAppBrowserListeners()
                 $window.dispatchEvent(ev)
-                _this.initDfd();
+                _this.initDfd()
                 authWindow.close()
             )
 

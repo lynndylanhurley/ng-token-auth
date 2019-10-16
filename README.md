@@ -1111,14 +1111,17 @@ When authenticating with a 3rd party provider, the following steps will take pla
   3. The API will send the user's info back to the client via `postMessage` event, and then close the external window.
 
 - `inAppBrowser` Mode
-  - This mode is virtually identical to the `newWindow` flow, except the flow varies slightly to account for limitations with the [Cordova inAppBrowser Plugin](https://github.com/apache/cordova-plugin-inappbrowser) and the `postMessage` API. Note: In order for this mode to work out of the box, inAppBrowser is assumed to be registered with any external window.open calls. eg - `window.open = window.cordova.InAppBrowser.open;`
+  - This mode is virtually identical to the `newWindow` flow, except the flow varies slightly to account for limitations with the [Cordova inAppBrowser Plugin](https://github.com/apache/cordova-plugin-inappbrowser) and the `postMessage` API. Note: In order for this mode to work out of the box, inAppBrowser is assumed to be registered with any external window.open calls. eg - `window.open = window.cordova.InAppBrowser.open;`. 
+  
+  _Note: With legacy versions of inAppBrowser, the `executeScript` API is used to ferry data to the parent window. However, there are payload size limitations with this mechanism. As of version `3.1.x`, the `postMessage` API
+  has better support and is utilized for sending data to the parent window, as it lacks these payload limitations._
 
 The `postMessage` event (utilized for both `newWindow` and `inAppBrowser` modes) must include the following a parameters:
 * **message** - this must contain the value `"deliverCredentials"`
 * **auth_token** - a unique token set by your server.
 * **uid** - the id that was returned by the provider. For example, the user's facebook id, twitter id, etc.
 
-Rails newWindow example: [controller](https://github.com/lynndylanhurley/ng-token-auth-api-rails/blob/master/app/controllers/users/auth_controller.rb#L21), [layout](https://github.com/lynndylanhurley/ng-token-auth-api-rails/blob/master/app/views/layouts/oauth_response.html.erb), [view](https://github.com/lynndylanhurley/ng-token-auth-api-rails/blob/master/app/views/users/auth/oauth_success.html.erb).
+Rails `newWindow` example: [controller](https://github.com/lynndylanhurley/ng-token-auth-api-rails/blob/master/app/controllers/users/auth_controller.rb#L21), [layout](https://github.com/lynndylanhurley/ng-token-auth-api-rails/blob/master/app/views/layouts/oauth_response.html.erb), [view](https://github.com/lynndylanhurley/ng-token-auth-api-rails/blob/master/app/views/users/auth/oauth_success.html.erb).
 
 ##### Example newWindow redirect_uri destination:
 
@@ -1156,6 +1159,13 @@ Rails newWindow example: [controller](https://github.com/lynndylanhurley/ng-toke
   </body>
 </html>
 ~~~
+
+##### Provider-Specific Caveats
+
+- Apple
+  - The use of `localhost` during redirects is not allowed. ng-token-auth will typically use the `window.location.href` value to construct the redirect URL. However, for local testing, or within a proxied
+  WKWebView implementation in Cordova, the use of `localhost` may be unavoidable. For this reason, you may specify
+  an alternative redirect via the `opts.auth_origin_url` value during `authenticate()`, using a validated domain, to get around this restriction.
 
 ## Token validation flow
 

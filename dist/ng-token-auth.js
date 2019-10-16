@@ -332,7 +332,7 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
               }
               authUrl = this.getConfig(opts.config).apiUrl;
               authUrl += this.getConfig(opts.config).authProviderPaths[provider];
-              authUrl += '?auth_origin_url=' + encodeURIComponent($window.location.href);
+              authUrl += '?auth_origin_url=' + encodeURIComponent(opts.auth_origin_url || $window.location.href);
               params = angular.extend({}, opts.params || {}, {
                 omniauth_window_type: omniauthWindowType
               });
@@ -358,25 +358,32 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
               }
             },
             requestCredentialsViaExecuteScript: function(authWindow) {
-              var handleAuthWindowClose, handleLoadStop;
+              var handleAuthWindowClose, handleLoadStop, handlePostMessage;
               this.cancelOmniauthInAppBrowserListeners();
               handleAuthWindowClose = this.handleAuthWindowClose.bind(this, authWindow);
               handleLoadStop = this.handleLoadStop.bind(this, authWindow);
+              handlePostMessage = this.handlePostMessage.bind(this);
               authWindow.addEventListener('loadstop', handleLoadStop);
               authWindow.addEventListener('exit', handleAuthWindowClose);
+              authWindow.addEventListener('message', handlePostMessage);
               return this.cancelOmniauthInAppBrowserListeners = function() {
                 authWindow.removeEventListener('loadstop', handleLoadStop);
-                return authWindow.removeEventListener('exit', handleAuthWindowClose);
+                authWindow.removeEventListener('exit', handleAuthWindowClose);
+                return authWindow.addEventListener('message', handlePostMessage);
               };
             },
             handleLoadStop: function(authWindow) {
+              var remoteCode;
               _this = this;
+              remoteCode = "function performBestTransit() { var data = requestCredentials(); if (webkit && webkit.messageHandlers && webkit.messageHandlers.cordova_iab) { var dataWithDeliverMessage = Object.assign({}, data, { message: 'deliverCredentials' }); webkit.messageHandlers.cordova_iab.postMessage(JSON.stringify(dataWithDeliverMessage)); return 'postMessageSuccess'; } else { return data; } } performBestTransit();";
               return authWindow.executeScript({
-                code: 'requestCredentials()'
+                code: remoteCode
               }, function(response) {
                 var data, ev;
                 data = response[0];
-                if (data) {
+                if (data === 'postMessageSuccess') {
+                  return authWindow.close();
+                } else if (data) {
                   ev = new Event('message');
                   ev.data = data;
                   _this.cancelOmniauthInAppBrowserListeners();
