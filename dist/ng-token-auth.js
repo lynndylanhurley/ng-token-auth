@@ -850,7 +850,7 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
           responseError: function(resp) {
             $injector.invoke([
               '$http', '$auth', function($http, $auth) {
-                if (resp.config.url.match($auth.apiUrl())) {
+                if (resp && resp.config && resp.config.url && resp.config.url.match($auth.apiUrl())) {
                   return updateHeadersFromResponse($auth, resp);
                 }
               }
