@@ -75,7 +75,7 @@
         "express": "~3.5.1",
         "gulp-rename": "^1.2.0",
         "http-proxy": "~1.1.4",
-        "js-yaml": "~3.0.2",
+        "js-yaml": "~3.13.1",
         "request": "~2.36.0",
         "sitemap": "~0.7.3"
     },
