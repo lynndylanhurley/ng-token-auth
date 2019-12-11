@@ -226,6 +226,7 @@ angular.module('ng-token-auth', ['ipCookie'])
                 @rejectDfd({
                   reason: 'unauthorized'
                   errors: ['Invalid credentials']
+                  data: resp
                 })
                 $rootScope.$broadcast('auth:login-error', resp.data)
               )
