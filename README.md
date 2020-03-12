@@ -1257,6 +1257,10 @@ This will all happen automatically when using this module.
 
 **Note**: You can customize the auth headers however you like. [Read more](#using-alternate-header-formats).
 
+# HTTP cookie
+
+The cookie should be flagged as 'secure' (see `cookieOps`) for a https-only website (in production environment). Mixed content sites could skip authentication for the http content, if possible. Using the http protocol, the least one can do is to make sure the backend changes the headers (e.g. `access-token`) on each request.
+
 # iOS
 
  * localStoage may not writable in Private Browsing mode. You may wish to configure `storage` to use a generic object store or temporary cookie store. See also: [Frustration](https://spin.atomicobject.com/2013/01/23/ios-private-browsing-localstorage/)
