@@ -51,7 +51,7 @@
         "gulp-useref": "~0.4.3",
         "gulp-util": "~2.2.17",
         "http-server": "^0.6.1",
-        "karma": "~0.13.9",
+        "karma": "~6.4.1",
         "karma-chai": "^0.1.0",
         "karma-chai-plugins": "^0.2.1",
         "karma-chrome-launcher": "~0.2.0",
