@@ -72,7 +72,7 @@
         "wiredep": "~1.8.1",
         "config": "~0.4.35",
         "crypto": "0.0.3",
-        "express": "~3.5.1",
+        "express": "~4.17.3",
         "gulp-rename": "^1.2.0",
         "http-proxy": "~1.1.4",
         "js-yaml": "~3.0.2",
